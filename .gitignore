@@ -1,0 +1,5 @@
+/vendor
+.idea/
+.bowerrc
+.travis.yml
+codeception.yml
