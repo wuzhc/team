@@ -31,6 +31,9 @@ http://localhost/manage/frontend/web/index.php
 ### 数据库设计：
 [数据库设计及字典说明](https://github.com/wuzhc/manage/blob/master/docs/note/%E6%95%B0%E6%8D%AE%E5%BA%93%E8%AE%BE%E8%AE%A1%E5%8F%8A%E5%AD%97%E5%85%B8%E8%AF%B4%E6%98%8E.md)  
 
+### 技术说明：
+[实现技术说明]()
+
 ### 效果图：  
 ![首页](https://github.com/wuzhc/manage/blob/master/frontend/web/images/index.png)
 ![动态页](https://github.com/wuzhc/manage/blob/master/frontend/web/images/dynamic.png)
