@@ -16,8 +16,8 @@ http://localhost/manage/frontend/web/index.php
 
 如果本地网址正常访问，表示安装成功
 
-效果图：
-![首页](https://github.com/manage/frontend/web/images/index.png)
-![动态页](https://github.com/manage/frontend/web/images/dynamic.png)
+效果图：  
+![首页](https://github.com/wuzhc/manage/blob/master/frontend/web/images/index.png)
+![动态页](https://github.com/wuzhc/manage/blob/master/frontend/web/images/dynamic.png)
 
 
