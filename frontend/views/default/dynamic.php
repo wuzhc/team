@@ -2,7 +2,7 @@
 
 /* @var $this yii\web\View */
 
-$this->title = '最新动态';
+$this->title = '动态消息';
 $directoryAsset = Yii::$app->assetManager->getPublishedUrl('@vendor/almasaeed2010/adminlte/dist');
 ?>
 <style>

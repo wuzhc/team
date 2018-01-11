@@ -1,5 +1,5 @@
 <?php
-$this->title = '团队';
+$this->title = '所有团队';
 $directoryAsset = Yii::$app->assetManager->getPublishedUrl('@vendor/almasaeed2010/adminlte/dist');
 ?>
 <div class="row">

@@ -6,7 +6,6 @@ $this->title = '主页';
 $directoryAsset = Yii::$app->assetManager->getPublishedUrl('@vendor/almasaeed2010/adminlte/dist');
 ?>
 <!--<section class="invoice">-->
-<div class="box">
     <div class="row">
         <div class="col-lg-3 col-xs-6">
             <!-- small box -->
@@ -191,7 +190,7 @@ $directoryAsset = Yii::$app->assetManager->getPublishedUrl('@vendor/almasaeed201
     <!-- /.row -->
 
 <!--</section>-->
-</div>
+
 
 
 
