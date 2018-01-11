@@ -9,6 +9,11 @@ git clone https://github.com/wuzhc/manage.git
 composer intall -vvv
 ```
 
+初始化
+```bash
+./init # window环境执行init.bat
+```
+
 安装数据库（暂时没有设计数据库，此阶段可以忽略）：
 ```bash
 ./yii migrate/down                 Downgrades the application by reverting old migrations.
