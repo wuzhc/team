@@ -19,9 +19,9 @@ $directoryAsset = Yii::$app->assetManager->getPublishedUrl('@vendor/almasaeed201
     .desc {
         font-size: 13px;
     }
-    .timeline>li>.timeline-item {
-        background: #f4f4f4;
-    }
+    /*.timeline>li>.timeline-item {*/
+        /*background: #f4f4f4;*/
+    /*}*/
 </style>
 
 <section class="content">

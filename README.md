@@ -46,6 +46,7 @@ http://localhost/manage/frontend/web/index.php
 ![首页](https://github.com/wuzhc/manage/blob/master/frontend/web/images/index.png)
 ![动态页](https://github.com/wuzhc/manage/blob/master/frontend/web/images/dymanic.png)
 ![聊天页](https://github.com/wuzhc/manage/blob/master/frontend/web/images/chat.png)
+![团队页](https://github.com/wuzhc/manage/blob/master/frontend/web/images/team.png)
 ![AppWeb首页](https://github.com/wuzhc/manage/blob/master/frontend/web/images/app-index.png)
 ![AppWeb动态页](https://github.com/wuzhc/manage/blob/master/frontend/web/images/app-dymanic.png)
 ![AppWeb聊天页](https://github.com/wuzhc/manage/blob/master/frontend/web/images/app-chat.png)

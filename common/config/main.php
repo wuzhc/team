@@ -1,6 +1,6 @@
 <?php
 return [
-    'name' => 'Manage',
+    'name' => 'Team',
     'language' => 'zh-Hant',
     'aliases' => [
         '@bower' => '@vendor/bower-asset',
