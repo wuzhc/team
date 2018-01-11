@@ -27,6 +27,9 @@ composer intall -vvv
 http://localhost/manage/frontend/web/index.php
 ```
 
+演示网址：  
+- [http://wuzhc.top](http://wuzhc.top)
+
 如果本地网址正常访问，表示安装成功
 
 ### 网站功能：
