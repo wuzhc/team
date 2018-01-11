@@ -3,7 +3,15 @@ use yii\widgets\Breadcrumbs;
 use dmstr\widgets\Alert;
 
 ?>
+<style>
+    .chat-portrait {
+        width: 35px;
+        height: 35px;
+    }
+</style>
+
 <div class="content-wrapper">
+    <div class="box">
     <section class="content-header">
         <?php if (isset($this->blocks['content-header'])) { ?>
             <h1><?= $this->blocks['content-header'] ?></h1>
@@ -33,13 +41,14 @@ use dmstr\widgets\Alert;
         <?= Alert::widget() ?>
         <?= $content ?>
     </section>
+    </div>
 </div>
 
 <footer class="main-footer">
     <div class="pull-right hidden-xs">
-        <b>Version</b> 2.0
+        <b>Version</b> 1.0
     </div>
-    <strong>Copyright &copy; 2014-2015 <a href="http://almsaeedstudio.com">Almsaeed Studio</a>.</strong> All rights
+    <strong>Copyright &copy; 2018-2019 <a href="http://almsaeedstudio.com">Almsaeed Studio</a>.</strong> All rights
     reserved.
 </footer>
 
@@ -47,56 +56,52 @@ use dmstr\widgets\Alert;
 <aside class="control-sidebar control-sidebar-dark">
     <!-- Create the tabs -->
     <ul class="nav nav-tabs nav-justified control-sidebar-tabs">
-        <li><a href="#control-sidebar-home-tab" data-toggle="tab"><i class="fa fa-home"></i></a></li>
+        <li class="active"><a href="#control-sidebar-home-tab" data-toggle="tab"><i class="fa fa-home"></i></a></li>
         <li><a href="#control-sidebar-settings-tab" data-toggle="tab"><i class="fa fa-gears"></i></a></li>
     </ul>
     <!-- Tab panes -->
     <div class="tab-content">
         <!-- Home tab content -->
-        <div class="tab-pane" id="control-sidebar-home-tab">
+        <div class="tab-pane active" id="control-sidebar-home-tab">
             <h3 class="control-sidebar-heading">Recent Activity</h3>
             <ul class='control-sidebar-menu'>
                 <li>
-                    <a href='javascript::;'>
-                        <i class="menu-icon fa fa-birthday-cake bg-red"></i>
-
+                    <a href='javascript:;' data-toggle="modal" data-target=".bs-example-modal-lg">
+                        <i class="fa menu-icon"><img class="img-circle img-bordered-sm chat-portrait" src="<?= $directoryAsset ?>/img/user1-128x128.jpg" alt="User Image"></i>
                         <div class="menu-info">
-                            <h4 class="control-sidebar-subheading">Langdon's Birthday</h4>
+                            <h4 class="control-sidebar-subheading">范冰冰</h4>
 
-                            <p>Will be 23 on April 24th</p>
+                            <p>fan@qq.com</p>
                         </div>
                     </a>
                 </li>
                 <li>
-                    <a href='javascript::;'>
-                        <i class="menu-icon fa fa-user bg-yellow"></i>
-
+                    <a href='javascript:;' data-toggle="modal" data-target=".bs-example-modal-lg">
+                        <i class="fa menu-icon"><img class="img-circle img-bordered-sm chat-portrait" src="<?= $directoryAsset ?>/img/user3-128x128.jpg" alt="User Image"></i>
                         <div class="menu-info">
-                            <h4 class="control-sidebar-subheading">Frodo Updated His Profile</h4>
+                            <h4 class="control-sidebar-subheading">欧阳宛玲</h4>
 
-                            <p>New phone +1(800)555-1234</p>
+                            <p>oangng@qq.com</p>
                         </div>
                     </a>
                 </li>
                 <li>
-                    <a href='javascript::;'>
-                        <i class="menu-icon fa fa-envelope-o bg-light-blue"></i>
-
+                    <a href='javascript:;' data-toggle="modal" data-target=".bs-example-modal-lg">
+                        <i class="fa menu-icon"><img class="img-circle img-bordered-sm chat-portrait" src="<?= $directoryAsset ?>/img/user4-128x128.jpg" alt="User Image"></i>
                         <div class="menu-info">
-                            <h4 class="control-sidebar-subheading">Nora Joined Mailing List</h4>
+                            <h4 class="control-sidebar-subheading">马云</h4>
 
-                            <p>nora@example.com</p>
+                            <p>10086@qq.com</p>
                         </div>
                     </a>
                 </li>
                 <li>
-                    <a href='javascript::;'>
-                        <i class="menu-icon fa fa-file-code-o bg-green"></i>
-
+                    <a href='javascript:;' data-toggle="modal" data-target=".bs-example-modal-lg">
+                        <i class="fa menu-icon"><img class="img-circle img-bordered-sm chat-portrait" src="<?= $directoryAsset ?>/img/user6-128x128.jpg" alt="User Image"></i>
                         <div class="menu-info">
-                            <h4 class="control-sidebar-subheading">Cron Job 254 Executed</h4>
+                            <h4 class="control-sidebar-subheading">吴桢灿</h4>
 
-                            <p>Execution time 5 seconds</p>
+                            <p>125@qq.com</p>
                         </div>
                     </a>
                 </li>

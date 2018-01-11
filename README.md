@@ -45,5 +45,9 @@ http://localhost/manage/frontend/web/index.php
 ### 效果图：  
 ![首页](https://github.com/wuzhc/manage/blob/master/frontend/web/images/index.png)
 ![动态页](https://github.com/wuzhc/manage/blob/master/frontend/web/images/dynamic.png)
+![聊天页](https://github.com/wuzhc/manage/blob/master/frontend/web/images/chat.png)
+![AppWeb首页](https://github.com/wuzhc/manage/blob/master/frontend/web/images/app-index.png)
+![AppWeb动态页](https://github.com/wuzhc/manage/blob/master/frontend/web/images/app-dymanic.png)
+![AppWeb聊天页](https://github.com/wuzhc/manage/blob/master/frontend/web/images/app-chat.png)
 
 
