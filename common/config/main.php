@@ -35,6 +35,10 @@ return [
         'mongodb' => [
             'class' => '\yii\mongodb\Connection',
             'dsn' => 'mongodb://'.MONGO_HOST.':'.MONGO_PORT.'/'.MONGO_DB,
+//            'options' => [
+//                'username' => 'wuzhc',
+//                'password' => 'wuzhc'
+//            ]
         ],
 
         // 主题设置
