@@ -1,4 +1,10 @@
 <?php
+
+/** mongo配置 */
+define('MONGO_HOST', '127.0.0.1');
+define('MONGO_PORT', '27017');
+define('MONGO_DB', 'team');
+
 return [
     'name' => 'Team',
     'language' => 'zh-Hant',
@@ -9,9 +15,13 @@ return [
     'defaultRoute' => 'default',
     'vendorPath' => dirname(dirname(__DIR__)) . '/vendor',
     'components' => [
+
+        // 缓存
         'cache' => [
             'class' => 'yii\caching\FileCache',
         ],
+
+        // 数据库管理
         'db' => [
             'class' => 'yii\db\Connection',
             'dsn' => 'mysql:host=localhost;dbname=zcshop',
@@ -19,10 +29,12 @@ return [
             'password' => 'wuzhc2580',
             'charset' => 'utf8',
             'tablePrefix' => 'zc_',
-            'on afterOpen' => function ($event) {
-                // 打开数据库，立即执行
-                // $event->sender->createCommand("set time_zone = '+8:00'")->execute();
-            }
+        ],
+
+        // mongo
+        'mongodb' => [
+            'class' => '\yii\mongodb\Connection',
+            'dsn' => 'mongodb://'.MONGO_HOST.':'.MONGO_PORT.'/'.MONGO_DB,
         ],
 
         // 主题设置
