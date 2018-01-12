@@ -2,9 +2,11 @@
 namespace frontend\form;
 
 
+use common\services\UserService;
 use Yii;
 use common\utils\ClientUtil;
 use yii\base\Model;
+use yii\web\User;
 
 /**
  * Login form
@@ -26,12 +28,12 @@ class LoginForm extends Model
         if ($this->validate()) {
             // 注册登录后事件
             Yii::$app->user->on('afterLogin', function ($event) {
-                MemberService::factory()->saveLoginLog($event->identity->id);
+                UserService::factory()->saveLoginLog($event->identity->id);
                 $event->identity->fdLastIP = ClientUtil::getClientIp();
                 $event->identity->fdLastTime = date('Y-m-d H:i:s', time());
                 $event->identity->save();
             });
-            if (Yii::$app->user->login($this->getMember(), $this->rememberMe ? 3600 * 24 * 30 : 0)) {
+            if (Yii::$app->user->login($this->getUser(), $this->rememberMe ? 3600 * 24 * 30 : 0)) {
                 return true;
             }
         }
@@ -60,7 +62,7 @@ class LoginForm extends Model
     public function validatePassword($attribute, $params)
     {
         if (!$this->hasErrors()) {
-            $user = $this->getMember();
+            $user = $this->getUser();
             if (!$user || !$user->validatePassword($this->password)) {
                 $this->addError($attribute, '密码不正确');
             }
@@ -68,13 +70,12 @@ class LoginForm extends Model
     }
 
     /**
-     * Finds user by [[username]]
-     * @return Member|null
+     * @return array|null|\yii\db\ActiveRecord|User
      */
-    protected function getMember()
+    protected function getUser()
     {
         if ($this->_user === null) {
-            $this->_user = MemberService::factory()->getMemberByAccount($this->username);
+            $this->_user = UserService::factory()->getUserObjByAccount($this->username);
         }
         return $this->_user;
     }

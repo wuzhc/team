@@ -24,7 +24,7 @@ return [
         // 数据库管理
         'db' => [
             'class' => 'yii\db\Connection',
-            'dsn' => 'mysql:host=localhost;dbname=zcshop',
+            'dsn' => 'mysql:host=localhost;dbname=team',
             'username' => 'root',
             'password' => 'wuzhc2580',
             'charset' => 'utf8',
