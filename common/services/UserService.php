@@ -62,6 +62,8 @@ class UserService extends AbstractService
         return $user;
     }
 
+
+
     /**
      * 保存登录日志
      * @param int|User $user 用户

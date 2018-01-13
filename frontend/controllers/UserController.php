@@ -2,12 +2,12 @@
 
 namespace frontend\controllers;
 
+use frontend\form\LoginForm;
+use frontend\form\SignupForm;
 use Yii;
-use common\models\User;
 use common\models\UserSearch;
+use yii\helpers\Url;
 use yii\web\Controller;
-use yii\web\NotFoundHttpException;
-use yii\filters\VerbFilter;
 
 /**
  * UserController implements the CRUD actions for User model.
@@ -17,110 +17,64 @@ class UserController extends Controller
     public $layout = 'main-member';
 
     /**
-     * @inheritdoc
+     * 登录页
+     * @return string
      */
-    public function behaviors()
+    public function actionLogin()
     {
-        return [
-            'verbs' => [
-                'class' => VerbFilter::className(),
-                'actions' => [
-                    'delete' => ['POST'],
-                ],
-            ],
-        ];
-    }
+        $this->layout = 'main-login';
 
-    /**
-     * Lists all User models.
-     * @return mixed
-     */
-    public function actionIndex()
-    {
-        $searchModel = new UserSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        if (!\Yii::$app->user->isGuest) {
+            return $this->goHome();
+        }
 
-        return $this->render('index', [
-            'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
-        ]);
-    }
-
-    /**
-     * Displays a single User model.
-     * @param integer $id
-     * @return mixed
-     */
-    public function actionView($id)
-    {
-        return $this->render('view', [
-            'model' => $this->findModel($id),
-        ]);
-    }
-
-    /**
-     * Creates a new User model.
-     * If creation is successful, the browser will be redirected to the 'view' page.
-     * @return mixed
-     */
-    public function actionCreate()
-    {
-        $model = new User();
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+        $model = new LoginForm();
+        if ($model->load(Yii::$app->request->post()) && $model->login()) {
+            return $this->redirect(['default/index']);
         } else {
-            return $this->render('create', [
+            return $this->render('login', [
                 'model' => $model,
             ]);
         }
     }
 
     /**
-     * Updates an existing User model.
-     * If update is successful, the browser will be redirected to the 'view' page.
-     * @param integer $id
+     * 注册
      * @return mixed
+     * @since 2016-02-27
      */
-    public function actionUpdate($id)
+    public function actionSignup()
     {
-        $model = $this->findModel($id);
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
-        } else {
-            return $this->render('update', [
-                'model' => $model,
-            ]);
+        $model = new SignupForm();
+        if ($model->load(Yii::$app->request->post())) {
+            if ($member = $model->signup()) {
+                if ($model->login()) {
+                    Yii::$app->session->setFlash('success', 'zcshop 欢迎你~~');
+                    $this->redirect(['member/index']);
+                } else {
+                    $url = Url::toRoute(['member/login']);
+                    $msg = '注册成功了，点击<a href="' . $url . '">这里</a>登录';
+                    Yii::$app->session->setFlash('success', $msg);
+                }
+            } else {
+                Yii::$app->session->setFlash('error', '很抱歉，注册失败了~~');
+            }
         }
+
+        $this->layout = 'main_login';
+        return $this->render('signup', [
+            'model' => $model,
+        ]);
     }
 
     /**
-     * Deletes an existing User model.
-     * If deletion is successful, the browser will be redirected to the 'index' page.
-     * @param integer $id
+     * 退出登录
      * @return mixed
+     * @since 2016-02-28
      */
-    public function actionDelete($id)
+    public function actionLogout()
     {
-        $this->findModel($id)->delete();
-
-        return $this->redirect(['index']);
-    }
-
-    /**
-     * Finds the User model based on its primary key value.
-     * If the model is not found, a 404 HTTP exception will be thrown.
-     * @param integer $id
-     * @return User the loaded model
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    protected function findModel($id)
-    {
-        if (($model = User::findOne($id)) !== null) {
-            return $model;
-        } else {
-            throw new NotFoundHttpException('The requested page does not exist.');
-        }
+        Yii::$app->user->logout();
+        return $this->redirect(['member/login']);
     }
 }

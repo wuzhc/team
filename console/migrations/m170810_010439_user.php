@@ -3,17 +3,23 @@
 use yii\db\Migration;
 
 /**
- * 管理员表
+ * 用户表
  * Class m170809_010439_user
  * @since 2017-08-09
  * @author wuzhc2016@163.com
  */
 class m170810_010439_user extends Migration
 {
+    public $tableName = '';
+
+    public function init()
+    {
+        $this->tableName = Yii::$app->db->tablePrefix . 'User';
+    }
+
     public function safeUp()
     {
-        $tableName = Yii::$app->db->tablePrefix . 'user';
-        $this->createTable($tableName, [
+        $this->createTable($this->tableName, [
             'id'              => $this->primaryKey(11)->unsigned(),
             'fdName'          => $this->string(32)->notNull()->comment('真实姓名'),
             'fdLogin'         => $this->string(32)->notNull()->comment('账号'),
@@ -31,9 +37,9 @@ class m170810_010439_user extends Migration
             'fdAuthKey'       => $this->string(32)->notNull()->comment('验证key'),
         ], 'ENGINE=InnoDB DEFAULT CHARSET=UTF8');
 
-        $this->createIndex('login', $tableName, 'fdLogin(10)');
+        $this->createIndex('login', $this->tableName, 'fdLogin(10)');
 
-        $this->insert($tableName, [
+        $this->insert($this->tableName, [
             'fdName'    => '啊牛管理员',
             'fdLogin'   => 'wuzhencan',
             'fdPwdHash' => '$2y$13$D8jfUn7k595cOJbn7muhJeHd1qYqlx4.FSnfqXA2EacD94zw3Ty6.',
@@ -48,8 +54,7 @@ class m170810_010439_user extends Migration
 
     public function safeDown()
     {
-        $tableName = Yii::$app->db->tablePrefix . 'user';
-        $this->dropIndex('login', $tableName);
-        $this->dropTable($tableName);
+        $this->dropIndex('login', $this->tableName);
+        $this->dropTable($this->tableName);
     }
 }

@@ -28,7 +28,7 @@ return [
             'username' => 'root',
             'password' => 'wuzhc2580',
             'charset' => 'utf8',
-            'tablePrefix' => 'zc_',
+            'tablePrefix' => 'tb',
         ],
 
         // mongo

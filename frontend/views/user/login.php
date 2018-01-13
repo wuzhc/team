@@ -27,7 +27,7 @@ $fieldOptions2 = [
     </div>
     <!-- /.login-logo -->
     <div class="login-box-body">
-        <p class="login-box-msg">会员中心登录</p>
+        <p class="login-box-msg">账号登录</p>
 
         <?php $form = ActiveForm::begin(['id' => 'login-form', 'enableClientValidation' => true]); ?>
 
@@ -54,22 +54,6 @@ $fieldOptions2 = [
 
         <?php ActiveForm::end(); ?>
         <!-- /.social-auth-links -->
-
-        <div class="social-auth-links text-center">
-            <p>- 第三方账号登录 -</p>
-            <a href="#" class="btn btn-block btn-warning">
-                <i class="fa fa-google-plus"></i>
-                QQ登录
-            </a>
-            <a href="#" class="btn btn-block btn-danger">
-                <i class="fa fa-google-plus"></i>
-                微信登录
-            </a>
-            <a href="http://openapi.baidu.com/oauth/2.0/authorize?response_type=code&redirect_uri=<?=BAIDU_CALLBACK?>&client_id=<?=BAIDU_API_KEY?>" class="btn btn-block btn-facebook">
-                <i class="fa fa-facebook"></i>
-                百度登录
-            </a>
-        </div>
 
         <a href="#">忘记密码</a><br>
         <a href="<?= Yii::$app->urlManager->createUrl(['member/signup']); ?>" class="text-center">注册一个新用户</a>
