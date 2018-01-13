@@ -1,7 +1,7 @@
 ### 安装方法
 下载：
 ```bash
-git clone https://github.com/wuzhc/manage.git
+git clone https://github.com/wuzhc/team.git
 ```
 
 安装（-vvv用于查看详细安装过程，国外源可能会很慢）：

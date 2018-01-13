@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: wuzc
- * Date: 18-1-11
- * Time: 下午10:47
- */
 
 namespace frontend\controllers;
 
@@ -15,6 +9,10 @@ class TaskController extends Controller
 {
     public $layout = 'main-member';
 
+    /**
+     * 首页
+     * @return string
+     */
     public function actionIndex()
     {
         return $this->render('index');

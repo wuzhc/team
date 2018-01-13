@@ -5,7 +5,6 @@ namespace frontend\controllers;
 use frontend\form\LoginForm;
 use frontend\form\SignupForm;
 use Yii;
-use common\models\UserSearch;
 use yii\helpers\Url;
 use yii\web\Controller;
 

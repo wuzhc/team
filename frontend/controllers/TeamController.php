@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: wuzc
- * Date: 18-1-11
- * Time: 下午10:07
- */
 
 namespace frontend\controllers;
 
