@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "276dbfb471280282c1b98351d027ada5",
+    "content-hash": "e76e89b3a78e8a7afdb57d028671241d",
     "packages": [
         {
             "name": "almasaeed2010/adminlte",
@@ -776,6 +776,55 @@
                 "yii2"
             ],
             "time": "2017-08-01 14:22:25"
+        },
+        {
+            "name": "yiisoft/yii2-mongodb",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/yiisoft/yii2-mongodb.git",
+                "reference": "0ad02a4750474ffaf43262c7203cf83836fe88e1"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/yiisoft/yii2-mongodb/zipball/0ad02a4750474ffaf43262c7203cf83836fe88e1",
+                "reference": "0ad02a4750474ffaf43262c7203cf83836fe88e1",
+                "shasum": ""
+            },
+            "require": {
+                "ext-mongodb": ">=1.0.0",
+                "yiisoft/yii2": "~2.0.13"
+            },
+            "type": "yii2-extension",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.1.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "yii\\mongodb\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Paul Klimov",
+                    "email": "klimov.paul@gmail.com"
+                }
+            ],
+            "description": "MongoDB extension for the Yii framework",
+            "keywords": [
+                "GridFS",
+                "active-record",
+                "mongo",
+                "mongodb",
+                "yii2"
+            ],
+            "time": "2017-12-18T11:43:02+00:00"
         },
         {
             "name": "yiisoft/yii2-swiftmailer",
@@ -3218,7 +3267,9 @@
     ],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": [],
+    "stability-flags": {
+        "yiisoft/yii2-mongodb": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
