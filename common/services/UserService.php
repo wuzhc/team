@@ -62,8 +62,6 @@ class UserService extends AbstractService
         return $user;
     }
 
-
-
     /**
      * 保存登录日志
      * @param int|User $user 用户
@@ -77,11 +75,13 @@ class UserService extends AbstractService
             return false;
         }
 
-        $collection = Yii::$app->mongodb->getCollection(Conf::USER_LOGIN_LOG);
+        /** @var \yii\mongodb\Connection $mongo */
+        $mongo = Yii::$app->mongodb;
+        $collection = $mongo->getCollection(Conf::USER_LOGIN_LOG);
         return $collection->insert([
             'userID'  => $user->id,
             'date'    => date('Y-m-d'),
             'loginIP' => ClientUtil::getClientIp()
-        ]);
+        ]) ? true : false;
     }
 }

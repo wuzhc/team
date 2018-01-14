@@ -15,11 +15,27 @@ composer intall -vvv
 ```
 
 安装数据库（暂时没有设计数据库，此阶段可以忽略）：
+新建数据库
 ```bash
+CREATE DATABASE team DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci
+```
+配置数据库组件 main.php
+```bash
+'db' => [
+    'class' => 'yii\db\Connection',
+    'dsn' => 'mysql:host=localhost;dbname=team',
+    'username' => 'db name',
+    'password' => 'db password',
+    'charset' => 'utf8',
+    'tablePrefix' => 'tb',
+],
+```
+迁移数据库表
+```bash
+./yii migrate/up (default)         Upgrades the application by applying new migrations.
 ./yii migrate/down                 Downgrades the application by reverting old migrations.
 ./yii migrate/history              Displays the migration history.
 ./yii migrate/redo                 Redoes the last few migrations.
-./yii migrate/up (default)         Upgrades the application by applying new migrations.
 ```
 
 本地网址：

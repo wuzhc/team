@@ -22,10 +22,7 @@ class DefaultController extends Controller
         return [
             'access' => [
                 'class' => AccessControl::className(),
-                'only'  => [
-                    'logout',
-                    'signup'
-                ],
+                'only'  => ['logout', 'signup', 'index', 'dynamic'],
                 'rules' => [
                     [
                         'actions' => ['signup'],
@@ -33,7 +30,7 @@ class DefaultController extends Controller
                         'roles'   => ['?'],
                     ],
                     [
-                        'actions' => ['logout'],
+                        'actions' => ['logout', 'index', 'dynamic'],
                         'allow'   => true,
                         'roles'   => ['@'],
                     ],

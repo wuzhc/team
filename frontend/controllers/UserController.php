@@ -5,6 +5,8 @@ namespace frontend\controllers;
 use frontend\form\LoginForm;
 use frontend\form\SignupForm;
 use Yii;
+use yii\filters\AccessControl;
+use yii\filters\VerbFilter;
 use yii\helpers\Url;
 use yii\web\Controller;
 
@@ -14,6 +16,40 @@ use yii\web\Controller;
 class UserController extends Controller
 {
     public $layout = 'main-member';
+
+    /**
+     * @inheritdoc
+     */
+    public function behaviors()
+    {
+        return [
+            'access' => [
+                'class' => AccessControl::className(),
+                'only'  => [
+                    'logout',
+                    'signup'
+                ],
+                'rules' => [
+                    [
+                        'actions' => ['signup'],
+                        'allow'   => true,
+                        'roles'   => ['?'],
+                    ],
+                    [
+                        'actions' => ['logout'],
+                        'allow'   => true,
+                        'roles'   => ['@'],
+                    ],
+                ],
+            ],
+            'verbs'  => [
+                'class'   => VerbFilter::className(),
+                'actions' => [
+                    'logout' => ['post'],
+                ],
+            ],
+        ];
+    }
 
     /**
      * 登录页
@@ -74,6 +110,6 @@ class UserController extends Controller
     public function actionLogout()
     {
         Yii::$app->user->logout();
-        return $this->redirect(['member/login']);
+        return $this->redirect(['/user/login']);
     }
 }

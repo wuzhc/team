@@ -16,6 +16,13 @@ return [
     'vendorPath' => dirname(dirname(__DIR__)) . '/vendor',
     'components' => [
 
+        // 用户组件 add by wuzhc 2018-01-14
+        'user' => [
+            'class' => 'yii\web\User',
+            'identityClass' => 'common\models\User',
+            'loginUrl' => ['user/login']
+        ],
+
         // 缓存
         'cache' => [
             'class' => 'yii\caching\FileCache',
@@ -31,7 +38,7 @@ return [
             'tablePrefix' => 'tb',
         ],
 
-        // mongo
+        // mongo add by wuzhc 2018-01-13
         'mongodb' => [
             'class' => '\yii\mongodb\Connection',
             'dsn' => 'mongodb://'.MONGO_HOST.':'.MONGO_PORT.'/'.MONGO_DB,
@@ -41,7 +48,7 @@ return [
 //            ]
         ],
 
-        // 主题设置
+        // 主题设置 add by wuzhc 2018-01-08
         'view' => [
 //            'theme' => [
 //                'pathMap' => [
@@ -50,13 +57,22 @@ return [
 //            ],
         ],
 
-        // adminlte皮肤管理
+        // adminlte皮肤管理 add by wuzhc 2018-01-08
         'assetManager' => [
             'bundles' => [
                 'dmstr\web\AdminLteAsset' => [
                     'skin' => 'skin-green',
                 ],
             ],
+        ],
+
+        // 权限管理 add by wuzhc 2018-01-14
+        'authManager' => [
+            'class' => 'common\components\RbacManager',
+            'ruleTable' => '{{%AuthRule}}',
+            'itemTable' => '{{%ItemTable}}',
+            'itemChildTable' => '{{%AuthItemChild}}',
+            'assignmentTable' => '{{%AuthAssignment}}',
         ],
     ],
 ];

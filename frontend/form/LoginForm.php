@@ -4,6 +4,7 @@ namespace frontend\form;
 
 
 use common\services\UserService;
+use common\utils\ClientUtil;
 use Yii;
 use yii\base\Model;
 use common\models\User;
@@ -30,7 +31,7 @@ class LoginForm extends Model
             // 注册登录后事件
             Yii::$app->user->on('afterLogin', function ($event) {
                 UserService::factory()->saveLoginLog($event->identity->id);
-                $event->identity->fdLastIP = Yii::$app->getRequest()->getUserIP();
+                $event->identity->fdLastIP = ClientUtil::getClientIp();
                 $event->identity->fdLastTime = date('Y-m-d H:i:s', time());
                 $event->identity->save();
             });

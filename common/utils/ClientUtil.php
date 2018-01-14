@@ -2,41 +2,26 @@
 
 namespace common\utils;
 
+
+use Yii;
+
 class ClientUtil
 {
 
     /**
      * 获取客户端ip
+     * @link https://segmentfault.com/q/1010000000686700
+     * @param bool $isCredibleProxy 是否可信用代理（一般是自己网站的反向代理）
      * @return string
      * @since 2016-02-27
      */
-    public static function getClientIp(){
-        $ip = '';
-        $xip = $_SERVER['HTTP_X_FORWARDED_FOR'];
-        $cip = $_SERVER['HTTP_CLIENT_IP'];
-        $rip = $_SERVER['REMOTE_ADDR'];
-
-        //使用代理服务器情况
-        if($xip && strcasecmp($xip, 'unknown')) {
-            if(false !== strpos($xip,',')) {
-                $ipArr = explode(',',$xip);
-                foreach($ipArr as $val) {
-                    if(trim(strtolower($val)) != 'unknown') {
-                        $ip = $val;
-                        break;
-                    }
-                }
-            } else {
-                $ip = $xip;
-            }
-        } elseif($cip && strcasecmp($cip, 'unknown')) {
-            $ip = $cip;
-        } elseif($rip && strcasecmp($rip, 'unknown')) {
-            $ip = $rip;
+    public static function getClientIp($isCredibleProxy = false)
+    {
+        if (true === $isCredibleProxy) {
+            return Yii::$app->request->getUserIP();
         }
 
-        preg_match("/[\d\.]{7,15}/", $ip, $match);
-        return $match[0] ? $match[0] : 'unknown';
+        return Yii::$app->request->getRemoteIP();
     }
 
     /**
@@ -45,19 +30,19 @@ class ClientUtil
      * @since 2016-01-22
      */
     protected static $browsers = array(
-        'Edge'            => 'Edge',
-        'IE'              => 'MSIE|IEMobile|MSIEMobile|Trident/[.0-9]+',
-        'Chrome'          => '(?:\bCrMo\b|CriOS|Android)?.*Chrome/[.0-9]* (Mobile)?',
-        'Opera'           => 'Opera.*Mini|Opera.*Mobi|Android.*Opera|Mobile.*OPR/[0-9.]+|Coast/[0-9.]+',
-        'Firefox'         => 'fennec|firefox.*maemo|(Mobile|Tablet).*Firefox|Firefox.*Mobile',
-        'Safari'          => 'Version.*Mobile.*Safari|Safari.*Mobile|MobileSafari',
-        'UCBrowser'       => 'UC.*Browser|UCWEB', //UC游览器
-        'QQBrowser'       => 'MQQBrowser|TencentTraveler', //QQ游览器
-        'The world'       => 'The world', //世界之窗游览器
-        'Maxthon'         => 'Maxthon', //遨游游览器
-        'baiduboxapp'     => 'baiduboxapp',
-        'baidubrowser'    => 'baidubrowser',
-        'NokiaBrowser'    => 'Nokia',
+        'Edge'         => 'Edge',
+        'IE'           => 'MSIE|IEMobile|MSIEMobile|Trident/[.0-9]+',
+        'Chrome'       => '(?:\bCrMo\b|CriOS|Android)?.*Chrome/[.0-9]* (Mobile)?',
+        'Opera'        => 'Opera.*Mini|Opera.*Mobi|Android.*Opera|Mobile.*OPR/[0-9.]+|Coast/[0-9.]+',
+        'Firefox'      => 'fennec|firefox.*maemo|(Mobile|Tablet).*Firefox|Firefox.*Mobile',
+        'Safari'       => 'Version.*Mobile.*Safari|Safari.*Mobile|MobileSafari',
+        'UCBrowser'    => 'UC.*Browser|UCWEB', //UC游览器
+        'QQBrowser'    => 'MQQBrowser|TencentTraveler', //QQ游览器
+        'The world'    => 'The world', //世界之窗游览器
+        'Maxthon'      => 'Maxthon', //遨游游览器
+        'baiduboxapp'  => 'baiduboxapp',
+        'baidubrowser' => 'baidubrowser',
+        'NokiaBrowser' => 'Nokia',
     );
 
     /**
@@ -92,24 +77,24 @@ class ClientUtil
     protected static $versionRegexs = array(
 
         // Browser
-        'Maxthon'       => 'Maxthon [VER]', //遨游
-        'Chrome'        => array('Chrome/[VER]', 'CriOS/[VER]', 'CrMo/[VER]'), //谷歌
-        'Firefox'       => 'Firefox/[VER]', //火狐
-        'Fennec'        => 'Fennec/[VER]', //火狐
-        'IE'            => array('IEMobile/[VER];', 'IEMobile [VER]', 'MSIE [VER];', 'rv:[VER]'),
-        'Opera'         => array('OPR/[VER]', 'Opera Mini/[VER]', 'Version/[VER]', 'Opera [VER]'),
-        'UC Browser'    => 'UC Browser[VER]', //UC
-        'QQBrowser'     => array('MQQBrowser/[VER]','TencentTraveler/[VER]'), //QQ
-        'MicroMessenger'=> 'MicroMessenger/[VER]', //微信
-        'baiduboxapp'   => 'baiduboxapp/[VER]', //百度盒子
-        'baidubrowser'  => 'baidubrowser/[VER]', //百度
-        'Safari'        => array('Version/[VER]', 'Safari/[VER]' ), //Mac OS X中的浏览器
-        'NokiaBrowser'  => 'NokiaBrowser/[VER]', //诺基亚
+        'Maxthon'          => 'Maxthon [VER]', //遨游
+        'Chrome'           => array('Chrome/[VER]', 'CriOS/[VER]', 'CrMo/[VER]'), //谷歌
+        'Firefox'          => 'Firefox/[VER]', //火狐
+        'Fennec'           => 'Fennec/[VER]', //火狐
+        'IE'               => array('IEMobile/[VER];', 'IEMobile [VER]', 'MSIE [VER];', 'rv:[VER]'),
+        'Opera'            => array('OPR/[VER]', 'Opera Mini/[VER]', 'Version/[VER]', 'Opera [VER]'),
+        'UC Browser'       => 'UC Browser[VER]', //UC
+        'QQBrowser'        => array('MQQBrowser/[VER]', 'TencentTraveler/[VER]'), //QQ
+        'MicroMessenger'   => 'MicroMessenger/[VER]', //微信
+        'baiduboxapp'      => 'baiduboxapp/[VER]', //百度盒子
+        'baidubrowser'     => 'baidubrowser/[VER]', //百度
+        'Safari'           => array('Version/[VER]', 'Safari/[VER]'), //Mac OS X中的浏览器
+        'NokiaBrowser'     => 'NokiaBrowser/[VER]', //诺基亚
 
         // OS
         'iOS'              => '\bi?OS\b [VER][ ;]{1}',
         'BlackBerry'       => array('BlackBerry[\w]+/[VER]', 'BlackBerry.*Version/[VER]', 'Version/[VER]'), //黑莓手机
-        'Windows Phone OS' => array( 'Windows Phone OS [VER]', 'Windows Phone [VER]'),
+        'Windows Phone OS' => array('Windows Phone OS [VER]', 'Windows Phone [VER]'),
         'Windows Phone'    => 'Windows Phone [VER]',
         'Windows NT'       => 'Windows NT [VER]',
         'Windows'          => 'Windows NT [VER]',
@@ -123,48 +108,50 @@ class ClientUtil
 
     /**
      * 获取客户端游览器
-     * @param $userAgent $_SERVER['HTTP_USER_AGENT']
+     * @param      $userAgent $_SERVER['HTTP_USER_AGENT']
      * @param bool $isReTurnVersion //是否一起返回版本号
      * @return string (类型 + 版本号)
      * @since 2016-01-23
      */
-    public static function getBrowser($userAgent,$isReTurnVersion = false) {
-        if(empty($userAgent)) {
+    public static function getBrowser($userAgent, $isReTurnVersion = false)
+    {
+        if (empty($userAgent)) {
             return '';
         }
         $clientBrowser = '';
-        foreach((array)self::$browsers as $key => $browser) {
-            if(self::match($browser,$userAgent)) {
+        foreach ((array)self::$browsers as $key => $browser) {
+            if (self::match($browser, $userAgent)) {
                 $clientBrowser = $key;
                 break;
             }
         }
-        if($isReTurnVersion && $clientBrowser) {
-            $clientBrowser .= ' '.self::getVersion($clientBrowser,$userAgent);
+        if ($isReTurnVersion && $clientBrowser) {
+            $clientBrowser .= ' ' . self::getVersion($clientBrowser, $userAgent);
         }
         return $clientBrowser;
     }
 
     /**
      * 获取客户端操作系统
-     * @param $userAgent
+     * @param      $userAgent
      * @param bool $isReTurnVersion //是否一起返回版本号
      * @return string
      * @since 2016-01-23
      */
-    public static function getPlatForm($userAgent,$isReTurnVersion = false) {
-        if(empty($userAgent)) {
+    public static function getPlatForm($userAgent, $isReTurnVersion = false)
+    {
+        if (empty($userAgent)) {
             return '';
         }
         $clientPlatform = '';
-        foreach((array)self::$platforms as $key => $platform) {
-            if(self::match($platform,$userAgent)) {
+        foreach ((array)self::$platforms as $key => $platform) {
+            if (self::match($platform, $userAgent)) {
                 $clientPlatform = $key;
                 break;
             }
         }
-        if($isReTurnVersion && $clientPlatform) {
-            $clientPlatform .= ' '.self::getVersion($clientPlatform,$userAgent);
+        if ($isReTurnVersion && $clientPlatform) {
+            $clientPlatform .= ' ' . self::getVersion($clientPlatform, $userAgent);
         }
         return $clientPlatform;
     }
@@ -177,21 +164,21 @@ class ClientUtil
      * @return string
      * @since 2016-01-22
      */
-    public static function getVersion($propertyName,$userAgent) {
+    public static function getVersion($propertyName, $userAgent)
+    {
 
-        $verRegex = array_key_exists($propertyName,self::$versionRegexs)
-            ? self::$versionRegexs[$propertyName] : null;
-        if(!$verRegex) {
+        $verRegex = array_key_exists($propertyName, self::$versionRegexs) ? self::$versionRegexs[$propertyName] : null;
+        if (!$verRegex) {
             return '';
         } else {
             $verRegex = (array)$verRegex;
         }
 
-        $match = self::matchVersion($verRegex,$userAgent); //开始匹配
-        if($match && stripos($propertyName,'window') !== false) { //windown系统版本号需要转换
+        $match = self::matchVersion($verRegex, $userAgent); //开始匹配
+        if ($match && stripos($propertyName, 'window') !== false) { //windown系统版本号需要转换
             return self::getWinVersion($match);
         } else {
-            return str_replace('_','.',$match);
+            return str_replace('_', '.', $match);
         }
     }
 
@@ -201,17 +188,15 @@ class ClientUtil
      * @return string
      * @since 2016-01-22
      */
-    protected static function getWinVersion($match) {
-        if($match == '6.0') {
+    protected static function getWinVersion($match)
+    {
+        if ($match == '6.0') {
             return 'Vista';
-        }
-        else if($match == '6.1') {
+        } else if ($match == '6.1') {
             return '7';
-        }
-        else if($match == '6.2') {
+        } else if ($match == '6.2') {
             return '8';
-        }
-        else if($match == '5.1') {
+        } else if ($match == '5.1') {
             return 'XP';
         }
     }
@@ -219,26 +204,28 @@ class ClientUtil
     /**
      * 正则匹配
      * @param array $regex
-     * @param $userAgent
+     * @param       $userAgent
      * @return string
      * @since 2016-01-22
      */
-    protected static function match($regex,$userAgent) {
-        return (bool)preg_match(sprintf('#%s#is',$regex),$userAgent,$matches);
+    protected static function match($regex, $userAgent)
+    {
+        return (bool)preg_match(sprintf('#%s#is', $regex), $userAgent, $matches);
     }
 
     /**
      * 版本号正则匹配
      * @param array $regexs
-     * @param $userAgent
+     * @param       $userAgent
      * @return string
      * @since 2016-01-22
      */
-    protected static function matchVersion($regexs,$userAgent) {
-        foreach((array)$regexs as $regex) {
-            $regex = str_replace('[VER]','([\w\.]+)', $regex);
-            $match = (bool)preg_match(sprintf('#%s#is',$regex),$userAgent,$matches);
-            if($match) {
+    protected static function matchVersion($regexs, $userAgent)
+    {
+        foreach ((array)$regexs as $regex) {
+            $regex = str_replace('[VER]', '([\w\.]+)', $regex);
+            $match = (bool)preg_match(sprintf('#%s#is', $regex), $userAgent, $matches);
+            if ($match) {
                 return $matches[1];
             }
         }
