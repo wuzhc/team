@@ -34,6 +34,7 @@
                     ['label' => '动态', 'icon' => 'file-code-o', 'url' => ['/default/dynamic']],
                     ['label' => '团队', 'icon' => 'dashboard', 'url' => ['/team/index']],
                     ['label' => '任务', 'icon' => 'dashboard', 'url' => ['/task/index']],
+                    ['label' => '公司', 'icon' => 'dashboard', 'url' => ['/company/index']],
                     ['label' => 'Login', 'url' => ['site/login'], 'visible' => Yii::$app->user->isGuest],
                     [
                         'label' => 'Some tools',

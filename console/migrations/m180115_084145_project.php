@@ -31,6 +31,7 @@ class m180115_084145_project extends Migration
             'fdDescription' => $this->string(255)->comment('描述'),
             'fdStatus'      => $this->smallInteger(1)->defaultValue(0)->comment('1可用，2已删除'),
             'fdCreate'      => $this->dateTime()->notNull()->comment('创建时间'),
+            'fdUpdate'      => $this->dateTime()->notNull()->comment('更新时间'),
         ], $tableOptions);
 
         $this->createIndex('creatorID', $this->tableName, 'fdCreatorID');

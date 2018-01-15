@@ -2,6 +2,7 @@
 
 namespace frontend\controllers;
 
+use common\utils\ResponseUtil;
 use Yii;
 use yii\web\Controller;
 use yii\filters\VerbFilter;
@@ -77,6 +78,18 @@ class DefaultController extends Controller
     public function actionDynamic()
     {
         return $this->render('dynamic');
+    }
+
+    /**
+     * 弹窗提示
+     * @since 2018-01-15
+     */
+    public function actionShowBox()
+    {
+        $data = Yii::$app->session->get('showbox');
+        $data = $data ? json_decode($data, true) : array();
+        Yii::$app->session->set('showbox', null);
+        ResponseUtil::jsonCORS($data);
     }
 
 }
