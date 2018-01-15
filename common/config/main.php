@@ -31,7 +31,7 @@ return [
         // 数据库管理
         'db' => [
             'class' => 'yii\db\Connection',
-            'dsn' => 'mysql:host=localhost;dbname=team',
+            'dsn' => 'mysql:host=127.0.0.1;dbname=team',
             'username' => 'root',
             'password' => 'wuzhc2580',
             'charset' => 'utf8',
