@@ -15,6 +15,13 @@ use yii\console\Controller;
  */
 class RbacController extends Controller
 {
+
+    public function actionP()
+    {
+        $auth = Yii::$app->authManager;
+
+    }
+
     public function actionInit()
     {
         $auth = Yii::$app->authManager;
@@ -45,5 +52,26 @@ class RbacController extends Controller
         // 通常在你的 User 模型中实现这个函数。
         $auth->assign($author, 2);
         $auth->assign($admin, 1);
+
+        // 添加规则
+        $rule = new \common\rbac\AuthorRule;
+        $auth->add($rule);
+
+// 添加 "updateOwnPost" 权限并与规则关联
+        $updateOwnPost = $auth->createPermission('updateOwnPost');
+        $updateOwnPost->description = 'Update own post';
+        $updateOwnPost->ruleName = $rule->name;
+        $auth->add($updateOwnPost);
+
+// "updateOwnPost" 权限将由 "updatePost" 权限使用
+        $auth->addChild($updateOwnPost, $updatePost);
+
+// 允许 "author" 更新自己的帖子
+        $auth->addChild($author, $updateOwnPost);
+
+        if (\Yii::$app->user->can('createPost')) {
+            // 建贴
+        }
     }
+
 }
