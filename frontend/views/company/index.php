@@ -23,7 +23,6 @@ $this->params['breadcrumbs'][] = $this->title;
             'layout' => "{items}\n{summary}\n{pager}",
             'columns' => [
                 ['class' => 'yii\grid\SerialColumn'],
-
                 [
                     'label' => '主键',
                     'attribute' => 'id',
@@ -37,7 +36,11 @@ $this->params['breadcrumbs'][] = $this->title;
                         return $searchModel->user->fdName;
                     },
                 ],
-                'fdDescription',
+                [
+                    'label' => '简介',
+                    'attribute' => 'fdDescription',
+                    'value' => \yii\helpers\StringHelper::truncateWords($searchModel->fdDescription,20)
+                ],
                 [
                     'label'=>'状态',
                     'attribute' => 'fdStatus',
