@@ -75,13 +75,15 @@ class UserService extends AbstractService
             return false;
         }
 
-        /** @var \yii\mongodb\Connection $mongo */
-        $mongo = Yii::$app->mongodb;
-        $collection = $mongo->getCollection(Conf::USER_LOGIN_LOG);
-        return $collection->insert([
-            'userID'  => $user->id,
-            'date'    => date('Y-m-d'),
-            'loginIP' => ClientUtil::getClientIp()
-        ]) ? true : false;
+        if (true === MONGO_ON) {
+            /** @var \yii\mongodb\Connection $mongo */
+            $mongo = Yii::$app->mongodb;
+            $collection = $mongo->getCollection(Conf::USER_LOGIN_LOG);
+            return $collection->insert([
+                'userID'  => $user->id,
+                'date'    => date('Y-m-d'),
+                'loginIP' => ClientUtil::getClientIp()
+            ]) ? true : false;
+        }
     }
 }

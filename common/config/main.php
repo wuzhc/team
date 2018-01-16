@@ -1,6 +1,7 @@
 <?php
 
 /** mongo配置 */
+define('MONGO_ON', false);
 define('MONGO_HOST', '127.0.0.1');
 define('MONGO_PORT', '27017');
 define('MONGO_DB', 'team');

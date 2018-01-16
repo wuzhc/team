@@ -129,8 +129,7 @@ class CompanyController extends BaseController
     public function actionDelete($id)
     {
         $this->findModel($id)->delete();
-
-        return $this->redirectMsgBox(['index'], '删除成功');
+        $this->redirectMsgBox(['index'], '删除成功');
     }
 
     /**
