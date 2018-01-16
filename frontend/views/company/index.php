@@ -28,18 +28,27 @@ $this->params['breadcrumbs'][] = $this->title;
                     'attribute' => 'id',
                     'headerOptions' => ['width' => 50]
                 ],
-                'fdName',
+                [
+                    'label' => '名称',
+                    'attribute' => 'fdName',
+                    'value' => function($searchModel) {
+                        return \yii\helpers\StringHelper::truncate($searchModel->fdName,15);
+                    }
+                ],
                 [
                     'label' => '创建者',
                     'attribute' => 'fdCreatorID',
                     'value' => function($searchModel) {
                         return $searchModel->user->fdName;
                     },
+                    'headerOptions' => ['width' => 100]
                 ],
                 [
                     'label' => '简介',
                     'attribute' => 'fdDescription',
-                    'value' => \yii\helpers\StringHelper::truncateWords($searchModel->fdDescription,20)
+                    'value' => function($searchModel) {
+                        return \yii\helpers\StringHelper::truncate($searchModel->fdDescription,30);
+                    }
                 ],
                 [
                     'label'=>'状态',
