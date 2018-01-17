@@ -239,7 +239,7 @@ use yii\helpers\Html;
                                  alt="User Image"/>
 
                             <p>
-                                PHP程序员
+                                <?=Yii::$app->user->identity->fdPosition?>
                                 <small>加入时间 <?=Yii::$app->user->identity->fdVerify?></small>
                             </p>
                         </li>
