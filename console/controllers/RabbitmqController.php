@@ -95,7 +95,7 @@ class RabbitmqController extends Controller
         $connection = new AMQPStreamConnection('localhost', 5672, 'guest', 'guest');
         $channel = $connection->channel();
 
-        $channel->queue_declare('work_queue', false, false, false, false);
+        $channel->queue_declare('send_email', false, false, false, false);
 
         echo " [x] You can stop with Ctrl+C \n";
 
@@ -108,7 +108,7 @@ class RabbitmqController extends Controller
         };
 
         $channel->basic_qos(null, 1, null);
-        $channel->basic_consume('work_queue', '', false, false, false, false, $callback);
+        $channel->basic_consume('send_email', '', false, false, false, false, $callback);
 
         while (count($channel->callbacks)) {
             $channel->wait();

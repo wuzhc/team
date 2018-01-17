@@ -24,7 +24,7 @@ class m170810_010439_user extends Migration
             'fdName'          => $this->string(32)->notNull()->comment('真实姓名'),
             'fdLogin'         => $this->string(32)->notNull()->comment('账号'),
             'fdStatus'        => $this->smallInteger(1)->defaultValue(0)->comment('账号状态0未完成注册，1正常，2冻结'),
-            'fdRoleID'        => $this->smallInteger(1)->defaultValue(0)->comment('身份，0超级管理员'),
+            'fdRoleID'        => $this->smallInteger(1)->defaultValue(0)->comment('身份，0游客，1超级管理员,2管理员，3成员'),
             'fdPhone'         => $this->string(11)->comment('手机号码'),
             'fdEmail'         => $this->string(64)->comment('邮箱地址'),
             'fdPortrait'      => $this->string(255)->comment('头像url'),
@@ -49,8 +49,8 @@ class m170810_010439_user extends Migration
             'fdVerify'   => date('Y-m-d H:i:s'),
             'fdEmail'    => 'wuzhc2016@163.com',
             'fdPosition' => '超级管理员',
-            'fdStatus'   => \common\config\Conf::ENABLE,
-            'fdRoleID'   => 0
+            'fdStatus'   => \common\config\Conf::USER_ENABLE,
+            'fdRoleID'   => \common\config\Conf::ROLE_SUPER
         ]);
     }
 

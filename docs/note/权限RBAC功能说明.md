@@ -1,4 +1,5 @@
 #### add by wuzhc 2018-01-14
+[http://www.yiichina.com/doc/guide/2.0/security-authorization](http://www.yiichina.com/doc/guide/2.0/security-authorization)
 
 - 一个用户是超级管理员，就是第一个创建公司的人
 - 所有的操作都需要检测是否在自己公司内
@@ -37,3 +38,56 @@
 - tbItemChildTable： 该表存放授权条目的层次关系。
 - tbAssignmentTable： 该表存放授权条目对用户的指派情况。
 - tbRuleTable： 该表存放规则。
+
+### 常量定义 team/common/config/Conf.php
+```bash
+const ROLE_SUPER = 0; // 超级管理员
+const ROLE_ADMIN = 1; // 普通管理员
+const ROLE_MEMBER = 2; // 普通成员
+```
+
+### 初始化脚本
+```bash
+./yii rbac/init
+```
+
+### 使用：
+用户是否有权限用Yii::$app->user->can($permissionName, $params = [], $allowCaching = true)判断，如下
+```php
+<?php
+/**
+ * @inheritdoc
+ */
+public function behaviors()
+{
+    return [
+        'access' => [
+            'class' => AccessControl::className(),
+            'rules' => [
+                [
+                    'allow' => true,
+                    'matchCallback' => function ($rule, $action) {
+                        // 登录检测
+                        if (Yii::$app->user->isGuest) {
+                            return false;
+                        }
+                        
+                        // 超级管理员检测
+                        if (!Yii::$app->user->can('super')) {
+                            return false;
+                        }
+                        
+                        return true;
+                    }
+                ],
+            ],
+        ],
+        'verbs' => [
+            'class'   => VerbFilter::className(),
+            'actions' => [
+                'delete' => ['POST'],
+            ],
+        ],
+    ];
+}
+```

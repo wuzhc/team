@@ -8,6 +8,8 @@ use common\models\User;
 use common\services\AbstractService;
 use common\utils\ClientUtil;
 use common\utils\VerifyUtil;
+use PhpAmqpLib\Connection\AMQPStreamConnection;
+use PhpAmqpLib\Message\AMQPMessage;
 use Yii;
 use yii\helpers\StringHelper;
 
@@ -141,22 +143,34 @@ class UserService extends AbstractService
             return [];
         }
 
+        $connection = new AMQPStreamConnection('localhost', 5672, 'guest', 'guest');
+        $channel = $connection->channel();
+        $channel->queue_declare('send_email', false, false, false, false);
+
         $values = [];
         foreach ($emails as $k => $email) {
             $values[$k] = [
                 '佚名',
                 't_' . VerifyUtil::getRandomCode(6, 3),
+                Conf::ROLE_GUEST,
                 $email,
-                '普通成员',
+                '游客',
                 date('Y-m-d H:i:s'),
                 Yii::$app->security->generatePasswordHash('123456'),
                 Yii::$app->security->generateRandomString()
             ];
+
+            $msg = new AMQPMessage($email);
+            $channel->basic_publish($msg, '', 'send_email');
         }
+
+        $channel->close();
+        $connection->close();
 
         $fields = [
             'fdName',
             'fdLogin',
+            'fdRoleID',
             'fdEmail',
             'fdPosition',
             'fdCreate',

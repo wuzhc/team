@@ -3,11 +3,13 @@
 namespace frontend\controllers;
 
 use common\config\Conf;
+use common\services\CommonService;
 use common\services\UserService;
 use common\utils\ResponseUtil;
 use Yii;
 use common\models\Company;
 use common\models\CompanySearch;
+use yii\filters\AccessControl;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
@@ -24,6 +26,25 @@ class CompanyController extends BaseController
     public function behaviors()
     {
         return [
+            'access' => [
+                'class' => AccessControl::className(),
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'matchCallback' => function ($rule, $action) {
+                            // 登录检测
+                            if (Yii::$app->user->isGuest) {
+                                return false;
+                            }
+                            // 超级管理员检测
+                            if (!Yii::$app->user->can('super')) {
+                                return false;
+                            }
+                            return true;
+                        }
+                    ],
+                ],
+            ],
             'verbs' => [
                 'class'   => VerbFilter::className(),
                 'actions' => [

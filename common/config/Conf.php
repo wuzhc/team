@@ -17,6 +17,12 @@ class Conf
     const USER_ENABLE = 1; // 帐号可用
     const USER_FREEZE = 2; // 帐号被冻结
 
+    /** 用户角色 */
+    const ROLE_GUEST = 0; // 游客
+    const ROLE_SUPER = 1; // 超级管理员
+    const ROLE_ADMIN = 2; // 普通管理员
+    const ROLE_MEMBER = 3; // 普通成员
+
     /** mongo集合名称 */
     const USER_LOGIN_LOG = 'userLoginLog';
 }

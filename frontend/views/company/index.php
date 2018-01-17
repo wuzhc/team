@@ -47,7 +47,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     'label' => '简介',
                     'attribute' => 'fdDescription',
                     'value' => function($searchModel) {
-                        return \yii\helpers\StringHelper::truncate($searchModel->fdDescription,30);
+                        return \yii\helpers\StringHelper::truncate($searchModel->fdDescription,20);
                     }
                 ],
                 [
