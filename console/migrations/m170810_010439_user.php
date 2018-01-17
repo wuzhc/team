@@ -14,7 +14,7 @@ class m170810_010439_user extends Migration
 
     public function init()
     {
-        $this->tableName = Yii::$app->db->tablePrefix . 'User';
+        $this->tableName = '{{%User}}';
     }
 
     public function safeUp()
