@@ -33,14 +33,11 @@ if (Yii::$app->controller->action->id === 'login') {
               href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
         <?php $this->head() ?>
 
-        <style>
-
-        </style>
         <script>
             <?php $this->beginBlock('jquery') ?>
             $(function () {
 
-                /*弹窗提示*/
+                /* 弹窗提示 */
                 var flag = <?= (isset($_GET['showmsg']) && $_GET['showmsg'] == 1) ? 1 : 0?>;
                 if (flag === 1) {
                     $.getJSON('<?= \yii\helpers\Url::to(['default/show-box'])?>', function (data) {
@@ -49,7 +46,7 @@ if (Yii::$app->controller->action->id === 'login') {
                         }
                     });
                 }
-                /*弹窗提示*/
+                /* 弹窗提示 */
 
             });
             <?php $this->endBlock() ?>

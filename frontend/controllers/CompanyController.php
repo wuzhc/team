@@ -3,6 +3,7 @@
 namespace frontend\controllers;
 
 use common\config\Conf;
+use common\utils\ResponseUtil;
 use Yii;
 use common\models\Company;
 use common\models\CompanySearch;
@@ -146,5 +147,39 @@ class CompanyController extends BaseController
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');
         }
+    }
+
+    /**
+     * 导入公司成员
+     * @return string
+     */
+    public function actionImportUser()
+    {
+        if (Yii::$app->request->isAjax) {
+            if ($data = Yii::$app->request->post()) {
+                $emails = explode(',', $data['emails']);
+
+                $available = [];
+                $unAvailable = [];
+
+                foreach ($emails as $email) {
+                    if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                        $available[] = $email;
+                    } else {
+                        $unAvailable[] = $email;
+                    }
+                }
+
+                ResponseUtil::jsonCORS([
+                    'data' => [
+                        'unAvailable' => $unAvailable
+                    ]
+                ]);
+
+            } else {
+                ResponseUtil::jsonCORS(['status' => 1, 'msg' => '内容不能为空']);
+            }
+        }
+        return $this->render('import-user');
     }
 }

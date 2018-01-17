@@ -9,17 +9,19 @@ use yii\bootstrap\ActiveForm;
 $this->title = '登录';
 
 $fieldOptions1 = [
-    'options' => ['class' => 'form-group has-feedback'],
+    'options'       => ['class' => 'form-group has-feedback'],
     'inputTemplate' => "{input}<span class='glyphicon glyphicon-envelope form-control-feedback'></span>"
 ];
 
 $fieldOptions2 = [
-    'options' => ['class' => 'form-group has-feedback'],
+    'options'       => ['class' => 'form-group has-feedback'],
     'inputTemplate' => "{input}<span class='glyphicon glyphicon-lock form-control-feedback'></span>"
 ];
 ?>
 <style>
-    .login-box{width: 320px}
+    .login-box {
+        width: 320px
+    }
 </style>
 <div class="login-box">
     <div class="login-logo">
@@ -31,14 +33,11 @@ $fieldOptions2 = [
 
         <?php $form = ActiveForm::begin(['id' => 'login-form', 'enableClientValidation' => true]); ?>
 
-        <?= $form
-            ->field($model, 'username', $fieldOptions1)
+        <?= $form->field($model, 'username', $fieldOptions1)
             ->label(false)
-            ->textInput(['placeholder' => $model->getAttributeLabel('用户名'), 'value' => 'wuzhencan'])
-        ?>
+            ->textInput(['placeholder' => $model->getAttributeLabel('用户名'), 'value' => 'wuzhencan']) ?>
 
-        <?= $form
-            ->field($model, 'password', $fieldOptions2)
+        <?= $form->field($model, 'password', $fieldOptions2)
             ->label(false)
             ->passwordInput(['placeholder' => $model->getAttributeLabel('密码'), 'value' => 'wuzhencan']) ?>
 
@@ -48,7 +47,10 @@ $fieldOptions2 = [
             </div>
             <!-- /.col -->
             <div class="col-xs-4">
-                <?= Html::submitButton('登录', ['class' => 'btn btn-primary btn-block btn-flat', 'name' => 'login-button']) ?>
+                <?= Html::submitButton('登录', [
+                    'class' => 'btn btn-primary btn-block btn-flat',
+                    'name'  => 'login-button'
+                ]) ?>
             </div>
             <!-- /.col -->
         </div>
@@ -57,19 +59,8 @@ $fieldOptions2 = [
         <!-- /.social-auth-links -->
 
         <a href="#">忘记密码</a><br>
-        <a href="<?= Yii::$app->urlManager->createUrl(['member/signup']); ?>" class="text-center">注册一个新用户</a>
+        <a href="<?= Yii::$app->urlManager->createUrl(['user/signup']); ?>" class="text-center">注册一个新用户</a>
 
     </div>
     <!-- /.login-box-body -->
 </div><!-- /.login-box -->
-
-<?php $this->beginBlock('jquery') ?>
-$(function(){
-$(".sys-login").click(function(e){
-e.preventDefault();
-$(this).attr("disabled","disabled");
-$("#login-form").submit();
-});
-});
-<?php $this->endBlock() ?>
-<?php $this->registerJs($this->blocks['jquery'], \yii\web\View::POS_END); ?>

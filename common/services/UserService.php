@@ -86,4 +86,28 @@ class UserService extends AbstractService
             ]) ? true : false;
         }
     }
+
+    public function saveUser($args)
+    {
+        $user = new User();
+        $user->fdLogin = $args['login'];
+        $user->fdPhone = $args['phone'];
+        $user->fdEmail = $args['email'];
+        $user->fdName = $args['name'];
+        $user->fdStatus = Conf::ENABLE;
+        $user->fdCreate = date('Y-m-d H:i:s');
+        $user->fdVerify = date('Y-m-d H:i:s');
+        $user->setPassword($args['password']);
+        $user->generateAuthKey();
+
+        if ($user->save()) {
+            return $user;
+        } else {
+            // 调试模式下输出错误信息
+            if (YII_DEBUG) {
+                var_dump($user->getErrors());
+                exit;
+            }
+        }
+    }
 }

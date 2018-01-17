@@ -1,8 +1,9 @@
 <?php
+
 namespace frontend\form;
 
-use common\models2\Member;
-use common\service2\MemberService;
+use common\models\User;
+use common\services\UserService;
 use common\utils\ClientUtil;
 use common\utils\VerifyUtil;
 use yii\base\Model;
@@ -19,8 +20,7 @@ class SignupForm extends Model
     public $password;
     public $readMe;
     public $name;
-    public $nickname;
-    private $_member;
+    private $_user;
 
     /**
      * @inheritdoc
@@ -45,7 +45,6 @@ class SignupForm extends Model
             ['password', 'string', 'min' => 6],
 
             ['name', 'required', 'message' => '姓名不能为空'],
-            ['nickname', 'required', 'message' => '昵称不能为空'],
 
             ['readMe', 'required', 'message' => '请阅读条款']
         ];
@@ -57,7 +56,7 @@ class SignupForm extends Model
      */
     public function checkLogin($attribute, $params)
     {
-        $isExist = Member::find()->andWhere(['fdLogin' => $this->login])->exists();
+        $isExist = User::find()->andWhere(['fdLogin' => $this->login])->exists();
         if ($isExist) {
             $this->addError($attribute, '改账号已经被注册');
         }
@@ -71,13 +70,15 @@ class SignupForm extends Model
     public function checkPhone($attribute, $params)
     {
         if (!$this->phone) {
-            return ;
+            return;
         }
+
         if (!VerifyUtil::checkPhone($this->phone)) {
             $this->addError($attribute, '手机格式不正确');
-            return ;
+            return;
         }
-        $isExist = Member::find()->andWhere(['fdPhone' => $this->phone])->exists();
+
+        $isExist = User::find()->andWhere(['fdPhone' => $this->phone])->exists();
         if ($isExist) {
             $this->addError($attribute, '手机已被注册');
         }
@@ -91,13 +92,15 @@ class SignupForm extends Model
     public function checkEmail($attribute, $params)
     {
         if (!$this->email) {
-            return ;
+            return;
         }
+
         if (!VerifyUtil::checkEmail($this->email)) {
             $this->addError($attribute, '邮箱格式不正确');
-            return ;
+            return;
         }
-        $isExist = Member::find()->andWhere(['fdEmail' => $this->email])->exists();
+
+        $isExist = User::find()->andWhere(['fdEmail' => $this->email])->exists();
         if ($isExist) {
             $this->addError($attribute, '邮箱已被注册');
         }
@@ -105,35 +108,25 @@ class SignupForm extends Model
 
     /**
      * Signs user up.
-     * @return Member|null the saved model or null if saving fails
+     * @return User|null the saved model or null if saving fails
      */
     public function signup()
     {
         if ($this->validate()) {
-            $member = new Member();
-            $member->fdLogin = $this->login;
-            $member->fdEmail = $this->email;
-            $member->fdName = $this->name;
-            $member->fdNickname = $this->nickname;
-            $member->fdStatus = 1;
-            $member->fdCreate = date('Y-m-d H:i:s');
-            $member->fdVerify = date('Y-m-d H:i:s');
-            $member->setPassword($this->password);
-            $member->generateAuthKey();
-            if ($member->save()) {
-                return $this->_member = $member;
-            } else {
-                // 调试模式下输出错误信息
-                if (YII_DEBUG) {
-                    d($member->getErrors());
-                }
-            }
+            $this->_user = UserService::factory()->saveUser([
+                'login'    => $this->login,
+                'email'    => $this->email,
+                'phone'    => $this->phone,
+                'name'     => $this->name,
+                'password' => $this->password,
+            ]);
         } else {
             if (YII_DEBUG) {
-                d($this->errors);
+                var_dump($this->errors);
+                exit;
             }
         }
-        return null;
+        return $this->_user;
     }
 
     /**
@@ -144,13 +137,13 @@ class SignupForm extends Model
     public function login()
     {
         // 注册登录后事件
-        Yii::$app->member->on('afterLogin', function ($event) {
-            MemberService::factory()->saveLoginLog($event->identity->id);
+        Yii::$app->user->on('afterLogin', function ($event) {
+            UserService::factory()->saveLoginLog($event->identity->id);
             $event->identity->fdLastIP = ClientUtil::getClientIp();
-            $event->identity->fdLastTime = date('Y-m-d H:i:s', time());
+            $event->identity->fdLastTime = date('Y-m-d H:i:s');
             $event->identity->save();
         });
-        if (Yii::$app->member->login($this->_member)) {
+        if (Yii::$app->user->login($this->_user)) {
             return true;
         } else {
             return false;

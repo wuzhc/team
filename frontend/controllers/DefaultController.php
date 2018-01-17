@@ -4,14 +4,13 @@ namespace frontend\controllers;
 
 use common\utils\ResponseUtil;
 use Yii;
-use yii\web\Controller;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
 
 /**
  * Site controller
  */
-class DefaultController extends Controller
+class DefaultController extends BaseController
 {
     public $layout = 'main-member';
 
