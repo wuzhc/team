@@ -28,6 +28,7 @@ class m170810_010439_user extends Migration
             'fdPhone'         => $this->string(11)->comment('手机号码'),
             'fdEmail'         => $this->string(64)->comment('邮箱地址'),
             'fdPortrait'      => $this->string(255)->comment('头像url'),
+            'fdPosition'      => $this->string(64)->comment('职位'),
             'fdCreate'        => $this->dateTime()->notNull()->comment('注册时间'),
             'fdVerify'        => $this->dateTime()->null()->comment('账号通过验证时间'),
             'fdLastIP'        => $this->string(16)->comment('最后登录IP'),
@@ -40,15 +41,16 @@ class m170810_010439_user extends Migration
         $this->createIndex('login', $this->tableName, 'fdLogin(10)');
 
         $this->insert($this->tableName, [
-            'fdName'    => '啊牛管理员',
-            'fdLogin'   => 'wuzhencan',
-            'fdPwdHash' => '$2y$13$D8jfUn7k595cOJbn7muhJeHd1qYqlx4.FSnfqXA2EacD94zw3Ty6.',
-            'fdAuthKey' => 'jT4bryRUP7T454ww8IgCJL3Z4HJq_tX7',
-            'fdCreate'  => date('Y-m-d H:i:s'),
-            'fdVerify'  => date('Y-m-d H:i:s'),
-            'fdEmail'   => 'wuzhc2016@163.com',
-            'fdStatus'  => \common\config\Conf::ENABLE,
-            'fdRoleID'  => 0
+            'fdName'     => '啊牛管理员',
+            'fdLogin'    => 'wuzhencan',
+            'fdPwdHash'  => '$2y$13$D8jfUn7k595cOJbn7muhJeHd1qYqlx4.FSnfqXA2EacD94zw3Ty6.',
+            'fdAuthKey'  => 'jT4bryRUP7T454ww8IgCJL3Z4HJq_tX7',
+            'fdCreate'   => date('Y-m-d H:i:s'),
+            'fdVerify'   => date('Y-m-d H:i:s'),
+            'fdEmail'    => 'wuzhc2016@163.com',
+            'fdPosition' => '超级管理员',
+            'fdStatus'   => \common\config\Conf::ENABLE,
+            'fdRoleID'   => 0
         ]);
     }
 
