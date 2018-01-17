@@ -7,7 +7,9 @@ use common\config\Conf;
 use common\models\User;
 use common\services\AbstractService;
 use common\utils\ClientUtil;
+use common\utils\VerifyUtil;
 use Yii;
+use yii\helpers\StringHelper;
 
 /**
  * Class UserService
@@ -33,7 +35,8 @@ class UserService extends AbstractService
      * 根据账号找会员对象
      * @param string $account login|phone|email
      * @return array|null|\yii\db\ActiveRecord
-     * @since 2017-08-09
+     * @author wuzhc
+     * @since 2018-01-15
      */
     public function getUserObjByAccount($account)
     {
@@ -48,6 +51,8 @@ class UserService extends AbstractService
     /**
      * @param $user
      * @return null|User
+     * @author wuzhc
+     * @since 2018-01-15
      */
     public function getUserInstance($user)
     {
@@ -66,7 +71,8 @@ class UserService extends AbstractService
      * 保存登录日志
      * @param int|User $user 用户
      * @return bool
-     * @since 2016-12-08
+     * @author wuzhc
+     * @since 2018-01-15
      */
     public function saveLoginLog($user)
     {
@@ -79,6 +85,7 @@ class UserService extends AbstractService
             /** @var \yii\mongodb\Connection $mongo */
             $mongo = Yii::$app->mongodb;
             $collection = $mongo->getCollection(Conf::USER_LOGIN_LOG);
+
             return $collection->insert([
                 'userID'  => $user->id,
                 'date'    => date('Y-m-d'),
@@ -87,7 +94,14 @@ class UserService extends AbstractService
         }
     }
 
-    public function saveUser($args)
+    /**
+     * 新建用户
+     * @param $args
+     * @return User|null
+     * @author wuzhc
+     * @since 2018-01-16
+     */
+    public function createUser($args)
     {
         $user = new User();
         $user->fdLogin = $args['login'];
@@ -103,11 +117,53 @@ class UserService extends AbstractService
         if ($user->save()) {
             return $user;
         } else {
+
             // 调试模式下输出错误信息
             if (YII_DEBUG) {
                 var_dump($user->getErrors());
                 exit;
             }
+
+            return null;
         }
+    }
+
+    /**
+     * 以邮箱为注册号，批量保存用户
+     * @param $emails
+     * @return array|int
+     * @author wuzhc
+     * @since 2018-01-17
+     */
+    public function batchCreateUser($emails)
+    {
+        if (!$emails || !is_array($emails)) {
+            return [];
+        }
+
+        $values = [];
+        foreach ($emails as $k => $email) {
+            $values[$k] = [
+                '佚名',
+                't_' . VerifyUtil::getRandomCode(6, 3),
+                $email,
+                '普通成员',
+                date('Y-m-d H:i:s'),
+                Yii::$app->security->generatePasswordHash('123456'),
+                Yii::$app->security->generateRandomString()
+            ];
+        }
+
+        $fields = [
+            'fdName',
+            'fdLogin',
+            'fdEmail',
+            'fdPosition',
+            'fdCreate',
+            'fdPwdHash',
+            'fdAuthKey',
+        ];
+
+        return Yii::$app->db->createCommand()->batchInsert(User::tableName(), $fields, $values)->execute();
     }
 }

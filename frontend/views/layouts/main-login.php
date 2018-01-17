@@ -54,8 +54,7 @@ AppAsset::registerJsFile($this, 'js/showBox.js');
                 <h4 class="modal-title"></h4>
             </div>
             <div class="modal-body">
-                <p class="text-center"
-                   style="font-weight: bold;font-size: 18px;padding: 25px 0px;color: #454545"></p>
+                <p class="text-center"></p>
             </div>
             <div class="modal-footer hidden">
                 <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>

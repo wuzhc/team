@@ -24,7 +24,7 @@ class BaseController extends Controller
      * @param int    $seconds 弹窗消失时间
      * @since 2018-01-15
      */
-    public function redirectMsgBox(array $url, $msg = '这是一个弹窗提示', $seconds = 2000)
+    public function redirectMsgBox(array $url, $msg = '弹窗提示', $seconds = 2000)
     {
         if (!is_array($url)) {
             Yii::$app->end('Url must be array');

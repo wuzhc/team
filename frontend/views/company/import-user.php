@@ -37,27 +37,42 @@ $this->title = '导入成员';
             }
 
             var url = "<?=\yii\helpers\Url::to(['import-user'])?>";
-                $.ajax({
-                    type: 'POST',
-                    url: url,
-                    data: {emails: content},
-                    dataType: 'json'
-                }).done(function (data) {
-                    if (data.status === 0) {
+            $.ajax({
+                type: 'POST',
+                url: url,
+                data: {emails: content},
+                dataType: 'json'
+            }).done(function (data) {
+                if (data.status === 1) {
+                    var unAvailableEmails = data.unAvailable || [];
+                    var len = unAvailableEmails.length;
+                    if (len > 0) {
+                        var html = '<div style="max-height: 250px;overflow-y: scroll">';
+                        for (var i = 0; i < len; i++) {
+                            html += '<p>' + unAvailableEmails[i] + '</p>';
+                        }
+                        html += '</div>';
+                        $.showBox({
+                            title: '以下邮箱格式不正确',
+                            html: html,
+                            isClose: false
+                        })
+                    } else {
                         $.showBox({
                             msg: '导入成功，等待成员邮箱验证',
                             callback: function () {
                                 window.location.href = "<?=\yii\helpers\Url::to(['team/index'])?>";
                             }
                         })
-                    } else {
-                        $.showBox({msg: '导入失败'});
                     }
-                }).fail(function () {
-                    $.showBox({msg: '系统繁忙~'});
-                })
-        }).on('click', '#clear-user', function() {
-            $(this).val('');
+                } else {
+                    $.showBox({msg: '导入失败'});
+                }
+            }).fail(function () {
+                $.showBox({msg: '系统繁忙~'});
+            })
+        }).on('click', '#clear-user', function () {
+            $('#user-content').val('');
         })
 
     });

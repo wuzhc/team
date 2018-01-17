@@ -113,7 +113,7 @@ class SignupForm extends Model
     public function signup()
     {
         if ($this->validate()) {
-            $this->_user = UserService::factory()->saveUser([
+            $this->_user = UserService::factory()->createUser([
                 'login'    => $this->login,
                 'email'    => $this->email,
                 'phone'    => $this->phone,
@@ -125,7 +125,9 @@ class SignupForm extends Model
                 var_dump($this->errors);
                 exit;
             }
+            return null;
         }
+
         return $this->_user;
     }
 

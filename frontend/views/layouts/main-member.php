@@ -151,12 +151,11 @@ if (Yii::$app->controller->action->id === 'login') {
                     <h4 class="modal-title"></h4>
                 </div>
                 <div class="modal-body">
-                    <p class="text-center"
-                       style="font-weight: bold;font-size: 18px;padding: 25px 0px;color: #454545"></p>
+                    <p class="text-center"></p>
                 </div>
                 <div class="modal-footer hidden">
                     <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
-                    <button type="button" class="btn btn-primary">确定</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">确定</button>
                 </div>
             </div>
         </div>

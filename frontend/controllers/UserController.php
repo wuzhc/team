@@ -63,13 +63,19 @@ class UserController extends BaseController
         }
 
         $model = new LoginForm();
-        if ($model->load(Yii::$app->request->post()) && $model->login()) {
-            return $this->redirect(['default/index']);
+        if ($model->load(Yii::$app->request->post())) {
+            $res = $model->login();
+            if ($res === 1) {
+                return $this->redirect(['default/index']);
+            } else {
+                $this->redirectMsgBox(['user/login'], Yii::$app->params['loginMsg'][$res]);
+            }
         } else {
             return $this->render('login', [
                 'model' => $model,
             ]);
         }
+
     }
 
     /**

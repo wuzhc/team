@@ -3,6 +3,7 @@
 namespace frontend\form;
 
 
+use common\config\Conf;
 use common\services\UserService;
 use common\utils\ClientUtil;
 use Yii;
@@ -18,31 +19,6 @@ class LoginForm extends Model
     public $password;
     public $rememberMe = true;
     private $_user;
-
-    /**
-     * 登录成功更新最后登录时间和最后登录IP
-     * Logs in a user using the provided username and password.
-     * @return boolean whether the user is logged in successfully
-     */
-    public function login()
-    {
-        if ($this->validate()) {
-
-            // 注册登录后事件
-            Yii::$app->user->on('afterLogin', function ($event) {
-                UserService::factory()->saveLoginLog($event->identity->id);
-                $event->identity->fdLastIP = ClientUtil::getClientIp();
-                $event->identity->fdLastTime = date('Y-m-d H:i:s', time());
-                $event->identity->save();
-            });
-
-            if (Yii::$app->user->login($this->getUser(), $this->rememberMe ? 3600 * 24 * 30 : 0)) {
-                return true;
-            }
-
-        }
-        return false;
-    }
 
     /**
      * @inheritdoc
@@ -83,6 +59,44 @@ class LoginForm extends Model
         }
         return $this->_user;
     }
+
+    /**
+     * 登录
+     * @return int 0帐号或密码不正确，1成功，2帐号未验证，3帐号被冻结
+     * @see Yii::$app->param['loginMsg']
+     */
+    public function login()
+    {
+        if ($this->validate()) {
+
+            $user = $this->getUser();
+            if ($user->fdStatus != Conf::USER_ENABLE) {
+                if ($user->fdStatus == Conf::USER_DISABLE) {
+                    return 2;
+                } elseif ($user->fdStatus == Conf::USER_FREEZE) {
+                    return 3;
+                }
+            }
+
+            // 注册登录后事件
+            Yii::$app->user->on('afterLogin', function ($event) {
+                UserService::factory()->saveLoginLog($event->identity->id);
+                $event->identity->fdLastIP = ClientUtil::getClientIp();
+                $event->identity->fdLastTime = date('Y-m-d H:i:s', time());
+                $event->identity->save();
+            });
+
+            if (Yii::$app->user->login($this->getUser(), $this->rememberMe ? 3600 * 24 * 30 : 0)) {
+                return 1;
+            } else {
+                return 0;
+            }
+
+        }
+
+        return 0;
+    }
+
 
     /**
      * 标签

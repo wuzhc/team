@@ -3,6 +3,7 @@
 namespace frontend\controllers;
 
 use common\config\Conf;
+use common\services\UserService;
 use common\utils\ResponseUtil;
 use Yii;
 use common\models\Company;
@@ -163,6 +164,7 @@ class CompanyController extends BaseController
                 $unAvailable = [];
 
                 foreach ($emails as $email) {
+                    $email = trim($email);
                     if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
                         $available[] = $email;
                     } else {
@@ -170,14 +172,21 @@ class CompanyController extends BaseController
                     }
                 }
 
-                ResponseUtil::jsonCORS([
-                    'data' => [
-                        'unAvailable' => $unAvailable
-                    ]
-                ]);
+                if ($available) {
+                    $res = UserService::factory()->batchCreateUser($available);
+                    if (!$res) {
+                        ResponseUtil::jsonCORS([
+                            'status' => 0,
+                        ]);
+                    }
+                }
 
+                ResponseUtil::jsonCORS([
+                    'status'      => 1,
+                    'unAvailable' => $unAvailable
+                ]);
             } else {
-                ResponseUtil::jsonCORS(['status' => 1, 'msg' => '内容不能为空']);
+                ResponseUtil::jsonCORS(['status' => 0, 'msg' => '内容不能为空']);
             }
         }
         return $this->render('import-user');
