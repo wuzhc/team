@@ -26,9 +26,10 @@
 
 ### 常量定义 team/common/config/Conf.php
 ```bash
-const ROLE_SUPER = 0; // 超级管理员
-const ROLE_ADMIN = 1; // 普通管理员
-const ROLE_MEMBER = 2; // 普通成员
+const ROLE_GUEST = 0; // 游客
+const ROLE_SUPER = 1; // 超级管理员
+const ROLE_ADMIN = 2; // 普通管理员
+const ROLE_MEMBER = 3; // 普通成员
 ```
 
 ### 初始化脚本
