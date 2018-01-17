@@ -73,6 +73,7 @@ return [
             'itemTable' => '{{%ItemTable}}',
             'itemChildTable' => '{{%AuthItemChild}}',
             'assignmentTable' => '{{%AuthAssignment}}',
+            'defaultRoles' => ['super', 'admin', 'guest', 'member'],
         ],
     ],
 ];

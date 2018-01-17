@@ -19,7 +19,7 @@ class CommonService extends AbstractService
 
     /**
      * 获取控制器方法名
-     * @param      $controller
+     * @param \yii\web\Controller $controller
      * @param bool $isFormat 是否格式化方法名,例如： actionSaveName 将返回 save-name
      * @return array
      * @author wuzhc <wuzhc2016@163.com>

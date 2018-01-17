@@ -20,9 +20,9 @@ class UserGroupRule extends Rule
 
     /**
      * 角色判断
-     * @param int|string     $user
+     * @param int|string $user
      * @param \yii\rbac\Item $item
-     * @param array          $params
+     * @param array $params
      * @return bool
      */
     public function execute($user, $item, $params)
@@ -34,8 +34,12 @@ class UserGroupRule extends Rule
             } elseif ($item->name === 'admin') {
                 return $roleID == Conf::ROLE_ADMIN || $roleID == Conf::ROLE_SUPER;
             } elseif ($item->name === 'member') {
-                return $roleID == Conf::ROLE_SUPER || $roleID == Conf::ROLE_ADMIN
-                    || $roleID == Conf::ROLE_MEMBER;
+                return $roleID == Conf::ROLE_SUPER || $roleID == Conf::ROLE_ADMIN || $roleID == Conf::ROLE_MEMBER;
+            } elseif ($item->name === 'guest') {
+                return $roleID == Conf::ROLE_SUPER ||
+                    $roleID == Conf::ROLE_ADMIN ||
+                    $roleID == Conf::ROLE_MEMBER ||
+                    $roleID == Conf::ROLE_GUEST;
             }
         }
 
