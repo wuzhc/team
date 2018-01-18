@@ -138,18 +138,7 @@ class SignupForm extends Model
      */
     public function login()
     {
-        // 注册登录后事件
-        Yii::$app->user->on('afterLogin', function ($event) {
-            UserService::factory()->saveLoginLog($event->identity->id);
-            $event->identity->fdLastIP = ClientUtil::getClientIp();
-            $event->identity->fdLastTime = date('Y-m-d H:i:s');
-            $event->identity->save();
-        });
-        if (Yii::$app->user->login($this->_user)) {
-            return true;
-        } else {
-            return false;
-        }
+        return UserService::factory()->login($this->_user);
     }
 
     public function attributeLabels()

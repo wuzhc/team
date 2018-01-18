@@ -2,6 +2,9 @@
 
 namespace frontend\controllers;
 
+use common\config\Conf;
+use common\models\User;
+use common\services\UserService;
 use frontend\form\LoginForm;
 use frontend\form\SignupForm;
 use Yii;
@@ -114,5 +117,43 @@ class UserController extends BaseController
     {
         Yii::$app->user->logout();
         return $this->redirect(['/user/login']);
+    }
+
+    /**
+     * 普通成员认证
+     * @since 2018-01-18
+     */
+    public function actionAuth()
+    {
+        $auth = Yii::$app->request->get('auth');
+        $email = Yii::$app->request->get('email');
+
+        if (!$auth || !$email) {
+            $this->redirectMsgBox(['user/login'], '链接无效');
+        }
+
+        $user = UserService::factory()->getUserObjByAccount($email);
+        if (!$user) {
+            $this->redirectMsgBox(['user/login'], '链接无效');
+        }
+
+        if ($auth != Yii::$app->security->generatePasswordHash($user->fdLogin)) {
+            $this->redirectMsgBox(['user/login'], '链接无效');
+        }
+
+        $user->fdStatus = Conf::USER_ENABLE;
+        $user->fdVerify = date('Y-m-d H:i:s');
+        $res = $user->update();
+
+        if (!$res) {
+            $this->redirectMsgBox(['user/login'], '认证失败');
+        }
+
+        // 验证成功，执行登录
+        if (UserService::factory()->login($user)) {
+            $this->redirectMsgBox(['default/index'], $user->fdName . ' 欢迎你...');
+        } else {
+            $this->redirectMsgBox(['user/login'], '验证成功，请登录...');
+        }
     }
 }

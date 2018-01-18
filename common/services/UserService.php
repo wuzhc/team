@@ -36,7 +36,7 @@ class UserService extends AbstractService
     /**
      * 根据账号找会员对象
      * @param string $account login|phone|email
-     * @return array|null|\yii\db\ActiveRecord
+     * @return array|null|\yii\db\ActiveRecord|User
      * @author wuzhc
      * @since 2018-01-15
      */
@@ -152,9 +152,9 @@ class UserService extends AbstractService
             $values[$k] = [
                 '佚名',
                 't_' . VerifyUtil::getRandomCode(6, 3),
-                Conf::ROLE_GUEST,
+                Conf::ROLE_MEMBER,
                 $email,
-                '游客',
+                '普通成员',
                 date('Y-m-d H:i:s'),
                 Yii::$app->security->generatePasswordHash('123456'),
                 Yii::$app->security->generateRandomString()
@@ -179,5 +179,34 @@ class UserService extends AbstractService
         ];
 
         return Yii::$app->db->createCommand()->batchInsert(User::tableName(), $fields, $values)->execute();
+    }
+
+    /**
+     * 用户登录
+     * @param int|User $user
+     * @return bool
+     * @since 2018-01-18
+     */
+    public function login($user)
+    {
+        $user = $this->getUserInstance($user);
+
+        if (null === $user) {
+            return false;
+        }
+
+        // 注册登录后事件
+        Yii::$app->user->on('afterLogin', function ($event) {
+            $this->saveLoginLog($event->identity->id);
+            $event->identity->fdLastIP = ClientUtil::getClientIp();
+            $event->identity->fdLastTime = date('Y-m-d H:i:s');
+            $event->identity->save();
+        });
+
+        if (Yii::$app->user->login($user)) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }
