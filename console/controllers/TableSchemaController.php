@@ -7,7 +7,7 @@ use Yii;
 use yii\console\Controller;
 
 /**
- * 生成表模式文档
+ * 数据库表结构文档自动生成工具
  * Class TableSchemaController
  * @package console\controllers
  */
@@ -21,7 +21,7 @@ class TableSchemaController extends Controller
         global $argv;
 
         if (!$argv[2] || strcasecmp($argv[2], 'help') === 0) {
-            echo "Usage: ./yii table-schema/create [all|tableName] \n";
+            echo "Usage: ./yii table-schema/create [all|tablename] [filename]\n";
             exit;
         }
 
@@ -44,13 +44,15 @@ class TableSchemaController extends Controller
         }
 
         $root = dirname(dirname(dirname(__FILE__)));
-        $fp = fopen($root.'/docs/note/数据库设计及字典说明.md', 'a+');
+        $filename = $argv[3] ? $argv[3] : '/docs/note/数据库设计及字典说明.md';
+        $filePath = $root . $filename;
+
+        $fp = fopen($filePath, 'a+');
         if (!$fp) {
             echo "Open file failed \n";
         }
 
         foreach ($tables as $table) {
-
             $schema = $db->getTableSchema($table, true);
             if (!$schema->columns) {
                 continue;
