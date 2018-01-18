@@ -85,7 +85,7 @@ class TableSchemaController extends Controller
     }
 
     /**
-     * 需要过滤的表
+     * 需要过滤的表(不希望生成文档的表)
      * @return array
      */
     protected function filterTables()
@@ -115,8 +115,23 @@ class TableSchemaController extends Controller
      */
     public function actionClear()
     {
+        global $argv;
+
+        if (!$argv[2] || strcasecmp($argv[2], 'help') === 0) {
+            echo "Usage: ./yii table-schema/clear [filename]\n";
+            exit;
+        }
+
         $root = dirname(dirname(dirname(__FILE__)));
-        $fp = fopen($root.'/docs/note/数据库设计及字典说明.md', 'w');
+        $filePath = $argv[2] ? $argv[2] : '/docs/note/数据库设计及字典说明.md';
+        $filePath = $root . $filePath;
+
+        if (!is_file($filePath)) {
+            echo "$filePath isn't exists \n";
+            exit;
+        }
+
+        $fp = fopen($filePath, 'w');
         if (!$fp) {
             echo "Open file failed \n";
         }
