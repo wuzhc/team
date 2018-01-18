@@ -10,6 +10,8 @@ use yii\console\Controller;
  * 数据库表结构文档自动生成工具
  * Class TableSchemaController
  * @package console\controllers
+ * @author wuzhc <wuzhc2016@163.com>
+ * @since 2018-01-18
  */
 class TableSchemaController extends Controller
 {
