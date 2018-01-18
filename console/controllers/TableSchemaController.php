@@ -105,4 +105,21 @@ class TableSchemaController extends Controller
     {
         return Yii::$app->db->getSchema()->getTableNames();
     }
+
+    /**
+     * 清空
+     */
+    public function actionClear()
+    {
+        $root = dirname(dirname(dirname(__FILE__)));
+        $fp = fopen($root.'/docs/note/数据库设计及字典说明.md', 'w');
+        if (!$fp) {
+            echo "Open file failed \n";
+        }
+
+        fwrite($fp, '');
+        fclose($fp);
+
+        echo "Clear successfully \n";
+    }
 }
