@@ -184,13 +184,13 @@ class UserService extends AbstractService
     /**
      * 用户登录
      * @param int|User $user
+     * @param int $rememberMe 记住密码
      * @return bool
      * @since 2018-01-18
      */
-    public function login($user)
+    public function login($user, $rememberMe = 2592000)
     {
         $user = $this->getUserInstance($user);
-
         if (null === $user) {
             return false;
         }
@@ -203,7 +203,7 @@ class UserService extends AbstractService
             $event->identity->save();
         });
 
-        if (Yii::$app->user->login($user)) {
+        if (Yii::$app->user->login($user, $rememberMe)) {
             return true;
         } else {
             return false;

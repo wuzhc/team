@@ -68,30 +68,18 @@ class LoginForm extends Model
     public function login()
     {
         if ($this->validate()) {
-
             $user = $this->getUser();
-            if ($user->fdStatus != Conf::USER_ENABLE) {
-                if ($user->fdStatus == Conf::USER_DISABLE) {
-                    return 2;
-                } elseif ($user->fdStatus == Conf::USER_FREEZE) {
-                    return 3;
-                }
+
+            // 可用状态
+            if ($user->fdStatus == Conf::USER_ENABLE) {
+                return UserService::factory()->login($user, $this->rememberMe) ? 1 : 0;
             }
 
-            // 注册登录后事件
-            Yii::$app->user->on('afterLogin', function ($event) {
-                UserService::factory()->saveLoginLog($event->identity->id);
-                $event->identity->fdLastIP = ClientUtil::getClientIp();
-                $event->identity->fdLastTime = date('Y-m-d H:i:s', time());
-                $event->identity->save();
-            });
-
-            if (Yii::$app->user->login($this->getUser(), $this->rememberMe ? 3600 * 24 * 30 : 0)) {
-                return 1;
-            } else {
-                return 0;
+            if ($user->fdStatus == Conf::USER_DISABLE) {
+                return 2;
+            } elseif ($user->fdStatus == Conf::USER_FREEZE) {
+                return 3;
             }
-
         }
 
         return 0;
