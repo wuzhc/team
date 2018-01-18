@@ -26,7 +26,7 @@ use yii\web\IdentityInterface;
  * @property string $fdPwdResetToken 密码重置token
  * @property string $fdAuthKey 验证key
  */
-class User  extends \yii\db\ActiveRecord implements IdentityInterface
+class User extends \yii\db\ActiveRecord implements IdentityInterface
 {
     /**
      * @inheritdoc
