@@ -10,15 +10,16 @@ use yii\db\Migration;
  */
 class m170810_010439_user extends Migration
 {
-    public $tableName = '';
-
-    public function init()
-    {
-        $this->tableName = '{{%User}}';
-    }
+    public $tableName = '{{%User}}';
 
     public function safeUp()
     {
+        $tableOptions = null;
+        if ($this->db->driverName === 'mysql') {
+            // http://stackoverflow.com/questions/766809/whats-the-difference-between-utf8-general-ci-and-utf8-unicode-ci
+            $tableOptions = 'CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE=InnoDB COMMENT="用户表"';
+        }
+
         $this->createTable($this->tableName, [
             'id'          => $this->primaryKey(11)->unsigned(),
             'fdName'      => $this->string(32)->notNull()->comment('真实姓名'),
@@ -27,7 +28,8 @@ class m170810_010439_user extends Migration
             'fdEmail'     => $this->string(64)->comment('邮箱地址'),
             'fdStatus'    => $this->smallInteger(1)->defaultValue(0)->comment('账号状态0未完成注册，1正常，2冻结'),
             'fdRoleID'    => $this->smallInteger(1)->defaultValue(0)->comment('身份，0游客，1超级管理员,2管理员，3成员'),
-            'fdCompanyID' => $this->integer(11)->notNull()->comment('当前用户所属公司，对应tbCompany.ID'),
+            'fdCompanyID' => $this->integer(11)->notNull()->comment('所属公司，对应tbCompany.id'),
+            'fdTeamID'    => $this->integer(11)->defaultValue(0)->comment('所属团队,对应tbTeam.id'),
             'fdPassword'  => $this->string(32)->notNull()->comment('密码'),
             'fdSalt'      => $this->string(6)->notNull()->comment('密码干扰项'),
             'fdPortrait'  => $this->string(255)->comment('头像url'),
@@ -36,7 +38,7 @@ class m170810_010439_user extends Migration
             'fdVerify'    => $this->dateTime()->null()->comment('账号通过验证时间'),
             'fdLastIP'    => $this->string(16)->comment('最后登录IP'),
             'fdLastTime'  => $this->dateTime()->comment('最后登录时间'),
-        ], 'ENGINE=InnoDB DEFAULT CHARSET=UTF8');
+        ], $tableOptions);
 
         $this->createIndex('login', $this->tableName, 'fdLogin(10)');
 

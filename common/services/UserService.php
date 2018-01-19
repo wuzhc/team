@@ -5,19 +5,15 @@ namespace common\services;
 
 use common\config\Conf;
 use common\models\User;
-use common\services\AbstractService;
 use common\utils\ClientUtil;
 use common\utils\VerifyUtil;
-use PhpAmqpLib\Connection\AMQPStreamConnection;
-use PhpAmqpLib\Message\AMQPMessage;
 use Yii;
-use yii\helpers\StringHelper;
 
 /**
  * Class UserService
  * 会员服务类
  * @package common\services
- * @since 2017-08-09
+ * @since 2018-01-15
  * @author wuzhc2016@163.com
  */
 class UserService extends AbstractService

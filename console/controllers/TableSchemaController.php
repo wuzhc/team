@@ -78,7 +78,7 @@ class TableSchemaController extends Controller
             fwrite($fp, $row);
             fwrite($fp, "\r\n\r\n");
 
-            echo "$schema->name successfully \n";
+            echo "- $schema->name successfully \n";
         }
 
         fclose($fp);
@@ -91,7 +91,7 @@ class TableSchemaController extends Controller
     protected function filterTables()
     {
         $filterTables = [
-            'tbmigration',
+            'tbMigration',
             'tbAuthAssignment',
             'tbAuthItemChild',
             'tbAuthRule',
@@ -117,7 +117,7 @@ class TableSchemaController extends Controller
     {
         global $argv;
 
-        if (!$argv[2] || strcasecmp($argv[2], 'help') === 0) {
+        if (strcasecmp($argv[2], 'help') === 0) {
             echo "Usage: ./yii table-schema/clear [filename]\n";
             exit;
         }

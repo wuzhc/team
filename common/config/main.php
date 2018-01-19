@@ -76,4 +76,12 @@ return [
             'defaultRoles' => ['super', 'admin', 'guest', 'member'],
         ],
     ],
+
+    'controllerMap' => [
+        // 数据库迁移 add by wuzhc 2018-01-19
+        'migrate' => [
+            'class' => 'yii\console\controllers\MigrateController',
+            'migrationTable' => '{{%Migration}}'
+        ],
+    ],
 ];

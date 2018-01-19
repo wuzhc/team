@@ -3,14 +3,14 @@
 use yii\db\Migration;
 
 /**
- * 公司项目关联表
- * Class m180115_090409_company_project_map
+ * 项目-用户关联表
+ * Class m180119_035201_project_user_map
  * @author wuzhc
  * @since 2018-01-15
  */
-class m180115_090409_company_project_map extends Migration
+class m180119_035201_project_user_map extends Migration
 {
-    public $tableName = '{{%CompanyProjectMap}}';
+    public $tableName = '{{%ProjectUserMap}}';
 
     /**
      * @inheritdoc
@@ -20,18 +20,18 @@ class m180115_090409_company_project_map extends Migration
         $tableOptions = null;
         if ($this->db->driverName === 'mysql') {
             // http://stackoverflow.com/questions/766809/whats-the-difference-between-utf8-general-ci-and-utf8-unicode-ci
-            $tableOptions = 'CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE=InnoDB';
+            $tableOptions = 'CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE=InnoDB COMMENT="项目-用户关联表"';
         }
 
         $this->createTable($this->tableName, [
             'id'          => $this->primaryKey(11)->unsigned(),
-            'fdCompanyID' => $this->integer(11)->notNull()->comment('公司,对应tbCompany.id'),
-            'fdProjectID' => $this->integer(11)->notNull()->comment('项目,对应tbProject.id'),
+            'fdProjectID' => $this->integer(11)->notNull()->comment('所属项目,对应tbProject.id'),
+            'fdUserID'    => $this->integer(11)->notNull()->comment('用户,对应tbUser.id'),
             'fdStatus'    => $this->smallInteger(1)->defaultValue(0)->comment('1可用，2已删除'),
         ], $tableOptions);
 
-        $this->createIndex('companyID', $this->tableName, 'fdCompanyID');
         $this->createIndex('projectID', $this->tableName, 'fdProjectID');
+        $this->createIndex('userID', $this->tableName, 'fdUserID');
     }
 
     /**
@@ -39,8 +39,8 @@ class m180115_090409_company_project_map extends Migration
      */
     public function safeDown()
     {
-        $this->dropIndex('companyID', $this->tableName);
         $this->dropIndex('projectID', $this->tableName);
+        $this->dropIndex('userID', $this->tableName);
         $this->dropTable($this->tableName);
     }
 }

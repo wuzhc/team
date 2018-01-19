@@ -3,14 +3,14 @@
 use yii\db\Migration;
 
 /**
- * 团队表
- * Class m180115_085452_team
+ * 项目表
+ * Class m180119_033653_project
  * @author wuzhc
  * @since 2018-01-15
  */
-class m180115_085452_team extends Migration
+class m180119_033653_project extends Migration
 {
-    public $tableName = '{{%Team}}';
+    public $tableName = '{{%Project}}';
 
     /**
      * @inheritdoc
@@ -20,7 +20,7 @@ class m180115_085452_team extends Migration
         $tableOptions = null;
         if ($this->db->driverName === 'mysql') {
             // http://stackoverflow.com/questions/766809/whats-the-difference-between-utf8-general-ci-and-utf8-unicode-ci
-            $tableOptions = 'CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE=InnoDB COMMENT="团队表"';
+            $tableOptions = 'CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE=InnoDB COMMENT="项目表"';
         }
 
         $this->createTable($this->tableName, [

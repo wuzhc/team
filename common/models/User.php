@@ -16,6 +16,8 @@ use yii\web\IdentityInterface;
  * @property string $fdPassword 密码
  * @property int $fdStatus 账号状态0未完成注册，1正常，2冻结
  * @property int $fdRoleID 身份，0超级管理员
+ * @property int $fdCompanyID 所属公司
+ * @property int $fdTeamID 所属团队
  * @property string $fdPhone 手机号码
  * @property string $fdEmail 邮箱地址
  * @property string $fdPortrait 头像url
@@ -41,8 +43,8 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
     public function rules()
     {
         return [
-            [['fdName', 'fdLogin', 'fdCreate', 'fdSalt', 'fdPassword'], 'required'],
-            [['fdStatus', 'fdRoleID'], 'integer'],
+            [['fdName', 'fdLogin', 'fdCreate', 'fdSalt', 'fdPassword', 'fdCompanyID'], 'required'],
+            [['fdStatus', 'fdRoleID', 'fdCompanyID', 'fdTeamID'], 'integer'],
             [['fdCreate', 'fdVerify', 'fdLastTime'], 'safe'],
             [['fdName', 'fdLogin', 'fdPassword'], 'string', 'max' => 32],
             [['fdPhone'], 'string', 'max' => 11],
@@ -72,6 +74,8 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
             'fdLastIP' => 'Fd Last Ip',
             'fdLastTime' => 'Fd Last Time',
             'fdSalt' => 'Fd Salt',
+            'fdCompanyID' => 'Fd Company',
+            'fdTeam' => 'Fd Team',
         ];
     }
 
