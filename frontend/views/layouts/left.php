@@ -1,3 +1,7 @@
+<?php
+/** @var \common\models\User $identify */
+$identify = Yii::$app->user->identity;
+?>
 <aside class="main-sidebar">
 
     <section class="sidebar">
@@ -8,7 +12,7 @@
                 <img src="<?= $directoryAsset ?>/img/user2-160x160.jpg" class="img-circle" alt="User Image"/>
             </div>
             <div class="pull-left info">
-                <p><?=Yii::$app->user->identity->fdName?></p>
+                <p><?=$identify->fdName?></p>
 
                 <a href="#"><i class="fa fa-circle text-success"></i> 在线</a>
             </div>
@@ -34,7 +38,7 @@
                     ['label' => '动态', 'icon' => 'file-code-o', 'url' => ['/default/dynamic']],
                     ['label' => '团队', 'icon' => 'dashboard', 'url' => ['/team/index']],
                     ['label' => '任务', 'icon' => 'dashboard', 'url' => ['/task/index']],
-                    ['label' => '公司', 'icon' => 'dashboard', 'url' => ['/company/index']],
+                    ['label' => '公司', 'icon' => 'dashboard', 'url' => ['/company/index'], 'visible' => $identify->fdRoleID === \common\config\Conf::ROLE_SUPER],
                     ['label' => 'Login', 'url' => ['site/login'], 'visible' => Yii::$app->user->isGuest],
                     [
                         'label' => 'Some tools',

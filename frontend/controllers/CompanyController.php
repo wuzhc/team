@@ -6,10 +6,12 @@ use common\config\Conf;
 use common\services\CommonService;
 use common\services\UserService;
 use common\utils\ResponseUtil;
+use common\utils\VerifyUtil;
 use Yii;
 use common\models\Company;
 use common\models\CompanySearch;
 use yii\filters\AccessControl;
+use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
@@ -30,14 +32,14 @@ class CompanyController extends BaseController
                 'class' => AccessControl::className(),
                 'rules' => [
                     [
-                        'allow' => true,
+                        'allow'         => true,
                         'matchCallback' => function ($rule, $action) {
                             // 登录检测
                             if (Yii::$app->user->isGuest) {
                                 return false;
                             }
                             // 超级管理员检测
-                            if (!Yii::$app->user->can('super')) {
+                            if (($action->id != 'import-user') && !Yii::$app->user->can('super')) {
                                 return false;
                             }
                             return true;
@@ -45,7 +47,7 @@ class CompanyController extends BaseController
                     ],
                 ],
             ],
-            'verbs' => [
+            'verbs'  => [
                 'class'   => VerbFilter::className(),
                 'actions' => [
                     'delete' => ['POST'],
@@ -172,44 +174,67 @@ class CompanyController extends BaseController
     }
 
     /**
-     * 导入公司成员
+     * 导入成员
      * @return string
+     * @throws ForbiddenHttpException
      */
     public function actionImportUser()
     {
-        if (Yii::$app->request->isAjax) {
-            if ($data = Yii::$app->request->post()) {
-                $emails = explode(',', $data['emails']);
-
-                $available = [];
-                $unAvailable = [];
-
-                foreach ($emails as $email) {
-                    $email = trim($email);
-                    if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                        $available[] = $email;
-                    } else {
-                        $unAvailable[] = $email;
-                    }
-                }
-
-                if ($available) {
-                    $res = UserService::factory()->batchCreateUser($available);
-                    if (!$res) {
-                        ResponseUtil::jsonCORS([
-                            'status' => 0,
-                        ]);
-                    }
-                }
-
-                ResponseUtil::jsonCORS([
-                    'status'      => 1,
-                    'unAvailable' => $unAvailable
-                ]);
-            } else {
-                ResponseUtil::jsonCORS(['status' => 0, 'msg' => '内容不能为空']);
-            }
+        // 权限检测，只有超级管理员和普通管理员才能执行
+        if (!Yii::$app->user->can('importUser')) {
+            throw new ForbiddenHttpException(Yii::t('yii', 'You are not allowed to perform this action.'));
         }
+
+        if (Yii::$app->request->isAjax && ($data = Yii::$app->request->post())) {
+            if (!$data['accounts']) {
+                ResponseUtil::jsonCORS(['status' => 0, 'msg' => '账号不能为空']);
+            }
+
+            $exists = []; // 已存在的账号
+            $news = []; // 新导入用户
+            $accounts = array_unique(explode(',', $data['accounts']));
+
+            foreach ($accounts as $account) {
+                // 账号已经存在
+                if (UserService::factory()->getUserObjByAccount($account)) {
+                    $exists[] = $account;
+                    continue;
+                }
+
+                $temp = [
+                    'phone' => '',
+                    'email' => '',
+                    'login' => 't_' . VerifyUtil::getRandomCode(8, 3)
+                ];
+
+                if (VerifyUtil::checkPhone($account)) {
+                    $temp['phone'] = $account;
+                } elseif (VerifyUtil::checkEmail($account)) {
+                    $temp['email'] = $account;
+                } else {
+                    $temp['login'] = $account;
+                }
+
+                $news[] = $temp;
+            }
+
+            // 成员入库
+            if ($news) {
+                $res = UserService::factory()->batchCreateUser($news);
+                if (!$res) {
+                    ResponseUtil::jsonCORS([
+                        'status' => 0,
+                        'exists' => $exists
+                    ]);
+                }
+            }
+
+            ResponseUtil::jsonCORS([
+                'status' => 1,
+                'exists' => $exists
+            ]);
+        }
+
         return $this->render('import-user');
     }
 }

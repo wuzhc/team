@@ -42,7 +42,7 @@ CREATE DATABASE team DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci
 本地网址：
 > 最好是自己配置虚拟域名，然后team/frontend/web作为root目录
 ```bash
-http://localhost/team/frontend/web/index.php
+http://localhost/team/docs/index.php
 ```
 
 演示网址：  
@@ -64,9 +64,9 @@ http://localhost/team/frontend/web/index.php
 - [实现技术说明](https://github.com/wuzhc/manage/blob/master/docs/note/%E5%AE%9E%E7%8E%B0%E6%8A%80%E6%9C%AF%E8%AF%B4%E6%98%8E.md)  
 
 ### 效果图：  
-![首页](https://github.com/wuzhc/manage/blob/master/frontend/web/images/index.png)
-![动态页](https://github.com/wuzhc/manage/blob/master/frontend/web/images/dymanic.png)
-![聊天页](https://github.com/wuzhc/manage/blob/master/frontend/web/images/chat.png)
-![团队页](https://github.com/wuzhc/manage/blob/master/frontend/web/images/team.png)
+![首页](https://github.com/wuzhc/manage/blob/master/docs/images/index.png)
+![动态页](https://github.com/wuzhc/manage/blob/master/docs/images/dymanic.png)
+![聊天页](https://github.com/wuzhc/manage/blob/master/docs/images/chat.png)
+![团队页](https://github.com/wuzhc/manage/blob/master/docs/images/team.png)
 
 

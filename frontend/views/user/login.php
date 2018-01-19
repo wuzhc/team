@@ -35,11 +35,11 @@ $fieldOptions2 = [
 
         <?= $form->field($model, 'username', $fieldOptions1)
             ->label(false)
-            ->textInput(['placeholder' => $model->getAttributeLabel('用户名'), 'value' => 'wuzhencan']) ?>
+            ->textInput(['placeholder' => $model->getAttributeLabel('用户名'), 'value' => 'superadmin']) ?>
 
         <?= $form->field($model, 'password', $fieldOptions2)
             ->label(false)
-            ->passwordInput(['placeholder' => $model->getAttributeLabel('密码'), 'value' => 'wuzhencan']) ?>
+            ->passwordInput(['placeholder' => $model->getAttributeLabel('密码'), 'value' => '123456']) ?>
 
         <div class="row">
             <div class="col-xs-8">

@@ -13,6 +13,7 @@ use yii\web\IdentityInterface;
  * @property int $id
  * @property string $fdName 真实姓名
  * @property string $fdLogin 账号
+ * @property string $fdPassword 密码
  * @property int $fdStatus 账号状态0未完成注册，1正常，2冻结
  * @property int $fdRoleID 身份，0超级管理员
  * @property string $fdPhone 手机号码
@@ -22,9 +23,7 @@ use yii\web\IdentityInterface;
  * @property string $fdVerify 账号通过验证时间
  * @property string $fdLastIP 最后登录IP
  * @property string $fdLastTime 最后登录时间
- * @property string $fdPwdHash 密码哈希
- * @property string $fdPwdResetToken 密码重置token
- * @property string $fdAuthKey 验证key
+ * @property string $fdSalt 密码干扰项
  */
 class User extends \yii\db\ActiveRecord implements IdentityInterface
 {
@@ -42,13 +41,13 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
     public function rules()
     {
         return [
-            [['fdName', 'fdLogin', 'fdCreate', 'fdPwdHash', 'fdAuthKey'], 'required'],
+            [['fdName', 'fdLogin', 'fdCreate', 'fdSalt', 'fdPassword'], 'required'],
             [['fdStatus', 'fdRoleID'], 'integer'],
             [['fdCreate', 'fdVerify', 'fdLastTime'], 'safe'],
-            [['fdName', 'fdLogin', 'fdAuthKey'], 'string', 'max' => 32],
+            [['fdName', 'fdLogin', 'fdPassword'], 'string', 'max' => 32],
             [['fdPhone'], 'string', 'max' => 11],
             [['fdEmail'], 'string', 'max' => 64],
-            [['fdPortrait', 'fdPwdHash', 'fdPwdResetToken'], 'string', 'max' => 255],
+            [['fdPortrait'], 'string', 'max' => 255],
             [['fdLastIP'], 'string', 'max' => 16],
         ];
     }
@@ -62,6 +61,7 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
             'id' => 'ID',
             'fdName' => 'Fd Name',
             'fdLogin' => 'Fd Login',
+            'fdPassword' => 'Fd Password',
             'fdStatus' => 'Fd Status',
             'fdRoleID' => 'Fd Role ID',
             'fdPhone' => 'Fd Phone',
@@ -71,9 +71,7 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
             'fdVerify' => 'Fd Verify',
             'fdLastIP' => 'Fd Last Ip',
             'fdLastTime' => 'Fd Last Time',
-            'fdPwdHash' => 'Fd Pwd Hash',
-            'fdPwdResetToken' => 'Fd Pwd Reset Token',
-            'fdAuthKey' => 'Fd Auth Key',
+            'fdSalt' => 'Fd Salt',
         ];
     }
 
@@ -84,7 +82,8 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
      */
     public function validatePassword($password)
     {
-        return Yii::$app->security->validatePassword($password, $this->fdPwdHash);
+//        return Yii::$app->security->validatePassword($password, $this->fdPwdHash);
+        return md5(md5($password).$this->fdSalt) === $this->fdPassword;
     }
 
     /**
@@ -93,7 +92,8 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
      */
     public function setPassword($password)
     {
-        $this->fdPwdHash = Yii::$app->security->generatePasswordHash($password);
+//        $this->fdPwdHash = Yii::$app->security->generatePasswordHash($password);
+        $this->fdPassword = md5(md5($password).$this->fdSalt);
     }
 
     /**
@@ -101,7 +101,7 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
      */
     public function generateAuthKey()
     {
-        $this->fdAuthKey = Yii::$app->security->generateRandomString();
+//        $this->fdAuthKey = Yii::$app->security->generateRandomString();
     }
 
     /**
@@ -109,7 +109,7 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
      */
     public function generatePasswordResetToken()
     {
-        $this->fdPwdResetToken = Yii::$app->security->generateRandomString() . '_' . time();
+//        $this->fdPwdResetToken = Yii::$app->security->generateRandomString() . '_' . time();
     }
 
     /**
@@ -117,7 +117,7 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
      */
     public function removePasswordResetToken()
     {
-        $this->fdPwdResetToken = null;
+//        $this->fdPwdResetToken = null;
     }
 
     /**
@@ -149,7 +149,7 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
      */
     public function getAuthKey()
     {
-        return $this->fdAuthKey;
+//        return $this->fdAuthKey;
     }
 
     /**
@@ -157,6 +157,6 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
      */
     public function validateAuthKey($authKey)
     {
-        return $this->getAuthKey() === $authKey;
+//        return $this->getAuthKey() === $authKey;
     }
 }

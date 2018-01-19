@@ -142,8 +142,7 @@ if (Yii::$app->controller->action->id === 'login') {
 
     <!--弹窗-->
     <div class="modal fade" id="showMsgModal" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
-        <div class="modal-dialog"
-             style="position: absolute;left: 50%;top: 45%;transform:translateX(-50%) translateY(-50%);">
+        <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header hidden">
                     <button type="button" class="close none" data-dismiss="modal"><span

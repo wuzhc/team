@@ -26,13 +26,13 @@ $this->title = '导入成员';
         // 规则说明
         $('[data-toggle="popover"]').popover({
             title: '规则说明',
-            content: '多个邮箱需要用英文状态下逗号隔开'
+            content: '多个账号需要用英文状态下逗号隔开'
         });
 
         $('#import-user-container').on('click', '#ensure-submit', function () {
-            var content = $.trim($('#user-content').val());
-            if (!content) {
-                $.showBox({msg: '内容不能为空'});
+            var accounts = $.trim($('#user-content').val());
+            if (!accounts) {
+                $.showBox({msg: '账号不能为空'});
                 return false;
             }
 
@@ -40,26 +40,26 @@ $this->title = '导入成员';
             $.ajax({
                 type: 'POST',
                 url: url,
-                data: {emails: content},
+                data: {accounts: accounts},
                 dataType: 'json'
             }).done(function (data) {
                 if (data.status === 1) {
-                    var unAvailableEmails = data.unAvailable || [];
-                    var len = unAvailableEmails.length;
+                    var exists = data.exists || [];
+                    var len = exists.length;
                     if (len > 0) {
-                        var html = '<div style="max-height: 250px;overflow-y: scroll">';
+                        var html = '<div>';
                         for (var i = 0; i < len; i++) {
-                            html += '<p>' + unAvailableEmails[i] + '</p>';
+                            html += '<p>' + exists[i] + '</p>';
                         }
                         html += '</div>';
                         $.showBox({
-                            title: '以下邮箱格式不正确',
+                            title: '以下账号已存在,导入失败',
                             html: html,
                             isClose: false
                         })
                     } else {
                         $.showBox({
-                            msg: '导入成功，等待成员邮箱验证',
+                            msg: '导入成功',
                             callback: function () {
                                 window.location.href = "<?=\yii\helpers\Url::to(['team/index'])?>";
                             }

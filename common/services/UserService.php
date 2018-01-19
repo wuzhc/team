@@ -113,8 +113,8 @@ class UserService extends AbstractService
         $user->fdStatus = Conf::ENABLE;
         $user->fdCreate = date('Y-m-d H:i:s');
         $user->fdVerify = date('Y-m-d H:i:s');
-        $user->setPassword($args['password']);
-        $user->generateAuthKey();
+        $user->fdSalt = VerifyUtil::getRandomCode(6, 3);
+        $user->fdPassword = md5(md5($args['password'] . $user->fdSalt));
 
         if ($user->save()) {
             return $user;
@@ -132,50 +132,47 @@ class UserService extends AbstractService
 
     /**
      * 以邮箱为注册号，批量保存用户
-     * @param $emails
+     * @param array $accounts
      * @return array|int
      * @author wuzhc
      * @since 2018-01-17
      */
-    public function batchCreateUser($emails)
+    public function batchCreateUser(array $accounts)
     {
-        if (!$emails || !is_array($emails)) {
+        if (!$accounts || !is_array($accounts)) {
             return [];
         }
 
-        $connection = new AMQPStreamConnection('localhost', 5672, 'guest', 'guest');
-        $channel = $connection->channel();
-        $channel->queue_declare('send_email', false, false, false, false);
-
         $values = [];
-        foreach ($emails as $k => $email) {
+        foreach ($accounts as $k => $account) {
+            $salt = VerifyUtil::getRandomCode(6, 3);
             $values[$k] = [
                 '佚名',
-                't_' . VerifyUtil::getRandomCode(6, 3),
+                $account['login'],
                 Conf::ROLE_MEMBER,
-                $email,
-                '普通成员',
+                Conf::USER_ENABLE,
+                $account['email'],
+                $account['phone'],
+                '',
                 date('Y-m-d H:i:s'),
-                Yii::$app->security->generatePasswordHash('123456'),
-                Yii::$app->security->generateRandomString()
+                date('Y-m-d H:i:s'),
+                md5(md5('123456') . $salt),
+                $salt,
             ];
-
-            $msg = new AMQPMessage($email);
-            $channel->basic_publish($msg, '', 'send_email');
         }
-
-        $channel->close();
-        $connection->close();
 
         $fields = [
             'fdName',
             'fdLogin',
             'fdRoleID',
+            'fdStatus',
             'fdEmail',
+            'fdPhone',
             'fdPosition',
             'fdCreate',
-            'fdPwdHash',
-            'fdAuthKey',
+            'fdVerify',
+            'fdPassword',
+            'fdSalt',
         ];
 
         return Yii::$app->db->createCommand()->batchInsert(User::tableName(), $fields, $values)->execute();

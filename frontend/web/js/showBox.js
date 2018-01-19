@@ -13,7 +13,6 @@
                 title: "提示信息",
                 msg: "this is a message",
                 callback: null,
-                width: 400,
                 html: ''
             }, options);
 
@@ -21,10 +20,9 @@
 
             // 初始化配置
             $self.find(".modal-title").text(config.title);
-            $self.find(".modal-dialog").css({"width": config.width + "px"});
 
             if (config.html) {
-                $self.find(".modal-body>p").html(config.html);
+                $self.find(".modal-body").html(config.html);
             } else {
                 $self.find(".modal-body>p").text(config.msg);
                 $self.find(".modal-body>p").css({

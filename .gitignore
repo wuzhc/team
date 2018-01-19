@@ -4,3 +4,5 @@
 .travis.yml
 codeception.yml
 vagrant/
+/common/config/common.php
+/console/controllers/TestController.php
