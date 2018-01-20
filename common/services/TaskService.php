@@ -46,7 +46,7 @@ class TaskService extends AbstractService
         $data = [];
 
         $projects = Project::find()
-            ->where(['fdCompanyID' => $companyID])
+            ->where(['fdCompanyID' => $companyID, 'fdStatus' => Conf::ENABLE])
             ->orderBy(['id' => SORT_DESC])
             ->all();
 
