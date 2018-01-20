@@ -2,6 +2,7 @@
 
 namespace common\models;
 
+use common\config\Conf;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
@@ -63,7 +64,7 @@ class ProjectSearch extends Project
             'id' => $this->id,
             'fdCreatorID' => $this->fdCreatorID,
             'fdCompanyID' => Yii::$app->user->identity->fdCompanyID,
-            'fdStatus' => $this->fdStatus,
+            'fdStatus' => Conf::ENABLE,
             'fdCreate' => $this->fdCreate,
             'fdUpdate' => $this->fdUpdate,
         ]);
