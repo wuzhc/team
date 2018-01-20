@@ -17,10 +17,15 @@ return [
         'bg-aqua',
         'bg-blue',
         'bg-orange',
-        'bg-aqua',
+        'bg-navy',
         'bg-red',
         'bg-purple',
         'bg-green',
-        'bg-black'
+        'bg-black',
+        'bg-fuchsia',
+        'bg-yellow',
+        'bg-olive',
+        'bg-maroon',
+        'bg-lime',
     ]
 ];

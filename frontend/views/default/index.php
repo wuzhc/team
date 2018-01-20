@@ -12,7 +12,7 @@ $directoryAsset = Yii::$app->assetManager->getPublishedUrl('@vendor/almasaeed201
         <!-- ./col -->
         <div class="col-lg-3 col-xs-6">
             <!-- small box -->
-            <div class="small-box <?= Yii::$app->params['bgColor'][$k % 7]?>">
+            <div class="small-box <?= Yii::$app->params['bgColor'][$k % 12]?>">
                 <div class="inner">
                     <h4><?= $project['name']?></h4>
                     <p><?= $project['completeTasks']?> / <?= $project['allTasks']?></p>
