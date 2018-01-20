@@ -28,6 +28,63 @@ class TeamService extends AbstractService
     }
 
     /**
+     * 新建团队记录
+     * @param array $args
+     * @return bool
+     * @since 2018-01-19
+     */
+    public function save($args)
+    {
+        $team = new Team();
+        $team->fdCreatorID = $args['creatorID'];
+        $team->fdCompanyID = $args['companyID'];
+        $team->fdName = $args['name'];
+        $team->fdDescription = $args['description'];
+        $team->fdStatus = Conf::ENABLE;
+        $team->fdCreate = date('Y-m-d H:i:s');
+        $team->fdUpdate = date('Y-m-d H:i:s');
+
+        $res = $team->save() ? $team->id : 0;
+        if (!$res) {
+            if (YII_DEBUG) {
+                var_dump($team->getErrors());
+                exit;
+            }
+        }
+
+        return $res;
+    }
+
+    /**
+     * 更新团队记录
+     * @param array $args
+     * @return bool
+     * @since 2018-01-19
+     */
+    public function update(array $args)
+    {
+        if (!empty($args['id'])) {
+            return false;
+        }
+
+        $team = Team::findOne(['id' => $args['id']]);
+        $team->fdName = $args['name'];
+        $team->fdDescription = $args['description'];
+        $team->fdStatus = $args['status'];
+        $team->fdUpdate = date('Y-m-d H:i:s');
+
+        $res = $team->update() ? true : false;
+        if (!$res) {
+            if (YII_DEBUG) {
+                var_dump($team->getErrors());
+                exit;
+            }
+        }
+
+        return $res;
+    }
+
+    /**
      * 获取团队成员
      * @param int $companyID
      * @return array
@@ -35,6 +92,8 @@ class TeamService extends AbstractService
      */
     public function getMembers($companyID)
     {
+        $data = [];
+
         $allMembers = User::find()
             ->select(['id', 'fdName', 'fdPortrait', 'fdTeamID', 'fdRoleID'])
             ->andWhere(['fdCompanyID' => $companyID])
@@ -43,7 +102,7 @@ class TeamService extends AbstractService
             ->all();
 
         if (!$allMembers) {
-            return [];
+            return $data;
         }
 
         $teamMemberMap = [];
@@ -63,8 +122,6 @@ class TeamService extends AbstractService
             ->orderBy(['fdOrder' => SORT_DESC])
             ->all();
 
-        $data = [];
-
         /** @var Team $team */
         foreach ((array)$allTeams as $team) {
             $temp = [];
@@ -72,24 +129,37 @@ class TeamService extends AbstractService
             $temp['name'] = $team->fdName;
 
             if (isset($teamMemberMap[$team->id])) {
-                $temp['count'] = count($teamMemberMap[$team->id]);
                 $temp['members'] = $teamMemberMap[$team->id];
             } else {
-                $temp['count'] = 0;
                 $temp['members'] = [];
             }
 
             $data[] = $temp;
         }
 
-        // 没有所属团队成员
+        // 剩余未加入团队的成员
         $data[] = [
             'id' => 0,
             'name' => '其他',
-            'count' => count($teamMemberMap[0]),
             'members' => $teamMemberMap[0]
         ];
 
         return $data;
+    }
+
+    /**
+     * 获取未加入团队的成员
+     * @param $companyID
+     * @return array|\yii\db\ActiveRecord[]
+     * @since 2018-01-21
+     */
+    public function getNotTeamMembers($companyID)
+    {
+        return User::find()
+            ->select(['id', 'fdName', 'fdPortrait'])
+            ->andWhere(['fdCompanyID' => $companyID])
+            ->andWhere(['fdTeamID' => 0])
+            ->andWhere(['fdStatus' => Conf::ENABLE])
+            ->all();
     }
 }

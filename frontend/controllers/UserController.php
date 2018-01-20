@@ -31,11 +31,12 @@ class UserController extends BaseController
                 'class' => AccessControl::className(),
                 'only'  => [
                     'logout',
-                    'signup'
+                    'signup',
+                    'login'
                 ],
                 'rules' => [
                     [
-                        'actions' => ['signup'],
+                        'actions' => ['signup', 'login'],
                         'allow'   => true,
                         'roles'   => ['?'],
                     ],
@@ -179,7 +180,7 @@ class UserController extends BaseController
 
             $exists = []; // 已存在的账号
             $newAccounts = []; // 新账号
-            $accounts = array_unique(explode(',', $data['accounts']));
+            $accounts = array_unique(array_filter(explode(',', $data['accounts'])));
 
             foreach ($accounts as $account) {
                 // 账号已经存在
@@ -211,8 +212,7 @@ class UserController extends BaseController
 
             // 成员入库
             if ($newAccounts) {
-                $companyID = Yii::$app->user->getIdentity()->fdCompanyID;
-                UserService::factory()->batchCreateUser($companyID, $newAccounts);
+                UserService::factory()->batchCreateUser($this->companyID, $newAccounts);
                 ResponseUtil::jsonCORS([
                     'status' => 0,
                     'exists' => $exists

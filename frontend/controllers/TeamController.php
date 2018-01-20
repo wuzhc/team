@@ -2,19 +2,23 @@
 
 namespace frontend\controllers;
 
+use common\config\Conf;
 use common\services\TeamService;
 use common\utils\ResponseUtil;
 use Yii;
 use common\models\Team;
-use common\models\TeamSearch;
-use yii\web\Controller;
+use yii\base\InvalidParamException;
+use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use common\models\User;
 
 /**
  * TeamController implements the CRUD actions for Team model.
+ * @author wuzhc <wuzhc2016@163.com>
+ * @since 2018-01-20
  */
-class TeamController extends Controller
+class TeamController extends BaseController
 {
     public $layout = 'main-member';
 
@@ -25,7 +29,7 @@ class TeamController extends Controller
     {
         return [
             'verbs' => [
-                'class' => VerbFilter::className(),
+                'class'   => VerbFilter::className(),
                 'actions' => [
                     'delete' => ['POST'],
                 ],
@@ -48,10 +52,8 @@ class TeamController extends Controller
      */
     public function actionGetMembers()
     {
-        $companyID = Yii::$app->user->identity->fdCompanyID;
-
         ResponseUtil::jsonCORS([
-            'data' => TeamService::factory()->getMembers($companyID)
+            'data' => TeamService::factory()->getMembers($this->companyID)
         ]);
     }
 
@@ -68,21 +70,64 @@ class TeamController extends Controller
     }
 
     /**
-     * Creates a new Team model.
-     * If creation is successful, the browser will be redirected to the 'view' page.
-     * @return mixed
+     * @return string
+     * @throws ForbiddenHttpException
      */
     public function actionCreate()
     {
-        $model = new Team();
+        if ($data = Yii::$app->request->post()) {
+            // 过滤非法数据
+            if (!$memberIDs = $this->_filterIllegalMembers($data['members'])) {
+                throw new ForbiddenHttpException('非法参数');
+            }
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+            $teamID = TeamService::factory()->save([
+                'name'        => $data['name'],
+                'creatorID'   => Yii::$app->user->id,
+                'companyID'   => $this->companyID,
+                'description' => $data['desc']
+            ]);
+
+            if (!$teamID) {
+                $this->redirectMsgBox(['team/index'], '创建失败');
+            }
+
+            $msg = User::updateAll(['fdTeamID' => $teamID], ['in', 'id', $memberIDs])
+                ? '创建成功' : '创建失败';
+
+            $this->redirectMsgBox(['team/index'], $msg);
+
         } else {
             return $this->render('create', [
-                'model' => $model,
+                'members' => TeamService::factory()->getNotTeamMembers($this->companyID),
             ]);
         }
+    }
+
+    private function _filterIllegalMembers($ids)
+    {
+        $data = [];
+
+        $members = User::find()
+            ->select(['id', 'fdStatus', 'fdCompanyID', 'fdTeamID'])
+            ->andWhere(['in', 'id', $ids])
+            ->all();
+
+        if (!$members) {
+            return $data;
+        }
+
+        /** @var User $member */
+        foreach ($members as $member) {
+            if ($member->fdStatus == Conf::ENABLE &&
+                $member->fdCompanyID == $this->companyID &&
+                $member->fdTeamID == 0
+            ) {
+                $data[] = $member->id;
+            }
+        }
+
+        return $data;
     }
 
     /**

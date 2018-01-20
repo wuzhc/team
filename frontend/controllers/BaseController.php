@@ -6,6 +6,7 @@ namespace frontend\controllers;
 use Yii;
 use yii\helpers\Url;
 use yii\web\Controller;
+use yii\web\ForbiddenHttpException;
 
 /**
  * 基础控制器
@@ -16,6 +17,20 @@ use yii\web\Controller;
  */
 class BaseController extends Controller
 {
+    protected $companyID;
+
+    /**
+     * @throws ForbiddenHttpException
+     */
+    public function init()
+    {
+        if (!Yii::$app->user->isGuest) {
+            $this->companyID = Yii::$app->user->identity->fdCompanyID;
+            if (empty($this->companyID)) {
+                throw new ForbiddenHttpException('禁止访问');
+            }
+        }
+    }
 
     /**
      * 跳转地址并弹窗提示信息

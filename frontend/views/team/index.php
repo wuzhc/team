@@ -8,7 +8,7 @@ $directoryAsset = Yii::$app->assetManager->getPublishedUrl('@vendor/almasaeed201
     <div class="col-md-3">
         <?php if (Yii::$app->user->can('importUser')) { ?>
         <div class="box box-solid">
-            <a href="<?= Url::to(['user/import'])?>" class="btn btn-success" style="width: 49%">新建团队</a>
+            <a href="<?= Url::to(['team/create'])?>" class="btn btn-success" style="width: 49%">新建团队</a>
             <a href="<?= Url::to(['user/import'])?>" class="btn btn-success" style="width: 49%">导入成员</a>
         </div>
         <?php } ?>
@@ -49,7 +49,8 @@ $directoryAsset = Yii::$app->assetManager->getPublishedUrl('@vendor/almasaeed201
     <div class="col-md-9">
         <div class="box">
             <div class="box-header with-border">
-                <h3 class="box-title">成员列表</h3>
+                <h3 class="box-title" id="team-name">成员列表</h3>
+                <a href="javaScript:void(0)" class="btn-sm btn-danger pull-right" id="team-url">新增</a>
             </div>
             <!-- /.box-header -->
             <div class="box-body no-padding">
@@ -165,10 +166,10 @@ $directoryAsset = Yii::$app->assetManager->getPublishedUrl('@vendor/almasaeed201
                 var teams = data.data || [];
                 var nav = '';
                 for (var i = 0, len = teams.length; i < len; i++) {
-                    teamMemeberMap[teams[i].id] = teams[i].members;
+                    teamMemeberMap[teams[i].id] = teams[i];
                     nav += '<li data-id="' + teams[i].id + '">' +
                         '<a href="#"><i class="fa fa-group"></i>' + teams[i].name +
-                        '<span class="label label-success pull-right">' + teams[i].count + '</span>' +
+                        '<span class="label label-success pull-right">' + teams[i].members.length + '</span>' +
                         '</a></li>';
 
                     if (i === 0) {
@@ -183,8 +184,12 @@ $directoryAsset = Yii::$app->assetManager->getPublishedUrl('@vendor/almasaeed201
 
         // 渲染成员
         function renderMembers(teamID) {
+
+            $('#team-name').text(teamMemeberMap[teamID].name);
+            $('#team-url').attr('href', "<?= Url::to(['team/update'])?>&id="+teamID);
+
             var portrait = '';
-            var members = teamMemeberMap[teamID] || [];
+            var members = teamMemeberMap[teamID].members || [];
             for (var j = 0, mlen = members.length; j < mlen; j++) {
                 portrait += '<li>' +
                     '<img src="' + members[j].portrait + '" alt="User Image">' +
