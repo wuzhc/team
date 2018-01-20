@@ -21,10 +21,10 @@ return [
         'bg-red',
         'bg-purple',
         'bg-green',
-        'bg-black',
         'bg-fuchsia',
         'bg-yellow',
         'bg-olive',
+        'bg-black',
         'bg-maroon',
         'bg-lime',
     ]
