@@ -2,19 +2,16 @@
 
 /* @var $this yii\web\View */
 
-$this->title = 'welcome';
+$this->title = 'Wuzhc博客';
 ?>
 <div class="site-index">
 
     <div class="jumbotron">
-        <h1>欢迎使用Team!</h1>
+        <h1>Congratulations!</h1>
 
-        <p class="lead">现在还没有项目，点击创建新项目吧.</p>
+        <p class="lead">You have successfully created your Yii-powered application.</p>
 
-        <p>
-            <a class="btn btn-lg btn-success" href="http://www.yiiframework.com">新建项目</a>
-            <a class="btn btn-lg btn-success" href="http://www.yiiframework.com">导入成员</a>
-        </p>
+        <p><a class="btn btn-lg btn-success" href="http://www.yiiframework.com">Get started with Yii</a></p>
     </div>
 
     <div class="body-content">

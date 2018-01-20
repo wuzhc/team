@@ -5,11 +5,14 @@ namespace frontend\controllers;
 use common\config\Conf;
 use common\models\User;
 use common\services\UserService;
+use common\utils\ResponseUtil;
+use common\utils\VerifyUtil;
 use frontend\form\LoginForm;
 use frontend\form\SignupForm;
 use Yii;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
+use yii\web\ForbiddenHttpException;
 
 /**
  * UserController implements the CRUD actions for User model.
@@ -94,7 +97,7 @@ class UserController extends BaseController
         if ($model->load(Yii::$app->request->post())) {
             if ($user = $model->signup()) {
                 if ($model->login()) {
-                    $this->redirectMsgBox(['default/index'], $user->fdName . ' 欢迎你...');
+                    $this->redirectMsgBox(['default/index'], '亲爱的' . $user->fdName . '，欢迎你使用Team');
                 } else {
                     $this->redirectMsgBox(['user/login'], '注册成功，请登录...');
                 }
@@ -155,5 +158,70 @@ class UserController extends BaseController
         } else {
             $this->redirectMsgBox(['user/login'], '验证成功，请登录...');
         }
+    }
+
+    /**
+     * 导入成员
+     * @return string
+     * @throws ForbiddenHttpException
+     */
+    public function actionImport()
+    {
+        // 权限检测，只有超级管理员和普通管理员才能执行
+        if (!Yii::$app->user->can('importUser')) {
+            throw new ForbiddenHttpException(Yii::t('yii', 'You are not allowed to perform this action.'));
+        }
+
+        if (Yii::$app->request->isAjax && ($data = Yii::$app->request->post())) {
+            if (!$data['accounts']) {
+                ResponseUtil::jsonCORS(['status' => 0, 'msg' => '账号不能为空']);
+            }
+
+            $exists = []; // 已存在的账号
+            $news = []; // 新导入用户
+            $accounts = array_unique(explode(',', $data['accounts']));
+
+            foreach ($accounts as $account) {
+                // 账号已经存在
+                if (UserService::factory()->getUserObjByAccount($account)) {
+                    $exists[] = $account;
+                    continue;
+                }
+
+                $temp = [
+                    'phone' => '',
+                    'email' => '',
+                    'login' => 't_' . VerifyUtil::getRandomCode(8, 3)
+                ];
+
+                if (VerifyUtil::checkPhone($account)) {
+                    $temp['phone'] = $account;
+                } elseif (VerifyUtil::checkEmail($account)) {
+                    $temp['email'] = $account;
+                } else {
+                    $temp['login'] = $account;
+                }
+
+                $news[] = $temp;
+            }
+
+            // 成员入库
+            if ($news) {
+                $res = UserService::factory()->batchCreateUser($news);
+                if (!$res) {
+                    ResponseUtil::jsonCORS([
+                        'status' => 0,
+                        'exists' => $exists
+                    ]);
+                }
+            }
+
+            ResponseUtil::jsonCORS([
+                'status' => 1,
+                'exists' => $exists
+            ]);
+        }
+
+        return $this->render('import-user');
     }
 }

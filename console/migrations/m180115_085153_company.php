@@ -25,12 +25,12 @@ class m180115_085153_company extends Migration
 
         $this->createTable($this->tableName, [
             'id'            => $this->primaryKey(11)->unsigned(),
-            'fdName'        => $this->string(32)->notNull()->comment('公司名称'),
+            'fdName'        => $this->string(32)->comment('公司名称'),
             'fdCreatorID'   => $this->integer(11)->defaultValue(0)->comment('创建者,对应tbUser.id，此字段为冗余字段'),
             'fdDescription' => $this->string(255)->comment('描述'),
             'fdStatus'      => $this->smallInteger(1)->defaultValue(0)->comment('1可用，2已删除'),
             'fdCreate'      => $this->dateTime()->notNull()->comment('创建时间'),
-            'fdUpdate'      => $this->dateTime()->notNull()->comment('更新时间'),
+            'fdUpdate'      => $this->dateTime()->comment('更新时间'),
         ], $tableOptions);
 
         $this->createIndex('creatorID', $this->tableName, 'fdCreatorID');

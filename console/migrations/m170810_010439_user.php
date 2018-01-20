@@ -51,7 +51,7 @@ class m170810_010439_user extends Migration
             'fdCreate'    => date('Y-m-d H:i:s'),
             'fdVerify'    => date('Y-m-d H:i:s'),
             'fdEmail'     => 'wuzhc2016@163.com',
-            'fdPosition'  => '超级管理员',
+            'fdPosition'  => 'Boss',
             'fdStatus'    => \common\config\Conf::USER_ENABLE,
             'fdRoleID'    => \common\config\Conf::ROLE_SUPER
         ]);

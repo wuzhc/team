@@ -3,22 +3,16 @@
 namespace frontend\controllers;
 
 use common\config\Conf;
-use common\services\CommonService;
-use common\services\UserService;
-use common\utils\ResponseUtil;
-use common\utils\VerifyUtil;
 use Yii;
-use common\models\Company;
-use common\models\CompanySearch;
-use yii\filters\AccessControl;
-use yii\web\ForbiddenHttpException;
+use common\models\Project;
+use common\models\ProjectSearch;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
 /**
- * CompanyController implements the CRUD actions for Company model.
+ * ProjectController implements the CRUD actions for Project model.
  */
-class CompanyController extends BaseController
+class ProjectController extends BaseController
 {
     public $layout = 'main-member';
 
@@ -28,27 +22,8 @@ class CompanyController extends BaseController
     public function behaviors()
     {
         return [
-            'access' => [
-                'class' => AccessControl::className(),
-                'rules' => [
-                    [
-                        'allow'         => true,
-                        'matchCallback' => function ($rule, $action) {
-                            // 登录检测
-                            if (Yii::$app->user->isGuest) {
-                                return false;
-                            }
-                            // 超级管理员检测
-                            if (($action->id != 'import-user') && !Yii::$app->user->can('super')) {
-                                return false;
-                            }
-                            return true;
-                        }
-                    ],
-                ],
-            ],
-            'verbs'  => [
-                'class'   => VerbFilter::className(),
+            'verbs' => [
+                'class' => VerbFilter::className(),
                 'actions' => [
                     'delete' => ['POST'],
                 ],
@@ -57,22 +32,22 @@ class CompanyController extends BaseController
     }
 
     /**
-     * Lists all Company models.
+     * Lists all Project models.
      * @return mixed
      */
     public function actionIndex()
     {
-        $searchModel = new CompanySearch();
+        $searchModel = new ProjectSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         return $this->render('index', [
-            'searchModel'  => $searchModel,
+            'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
         ]);
     }
 
     /**
-     * Displays a single Company model.
+     * Displays a single Project model.
      * @param integer $id
      * @return mixed
      */
@@ -84,29 +59,24 @@ class CompanyController extends BaseController
     }
 
     /**
-     * Creates a new Company model.
+     * Creates a new Project model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
     public function actionCreate()
     {
-        $model = new Company();
+        $model = new Project();
 
         if ($model->load(Yii::$app->request->post())) {
-            $model->fdStatus = Conf::ENABLE;
+            $model->fdCreatorID = Yii::$app->user->id;
+            $model->fdCompanyID = Yii::$app->user->identity->fdCompanyID;
             $model->fdCreate = date('Y-m-d H:i:s');
             $model->fdUpdate = date('Y-m-d H:i:s');
-            $model->fdCreatorID = Yii::$app->user->id;
-
+            $model->fdStatus = Conf::ENABLE;
             if ($model->save()) {
                 return $this->redirect(['view', 'id' => $model->id]);
             } else {
-                $msg = '';
-                foreach ($model->getErrors() as $key => $errors) {
-                    $msg = $errors[0];
-                    break;
-                }
-                $this->redirectMsgBox(['create'], $msg);
+                $this->redirectMsgBox(['project/index'], '操作失败');
             }
         } else {
             return $this->render('create', [
@@ -116,7 +86,7 @@ class CompanyController extends BaseController
     }
 
     /**
-     * Updates an existing Company model.
+     * Updates an existing Project model.
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param integer $id
      * @return mixed
@@ -127,16 +97,10 @@ class CompanyController extends BaseController
 
         if ($model->load(Yii::$app->request->post())) {
             $model->fdUpdate = date('Y-m-d H:i:s');
-
             if ($model->save()) {
                 return $this->redirect(['view', 'id' => $model->id]);
             } else {
-                $msg = '';
-                foreach ($model->getErrors() as $key => $errors) {
-                    $msg = $errors[0];
-                    break;
-                }
-                $this->redirectMsgBox(['update'], $msg);
+                $this->redirectMsgBox(['project/index'], '操作失败');
             }
         } else {
             return $this->render('update', [
@@ -146,7 +110,7 @@ class CompanyController extends BaseController
     }
 
     /**
-     * Deletes an existing Company model.
+     * Deletes an existing Project model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
      * @param integer $id
      * @return mixed
@@ -154,19 +118,20 @@ class CompanyController extends BaseController
     public function actionDelete($id)
     {
         $this->findModel($id)->delete();
-        $this->redirectMsgBox(['index'], '删除成功');
+
+        return $this->redirect(['index']);
     }
 
     /**
-     * Finds the Company model based on its primary key value.
+     * Finds the Project model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param integer $id
-     * @return Company the loaded model
+     * @return Project the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id)
     {
-        if (($model = Company::findOne($id)) !== null) {
+        if (($model = Project::findOne($id)) !== null) {
             return $model;
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');

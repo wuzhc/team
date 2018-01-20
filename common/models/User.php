@@ -18,6 +18,7 @@ use yii\web\IdentityInterface;
  * @property int $fdRoleID 身份，0超级管理员
  * @property int $fdCompanyID 所属公司
  * @property int $fdTeamID 所属团队
+ * @property string $fdPosition 职位
  * @property string $fdPhone 手机号码
  * @property string $fdEmail 邮箱地址
  * @property string $fdPortrait 头像url
@@ -45,7 +46,7 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
         return [
             [['fdName', 'fdLogin', 'fdCreate', 'fdSalt', 'fdPassword', 'fdCompanyID'], 'required'],
             [['fdStatus', 'fdRoleID', 'fdCompanyID', 'fdTeamID'], 'integer'],
-            [['fdCreate', 'fdVerify', 'fdLastTime'], 'safe'],
+            [['fdCreate', 'fdVerify', 'fdLastTime', 'fdPosition'], 'safe'],
             [['fdName', 'fdLogin', 'fdPassword'], 'string', 'max' => 32],
             [['fdPhone'], 'string', 'max' => 11],
             [['fdEmail'], 'string', 'max' => 64],
@@ -76,6 +77,7 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
             'fdSalt' => 'Fd Salt',
             'fdCompanyID' => 'Fd Company',
             'fdTeam' => 'Fd Team',
+            'fdPosition' => 'Fd Position',
         ];
     }
 

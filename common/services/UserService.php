@@ -107,10 +107,13 @@ class UserService extends AbstractService
         $user->fdEmail = $args['email'];
         $user->fdName = $args['name'];
         $user->fdStatus = Conf::ENABLE;
+        $user->fdRoleID = Conf::ROLE_SUPER;
+        $user->fdPosition = 'Boss';
         $user->fdCreate = date('Y-m-d H:i:s');
         $user->fdVerify = date('Y-m-d H:i:s');
+        $user->fdCompanyID = $args['companyID'];
         $user->fdSalt = VerifyUtil::getRandomCode(6, 3);
-        $user->fdPassword = md5(md5($args['password'] . $user->fdSalt));
+        $user->fdPassword = md5(md5($args['password']) . $user->fdSalt);
 
         if ($user->save()) {
             return $user;

@@ -2,6 +2,8 @@
 
 namespace frontend\controllers;
 
+use common\models\Project;
+use common\models\User;
 use common\utils\ResponseUtil;
 use Yii;
 use yii\filters\VerbFilter;
@@ -62,12 +64,26 @@ class DefaultController extends BaseController
     }
 
     /**
-     * Displays homepage.
+     * 首页
      * @return mixed
      */
     public function actionIndex()
     {
-        return $this->render('index');
+        /** @var User $user */
+        $user = Yii::$app->user->identity;
+
+        $projects = Project::find()
+            ->where(['fdCompanyID' => $user->fdCompanyID])
+            ->orderBy(['id' => SORT_DESC])
+            ->all();
+
+        if ($projects) {
+
+        }
+
+        return $this->render('index', [
+            '$projects' => $projects
+        ]);
     }
 
     /**

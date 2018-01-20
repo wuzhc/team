@@ -3,6 +3,7 @@
 namespace frontend\form;
 
 use common\models\User;
+use common\services\CompanyService;
 use common\services\UserService;
 use common\utils\ClientUtil;
 use common\utils\VerifyUtil;
@@ -113,12 +114,25 @@ class SignupForm extends Model
     public function signup()
     {
         if ($this->validate()) {
+            // 新注册用户默认所属一个新公司
+            if (!($companyID = CompanyService::factory()->save())) {
+                return null;
+            }
+
+            // 账号区分，如果账号类型是手机或邮箱，则同步到手机邮箱
+            if (VerifyUtil::checkPhone($this->login)) {
+                $this->phone or $this->phone = $this->login;
+            } elseif (VerifyUtil::checkEmail($this->login)) {
+                $this->email or $this->email = $this->login;
+            }
+
             $this->_user = UserService::factory()->createUser([
-                'login'    => $this->login,
-                'email'    => $this->email,
-                'phone'    => $this->phone,
-                'name'     => $this->name,
-                'password' => $this->password,
+                'login'     => $this->login,
+                'email'     => $this->email,
+                'phone'     => $this->phone,
+                'name'      => $this->name,
+                'password'  => $this->password,
+                'companyID' => $companyID
             ]);
         } else {
             if (YII_DEBUG) {
@@ -144,7 +158,9 @@ class SignupForm extends Model
     public function attributeLabels()
     {
         return [
-            'readMe' => '我同意接受条款'
+            'readMe' => '我同意接受条款',
+            'email' => '邮箱',
+            'phone' => '手机号'
         ];
     }
 }
