@@ -131,7 +131,7 @@ class UserService extends AbstractService
 
     /**
      * 以邮箱为注册号，批量保存用户
-     * @param int $companyID
+     * @param int $companyID 对应tbCompany.id
      * @param array $accounts
      * @return array|int
      * @author wuzhc
@@ -147,7 +147,7 @@ class UserService extends AbstractService
         foreach ($accounts as $k => $account) {
             $salt = VerifyUtil::getRandomCode(6, 3);
             $values[$k] = [
-                '佚名',
+                $account['name'] ,
                 $account['login'],
                 Conf::ROLE_MEMBER,
                 $companyID,

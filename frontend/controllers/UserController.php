@@ -189,6 +189,7 @@ class UserController extends BaseController
                 }
 
                 $temp = [
+                    'name'  => '',
                     'phone' => '',
                     'email' => '',
                     'login' => 't_' . VerifyUtil::getRandomCode(8, 3)
@@ -196,10 +197,13 @@ class UserController extends BaseController
 
                 if (VerifyUtil::checkPhone($account)) {
                     $temp['phone'] = $account;
+                    $temp['name'] = $account;
                 } elseif (VerifyUtil::checkEmail($account)) {
                     $temp['email'] = $account;
+                    $temp['name'] = $account;
                 } else {
                     $temp['login'] = $account;
+                    $temp['name'] = $account;
                 }
 
                 $newAccounts[] = $temp;
@@ -208,13 +212,11 @@ class UserController extends BaseController
             // 成员入库
             if ($newAccounts) {
                 $companyID = Yii::$app->user->getIdentity()->fdCompanyID;
-                $res = UserService::factory()->batchCreateUser($companyID, $newAccounts);
-                if (!$res) {
-                    ResponseUtil::jsonCORS([
-                        'status' => 0,
-                        'exists' => $exists
-                    ]);
-                }
+                UserService::factory()->batchCreateUser($companyID, $newAccounts);
+                ResponseUtil::jsonCORS([
+                    'status' => 0,
+                    'exists' => $exists
+                ]);
             }
 
             ResponseUtil::jsonCORS([

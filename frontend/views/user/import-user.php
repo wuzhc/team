@@ -6,7 +6,8 @@ $this->title = '导入成员';
     <!-- /.box-header -->
     <form role="form">
         <div class="box-header with-border">
-            <a tabindex="0" class="btn btn-success" data-toggle="popover" data-trigger="focus">导入规则说明</a>
+            <a tabindex="0" class="btn btn-danger" data-toggle="popover" data-trigger="focus">导入规则说明</a>
+            <a href="<?= Yii::$app->request->referrer?>" class="btn btn-success">返回</a>
         </div>
         <div class="box-body">
             <textarea class="form-control" rows="15" placeholder="多个成员邮箱英文逗号隔开" id="user-content"></textarea>
@@ -43,7 +44,7 @@ $this->title = '导入成员';
                 data: {accounts: accounts},
                 dataType: 'json'
             }).done(function (data) {
-                if (data.status === 1) {
+                if (data.status === 0) {
                     var exists = data.exists || [];
                     var len = exists.length;
                     if (len > 0) {

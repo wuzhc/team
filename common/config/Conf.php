@@ -19,14 +19,17 @@ class Conf
     const USER_FREEZE = 2; // 帐号被冻结
 
     /** 用户角色 */
-    const ROLE_GUEST = 0; // 游客
-    const ROLE_SUPER = 1; // 超级管理员
-    const ROLE_ADMIN = 2; // 普通管理员
-    const ROLE_MEMBER = 3; // 普通成员
+    const ROLE_SUPER = 0; // 超级管理员
+    const ROLE_ADMIN = 1; // 普通管理员
+    const ROLE_MEMBER = 2; // 普通成员
+    const ROLE_GUEST = 3; // 游客
 
     /** mongo集合名称 */
     const M_USER_LOGIN_LOG = 'userLoginLog';
 
     /** redis键 */
     const R_COUNTER_PROJ_TASK_NUM = 'counter:proj:';
+
+    /** 默认用户头像 */
+    const USER_PORTRAIT = 'http://file.cnweike.cn/content/0/0/0/251/255072.png?r=1516088302';
 }

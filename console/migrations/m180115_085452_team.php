@@ -30,8 +30,9 @@ class m180115_085452_team extends Migration
             'fdCompanyID'   => $this->integer(11)->notNull()->comment('公司,对应tbCompany.id'),
             'fdDescription' => $this->string(255)->comment('描述'),
             'fdStatus'      => $this->smallInteger(1)->defaultValue(0)->comment('1可用，2已删除'),
+            'fdOrder'       => $this->smallInteger(10)->defaultValue(0)->comment('排序，值越大排越前'),
             'fdCreate'      => $this->dateTime()->notNull()->comment('创建时间'),
-            'fdUpdate'      => $this->dateTime()->notNull()->comment('更新时间'),
+            'fdUpdate'      => $this->dateTime()->comment('更新时间'),
         ], $tableOptions);
 
         $this->createIndex('creatorID', $this->tableName, 'fdCreatorID');
