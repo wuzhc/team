@@ -3,9 +3,11 @@
 namespace frontend\controllers;
 
 use common\config\Conf;
+use common\services\TaskService;
 use Yii;
 use common\models\Project;
 use common\models\ProjectSearch;
+use yii\filters\AccessControl;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
@@ -22,8 +24,27 @@ class ProjectController extends BaseController
     public function behaviors()
     {
         return [
+            'access' => [
+                'class' => AccessControl::className(),
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'matchCallback' => function () {
+                            // 登录检测
+                            if (Yii::$app->user->isGuest) {
+                                return false;
+                            }
+                            // 管理员身份检测
+                            if (!Yii::$app->user->can('admin')) {
+                                return false;
+                            }
+                            return true;
+                        }
+                    ],
+                ],
+            ],
             'verbs' => [
-                'class' => VerbFilter::className(),
+                'class'   => VerbFilter::className(),
                 'actions' => [
                     'delete' => ['POST'],
                 ],
@@ -41,7 +62,7 @@ class ProjectController extends BaseController
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         return $this->render('index', [
-            'searchModel' => $searchModel,
+            'searchModel'  => $searchModel,
             'dataProvider' => $dataProvider,
         ]);
     }
@@ -68,12 +89,15 @@ class ProjectController extends BaseController
         $model = new Project();
 
         if ($model->load(Yii::$app->request->post())) {
+            // 默认数据
             $model->fdCreatorID = Yii::$app->user->id;
             $model->fdCompanyID = Yii::$app->user->identity->fdCompanyID;
             $model->fdCreate = date('Y-m-d H:i:s');
             $model->fdUpdate = date('Y-m-d H:i:s');
             $model->fdStatus = Conf::ENABLE;
+
             if ($model->save()) {
+                Yii::$app->redis->hmset(Conf::R_COUNTER_PROJ_TASK_NUM . $model->id, 'completeTasks', 0, 'allTasks', 0);
                 return $this->redirect(['view', 'id' => $model->id]);
             } else {
                 $this->redirectMsgBox(['project/index'], '操作失败');
@@ -117,7 +141,8 @@ class ProjectController extends BaseController
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+        $this->findModel($id)->updateAttributes(['fdStatus' => Conf::DISABLE]);
+        Yii::$app->redis->del(Conf::R_COUNTER_PROJ_TASK_NUM . $id);
 
         return $this->redirect(['index']);
     }

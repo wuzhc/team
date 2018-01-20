@@ -8,7 +8,7 @@ use yii\widgets\ActiveForm;
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
-<div class="project-form box box-primary">
+<div class="project-form box box-success">
     <?php $form = ActiveForm::begin(); ?>
     <div class="box-body table-responsive">
 

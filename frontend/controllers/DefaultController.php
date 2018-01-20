@@ -4,10 +4,13 @@ namespace frontend\controllers;
 
 use common\models\Project;
 use common\models\User;
+use common\services\ProjectService;
+use common\services\TaskService;
 use common\utils\ResponseUtil;
 use Yii;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
+use yii\helpers\ArrayHelper;
 
 /**
  * Site controller
@@ -72,17 +75,9 @@ class DefaultController extends BaseController
         /** @var User $user */
         $user = Yii::$app->user->identity;
 
-        $projects = Project::find()
-            ->where(['fdCompanyID' => $user->fdCompanyID])
-            ->orderBy(['id' => SORT_DESC])
-            ->all();
-
-        if ($projects) {
-
-        }
-
+        $projects = TaskService::factory()->getProjectStatByCompanyID($user->fdCompanyID);
         return $this->render('index', [
-            '$projects' => $projects
+            'projects' => $projects
         ]);
     }
 

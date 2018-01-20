@@ -10,7 +10,7 @@ $this->title = $model->fdName;
 $this->params['breadcrumbs'][] = ['label' => '项目', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="project-view box box-primary">
+<div class="project-view box box-success">
     <div class="box-header">
         <?= Html::a('更新', ['update', 'id' => $model->id], ['class' => 'btn btn-primary btn-flat']) ?>
         <?= Html::a('删除', ['delete', 'id' => $model->id], [

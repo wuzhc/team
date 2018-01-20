@@ -75,6 +75,14 @@ return [
             'assignmentTable' => '{{%AuthAssignment}}',
             'defaultRoles' => ['super', 'admin', 'guest', 'member'],
         ],
+
+        // redis add by wuzhc 2018-01-20
+        'redis' => [
+            'class' => 'yii\redis\Connection',
+            'hostname' => 'localhost',
+            'port' => 6379,
+            'database' => 0,
+        ],
     ],
 
     'controllerMap' => [

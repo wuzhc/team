@@ -10,7 +10,7 @@ use yii\widgets\Pjax;
 $this->title = '项目';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="project-index box box-primary">
+<div class="project-index box box-success">
     <?php Pjax::begin(); ?>
     <div class="box-header with-border">
         <?= Html::a('新建项目', ['create'], ['class' => 'btn btn-success btn-flat']) ?>

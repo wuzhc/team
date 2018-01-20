@@ -178,7 +178,7 @@ class UserController extends BaseController
             }
 
             $exists = []; // 已存在的账号
-            $news = []; // 新导入用户
+            $newAccounts = []; // 新账号
             $accounts = array_unique(explode(',', $data['accounts']));
 
             foreach ($accounts as $account) {
@@ -202,12 +202,13 @@ class UserController extends BaseController
                     $temp['login'] = $account;
                 }
 
-                $news[] = $temp;
+                $newAccounts[] = $temp;
             }
 
             // 成员入库
-            if ($news) {
-                $res = UserService::factory()->batchCreateUser($news);
+            if ($newAccounts) {
+                $companyID = Yii::$app->user->getIdentity()->fdCompanyID;
+                $res = UserService::factory()->batchCreateUser($companyID, $newAccounts);
                 if (!$res) {
                     ResponseUtil::jsonCORS([
                         'status' => 0,

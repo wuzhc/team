@@ -82,7 +82,7 @@ class UserService extends AbstractService
         if (true === MONGO_ON) {
             /** @var \yii\mongodb\Connection $mongo */
             $mongo = Yii::$app->mongodb;
-            $collection = $mongo->getCollection(Conf::USER_LOGIN_LOG);
+            $collection = $mongo->getCollection(Conf::M_USER_LOGIN_LOG);
 
             return $collection->insert([
                 'userID'  => $user->id,
@@ -131,14 +131,15 @@ class UserService extends AbstractService
 
     /**
      * 以邮箱为注册号，批量保存用户
+     * @param int $companyID
      * @param array $accounts
      * @return array|int
      * @author wuzhc
      * @since 2018-01-17
      */
-    public function batchCreateUser(array $accounts)
+    public function batchCreateUser($companyID, array $accounts)
     {
-        if (!$accounts || !is_array($accounts)) {
+        if (!$companyID || !$accounts || !is_array($accounts)) {
             return [];
         }
 
@@ -149,6 +150,7 @@ class UserService extends AbstractService
                 '佚名',
                 $account['login'],
                 Conf::ROLE_MEMBER,
+                $companyID,
                 Conf::USER_ENABLE,
                 $account['email'],
                 $account['phone'],
@@ -164,6 +166,7 @@ class UserService extends AbstractService
             'fdName',
             'fdLogin',
             'fdRoleID',
+            'fdCompanyID',
             'fdStatus',
             'fdEmail',
             'fdPhone',
@@ -174,7 +177,9 @@ class UserService extends AbstractService
             'fdSalt',
         ];
 
-        return Yii::$app->db->createCommand()->batchInsert(User::tableName(), $fields, $values)->execute();
+        return Yii::$app->db->createCommand()
+            ->batchInsert(User::tableName(), $fields, $values)
+            ->execute();
     }
 
     /**

@@ -62,7 +62,7 @@ class ProjectSearch extends Project
         $query->andFilterWhere([
             'id' => $this->id,
             'fdCreatorID' => $this->fdCreatorID,
-            'fdCompanyID' => $this->fdCompanyID,
+            'fdCompanyID' => Yii::$app->user->identity->fdCompanyID,
             'fdStatus' => $this->fdStatus,
             'fdCreate' => $this->fdCreate,
             'fdUpdate' => $this->fdUpdate,
