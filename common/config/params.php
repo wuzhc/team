@@ -44,7 +44,7 @@ return [
         'https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=2711067143,3961645744&fm=27&gp=0.jpg',
         'https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=1424212866,1672514568&fm=27&gp=0.jpg',
         'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=861963426,2321602261&fm=27&gp=0.jpg',
-        'https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=3796207220,3190924648&fm=27&gp=0.jpg',
+        'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3999684833,1365604362&fm=27&gp=0.jpg',
         'https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=1277106952,3591051236&fm=27&gp=0.jpg',
         'https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=1797640078,4104728626&fm=27&gp=0.jpg',
         'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=4261850071,2329649290&fm=27&gp=0.jpg',
