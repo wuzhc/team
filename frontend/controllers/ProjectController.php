@@ -4,6 +4,7 @@ namespace frontend\controllers;
 
 use common\config\Conf;
 use common\services\TaskService;
+use common\services\TeamService;
 use Yii;
 use common\models\Project;
 use common\models\ProjectSearch;
@@ -28,7 +29,7 @@ class ProjectController extends BaseController
                 'class' => AccessControl::className(),
                 'rules' => [
                     [
-                        'allow' => true,
+                        'allow'         => true,
                         'matchCallback' => function () {
                             // 登录检测
                             if (Yii::$app->user->isGuest) {
@@ -43,7 +44,7 @@ class ProjectController extends BaseController
                     ],
                 ],
             ],
-            'verbs' => [
+            'verbs'  => [
                 'class'   => VerbFilter::className(),
                 'actions' => [
                     'delete' => ['POST'],
@@ -160,6 +161,20 @@ class ProjectController extends BaseController
             return $model;
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');
+        }
+    }
+
+    /**
+     * 成员管理
+     */
+    public function actionMembers($id)
+    {
+        if ($data = Yii::$app->request->post() && Yii::$app->request->isAjax) {
+
+        } else {
+            return $this->render('members', [
+                'teams' => TeamService::factory()->getAllTeamMembers($this->companyID)
+            ]);
         }
     }
 }

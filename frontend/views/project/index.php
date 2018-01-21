@@ -72,6 +72,14 @@ $this->params['breadcrumbs'][] = $this->title;
                 ],
                  'fdCreate',
                 // 'fdUpdate',
+                [
+                    'label' => '成员管理',
+                    'value' => function ($searchModel) {
+                        return '<a href="'. \yii\helpers\Url::to(['project/members', 'id' => $searchModel->id]) .'">设置</a>';
+                    },
+                    'format' => 'html',
+                    'headerOptions' => ['width' => 80]
+                ],
 
                 ['class' => 'yii\grid\ActionColumn'],
             ],
