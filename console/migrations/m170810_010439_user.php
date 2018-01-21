@@ -1,5 +1,6 @@
 <?php
 
+use common\config\Conf;
 use yii\db\Migration;
 
 /**
@@ -41,6 +42,8 @@ class m170810_010439_user extends Migration
         ], $tableOptions);
 
         $this->createIndex('login', $this->tableName, 'fdLogin(10)');
+        $this->createIndex('companyID', $this->tableName, 'fdCompanyID');
+        $this->createIndex('teamID', $this->tableName, 'fdTeamID');
 
         $this->insert($this->tableName, [
             'fdName'      => '啊牛管理员',
@@ -55,11 +58,31 @@ class m170810_010439_user extends Migration
             'fdStatus'    => \common\config\Conf::USER_ENABLE,
             'fdRoleID'    => \common\config\Conf::ROLE_SUPER
         ]);
+
+        $this->batchInsert($this->tableName, [
+            'fdName', 'fdLogin', 'fdPassword', 'fdSalt', 'fdCompanyID', 'fdCreate', 'fdVerify', 'fdEmail', 'fdPosition', 'fdStatus', 'fdRoleID', 'fdPortrait', 'fdTeamID'
+        ], [
+            ['马云', 'mayun', 'a7aae49067df52022ad3ffc2e3c41096', 'gwsegb', 1, date('Y-m-d H:i:s'), date('Y-m-d H:i:s'), 'mayun@qq.com', '', Conf::USER_ENABLE, Conf::ROLE_MEMBER, Yii::$app->params['defaultPortrait'][0], 1],
+            ['王力宏', 'wanglihong', 'a7aae49067df52022ad3ffc2e3c41096', 'gwsegb', 1, date('Y-m-d H:i:s'), date('Y-m-d H:i:s'), 'wanglihong@qq.com', '', Conf::USER_ENABLE, Conf::ROLE_MEMBER, Yii::$app->params['defaultPortrait'][1], 1],
+            ['李连杰', 'lilianjie', 'a7aae49067df52022ad3ffc2e3c41096', 'gwsegb', 1, date('Y-m-d H:i:s'), date('Y-m-d H:i:s'), 'liliangjie@qq.com', '', Conf::USER_ENABLE, Conf::ROLE_MEMBER, Yii::$app->params['defaultPortrait'][2], 1],
+            ['蒋雪儿', 'jiangxueer', 'a7aae49067df52022ad3ffc2e3c41096', 'gwsegb', 1, date('Y-m-d H:i:s'), date('Y-m-d H:i:s'), 'jiangxuer@qq.com', '', Conf::USER_ENABLE, Conf::ROLE_MEMBER, Yii::$app->params['defaultPortrait'][3], 1],
+            ['马化腾', 'mahuateng', 'a7aae49067df52022ad3ffc2e3c41096', 'gwsegb', 1, date('Y-m-d H:i:s'), date('Y-m-d H:i:s'), 'mahuateng@qq.com', '', Conf::USER_ENABLE, Conf::ROLE_MEMBER, Yii::$app->params['defaultPortrait'][4], 1],
+            ['刘强东', 'liuqiangdong', 'a7aae49067df52022ad3ffc2e3c41096', 'gwsegb', 1, date('Y-m-d H:i:s'), date('Y-m-d H:i:s'), 'liuqiangdong@qq.com', '', Conf::USER_ENABLE, Conf::ROLE_MEMBER, Yii::$app->params['defaultPortrait'][5], 1],
+            ['吕永钜', 'lvyonju', 'a7aae49067df52022ad3ffc2e3c41096', 'gwsegb', 1, date('Y-m-d H:i:s'), date('Y-m-d H:i:s'), 'lvyonju@qq.com', '', Conf::USER_ENABLE, Conf::ROLE_MEMBER, Yii::$app->params['defaultPortrait'][6], 1],
+            ['张飞', 'zhangfei', 'a7aae49067df52022ad3ffc2e3c41096', 'gwsegb', 1, date('Y-m-d H:i:s'), date('Y-m-d H:i:s'), 'zhangfei@qq.com', '', Conf::USER_ENABLE, Conf::ROLE_MEMBER, Yii::$app->params['defaultPortrait'][7], 1],
+            ['李世民', 'lishimin', 'a7aae49067df52022ad3ffc2e3c41096', 'gwsegb', 1, date('Y-m-d H:i:s'), date('Y-m-d H:i:s'), 'lishimin@qq.com', '', Conf::USER_ENABLE, Conf::ROLE_MEMBER, Yii::$app->params['defaultPortrait'][8], 1],
+            ['秦烈', 'qinlie', 'a7aae49067df52022ad3ffc2e3c41096', 'gwsegb', 1, date('Y-m-d H:i:s'), date('Y-m-d H:i:s'), 'qinlie@qq.com', '', Conf::USER_ENABLE, Conf::ROLE_MEMBER, Yii::$app->params['defaultPortrait'][9], 1],
+            ['周传雄', 'zhouchuanxiong', 'a7aae49067df52022ad3ffc2e3c41096', 'gwsegb', 1, date('Y-m-d H:i:s'), date('Y-m-d H:i:s'), 'zhouchuanxiong@qq.com', '', Conf::USER_ENABLE, Conf::ROLE_MEMBER, Yii::$app->params['defaultPortrait'][10], 2],
+            ['费玉清', 'feiyuqing', 'a7aae49067df52022ad3ffc2e3c41096', 'gwsegb', 1, date('Y-m-d H:i:s'), date('Y-m-d H:i:s'), 'feiyuqing@qq.com', '', Conf::USER_ENABLE, Conf::ROLE_MEMBER, Yii::$app->params['defaultPortrait'][11], 2],
+            ['杨毅', 'yangyi', 'a7aae49067df52022ad3ffc2e3c41096', 'gwsegb', 1, date('Y-m-d H:i:s'), date('Y-m-d H:i:s'), 'yangyi@qq.com', '', Conf::USER_ENABLE, Conf::ROLE_MEMBER, Yii::$app->params['defaultPortrait'][12], 2]
+        ]);
     }
 
     public function safeDown()
     {
         $this->dropIndex('login', $this->tableName);
+        $this->dropIndex('companyID', $this->tableName);
+        $this->dropIndex('teamID', $this->tableName);
         $this->dropTable($this->tableName);
     }
 }

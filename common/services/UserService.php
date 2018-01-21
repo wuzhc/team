@@ -109,6 +109,7 @@ class UserService extends AbstractService
         $user->fdStatus = Conf::ENABLE;
         $user->fdRoleID = Conf::ROLE_SUPER;
         $user->fdPosition = 'Boss';
+        $user->fdPortrait = Yii::$app->params['defaultPortrait'][round(0,12)];
         $user->fdCreate = date('Y-m-d H:i:s');
         $user->fdVerify = date('Y-m-d H:i:s');
         $user->fdCompanyID = $args['companyID'];
@@ -154,7 +155,7 @@ class UserService extends AbstractService
                 Conf::USER_ENABLE,
                 $account['email'],
                 $account['phone'],
-                '',
+                Yii::$app->params['defaultPortrait'][$k%13],
                 date('Y-m-d H:i:s'),
                 date('Y-m-d H:i:s'),
                 md5(md5('123456') . $salt),
@@ -170,7 +171,7 @@ class UserService extends AbstractService
             'fdStatus',
             'fdEmail',
             'fdPhone',
-            'fdPosition',
+            'fdPortrait',
             'fdCreate',
             'fdVerify',
             'fdPassword',

@@ -37,6 +37,18 @@ class m180115_085452_team extends Migration
 
         $this->createIndex('creatorID', $this->tableName, 'fdCreatorID');
         $this->createIndex('companyID', $this->tableName, 'fdCompanyID');
+
+        $this->batchInsert($this->tableName, ['fdName', 'fdCreatorID', 'fdCompanyID', 'fdStatus', 'fdOrder', 'fdCreate', 'fdUpdate'], [
+            ['PHP后端', 1, 1, \common\config\Conf::USER_ENABLE, 6, date('Y-m-d H:i:s'), date('Y-m-d H:i:s')],
+            ['Java后端', 1, 1, \common\config\Conf::USER_ENABLE, 5, date('Y-m-d H:i:s'), date('Y-m-d H:i:s')],
+            ['美术', 1, 1, \common\config\Conf::USER_ENABLE, 0, date('Y-m-d H:i:s'), date('Y-m-d H:i:s')],
+            ['产品', 1, 1, \common\config\Conf::USER_ENABLE, 0, date('Y-m-d H:i:s'), date('Y-m-d H:i:s')],
+            ['Web前端', 1, 1, \common\config\Conf::USER_ENABLE, 5, date('Y-m-d H:i:s'), date('Y-m-d H:i:s')],
+            ['运维', 1, 1, \common\config\Conf::USER_ENABLE, 4, date('Y-m-d H:i:s'), date('Y-m-d H:i:s')],
+            ['测试', 1, 1, \common\config\Conf::USER_ENABLE, 0, date('Y-m-d H:i:s'), date('Y-m-d H:i:s')],
+            ['客服', 1, 1, \common\config\Conf::USER_ENABLE, 0, date('Y-m-d H:i:s'), date('Y-m-d H:i:s')],
+            ['市场', 1, 1, \common\config\Conf::USER_ENABLE, 0, date('Y-m-d H:i:s'), date('Y-m-d H:i:s')],
+        ]);
     }
 
     /**

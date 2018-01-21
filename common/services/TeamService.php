@@ -6,6 +6,7 @@ use common\models\Project;
 use common\models\Team;
 use common\models\User;
 use Yii;
+use yii\helpers\ArrayHelper;
 
 
 /**
@@ -90,7 +91,7 @@ class TeamService extends AbstractService
      * @return array
      * @since 2018-01-20
      */
-    public function getMembers($companyID)
+    public function getAllTeamMembers($companyID)
     {
         $data = [];
 
@@ -141,7 +142,7 @@ class TeamService extends AbstractService
         $data[] = [
             'id' => 0,
             'name' => '其他',
-            'members' => $teamMemberMap[0]
+            'members' => isset($teamMemberMap[0]) ? $teamMemberMap[0] : []
         ];
 
         return $data;
@@ -153,7 +154,7 @@ class TeamService extends AbstractService
      * @return array|\yii\db\ActiveRecord[]
      * @since 2018-01-21
      */
-    public function getNotTeamMembers($companyID)
+    public function getNotJoinTeamMembers($companyID)
     {
         return User::find()
             ->select(['id', 'fdName', 'fdPortrait'])
@@ -161,5 +162,33 @@ class TeamService extends AbstractService
             ->andWhere(['fdTeamID' => 0])
             ->andWhere(['fdStatus' => Conf::ENABLE])
             ->all();
+    }
+
+    /**
+     * 已经加入到某个团队的成员
+     * @param int $teamID 团队ID，对应tbTeam.id
+     * @param array $select 需要返回的字段
+     * @return array|\yii\db\ActiveRecord[]
+     * @since 2018-01-21
+     */
+    public function getHasJoinTeamMembers($teamID, $select = [])
+    {
+        return User::find()
+            ->select($select ?: ['id', 'fdName', 'fdPortrait', 'fdPosition'])
+            ->andWhere(['fdTeamID' => $teamID])
+            ->andWhere(['fdStatus' => Conf::ENABLE])
+            ->all();
+    }
+
+    /**
+     * 获取已经加入团队的成员ID
+     * @param int $teamID
+     * @return array
+     * @since 2018-01-21
+     */
+    public function getHasJoinTeamMemberIDs($teamID)
+    {
+        $members = $this->getHasJoinTeamMembers($teamID, ['id']);
+        return $members ? ArrayHelper::getColumn($members, 'id') : [];
     }
 }

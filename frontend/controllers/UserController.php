@@ -178,11 +178,13 @@ class UserController extends BaseController
                 ResponseUtil::jsonCORS(['status' => 0, 'msg' => '账号不能为空']);
             }
 
-            $exists = []; // 已存在的账号
+            $existAccounts = []; // 已存在的账号
             $newAccounts = []; // 新账号
             $accounts = array_unique(array_filter(explode(',', $data['accounts'])));
 
             foreach ($accounts as $account) {
+                $account = trim($account);
+
                 // 账号已经存在
                 if (UserService::factory()->getUserObjByAccount($account)) {
                     $exists[] = $account;
@@ -215,13 +217,13 @@ class UserController extends BaseController
                 UserService::factory()->batchCreateUser($this->companyID, $newAccounts);
                 ResponseUtil::jsonCORS([
                     'status' => 0,
-                    'exists' => $exists
+                    'exists' => $existAccounts
                 ]);
             }
 
             ResponseUtil::jsonCORS([
                 'status' => 1,
-                'exists' => $exists
+                'exists' => $existAccounts
             ]);
         }
 

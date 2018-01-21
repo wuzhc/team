@@ -50,7 +50,9 @@ $directoryAsset = Yii::$app->assetManager->getPublishedUrl('@vendor/almasaeed201
         <div class="box">
             <div class="box-header with-border">
                 <h3 class="box-title" id="team-name">成员列表</h3>
-                <a href="javaScript:void(0)" class="btn-sm btn-danger pull-right" id="team-url">新增</a>
+                <?php if (Yii::$app->user->can('editTeam')) { ?>
+                    <a href="javaScript:void(0)" class="btn-sm btn-danger pull-right" id="team-url">编辑</a>
+                <?php } ?>
             </div>
             <!-- /.box-header -->
             <div class="box-body no-padding">
@@ -192,7 +194,7 @@ $directoryAsset = Yii::$app->assetManager->getPublishedUrl('@vendor/almasaeed201
             var members = teamMemeberMap[teamID].members || [];
             for (var j = 0, mlen = members.length; j < mlen; j++) {
                 portrait += '<li>' +
-                    '<img src="' + members[j].portrait + '" alt="User Image">' +
+                    '<img src="' + members[j].portrait + '" alt="User Image" width="100px" height="100px">' +
                     '<a class="users-list-name" href="#">' + members[j].name + '</a>' +
                     '<span class="users-list-date">' + members[j].role + '</span>' +
                     '</li>';

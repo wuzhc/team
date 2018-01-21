@@ -8,6 +8,7 @@ use common\utils\ResponseUtil;
 use Yii;
 use common\models\Team;
 use yii\base\InvalidParamException;
+use yii\helpers\ArrayHelper;
 use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -53,7 +54,7 @@ class TeamController extends BaseController
     public function actionGetMembers()
     {
         ResponseUtil::jsonCORS([
-            'data' => TeamService::factory()->getMembers($this->companyID)
+            'data' => TeamService::factory()->getAllTeamMembers($this->companyID)
         ]);
     }
 
@@ -64,8 +65,14 @@ class TeamController extends BaseController
      */
     public function actionView($id)
     {
+        $team = Team::findOne(['id' => $id, 'fdStatus' => Conf::ENABLE]);
+        if (!$team) {
+            $this->redirectMsgBox(['team/index'], '数据不存在或已删除');
+        }
+
         return $this->render('view', [
-            'model' => $this->findModel($id),
+            'team' => $team,
+            'members' => TeamService::factory()->getHasJoinTeamMembers($id)
         ]);
     }
 
@@ -92,19 +99,22 @@ class TeamController extends BaseController
                 $this->redirectMsgBox(['team/index'], '创建失败');
             }
 
-            $msg = User::updateAll(['fdTeamID' => $teamID], ['in', 'id', $memberIDs])
-                ? '创建成功' : '创建失败';
-
+            $msg = User::updateAll(['fdTeamID' => $teamID], ['in', 'id', $memberIDs]) ? '创建成功' : '创建失败';
             $this->redirectMsgBox(['team/index'], $msg);
-
         } else {
             return $this->render('create', [
-                'members' => TeamService::factory()->getNotTeamMembers($this->companyID),
+                'members' => TeamService::factory()->getNotJoinTeamMembers($this->companyID),
             ]);
         }
     }
 
-    private function _filterIllegalMembers($ids)
+    /**
+     * 过滤非法成员ID
+     * @param $ids
+     * @param $teamID
+     * @return array
+     */
+    private function _filterIllegalMembers($ids, $teamID = 0)
     {
         $data = [];
 
@@ -121,7 +131,7 @@ class TeamController extends BaseController
         foreach ($members as $member) {
             if ($member->fdStatus == Conf::ENABLE &&
                 $member->fdCompanyID == $this->companyID &&
-                $member->fdTeamID == 0
+                ($member->fdTeamID == 0 || $member->fdTeamID == $teamID)
             ) {
                 $data[] = $member->id;
             }
@@ -131,20 +141,66 @@ class TeamController extends BaseController
     }
 
     /**
-     * Updates an existing Team model.
-     * If update is successful, the browser will be redirected to the 'view' page.
-     * @param integer $id
-     * @return mixed
+     * 编辑团队
+     * @param $id
+     * @return string
+     * @throws ForbiddenHttpException
+     * @throws \Exception
      */
     public function actionUpdate($id)
     {
-        $model = $this->findModel($id);
+        $team = Team::findOne(['id' => $id, 'fdStatus' => Conf::ENABLE]);
+        if (!$team) {
+            $this->redirectMsgBox(['team/index'], '数据不存在或已删除');
+        }
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+        if ($data = Yii::$app->request->post()) {
+            // 过滤非法数据
+            if (!$memberIDs = $this->_filterIllegalMembers($data['members'], $id)) {
+                throw new ForbiddenHttpException('非法参数');
+            }
+
+            // 已经加入团队的成员
+            $hasJoinMemberIDs = TeamService::factory()->getHasJoinTeamMemberIDs($id);
+
+            $transaction = Yii::$app->db->beginTransaction();
+            try {
+                // 更新team信息
+                TeamService::factory()->update([
+                    'id'          => $id,
+                    'name'        => $data['name'],
+                    'description' => $data['desc'],
+                    'status'      => Conf::ENABLE
+                ]);
+
+                // 移除成员
+                $removes = array_diff($hasJoinMemberIDs, $memberIDs);
+                if ($removes) {
+                    User::updateAll(['fdTeamID' => 0], ['in', 'id', $removes]);
+                }
+
+                // 新增成员
+                $news = array_diff($memberIDs, $hasJoinMemberIDs);
+                if ($news) {
+                    User::updateAll(['fdTeamID' => $id], ['in', 'id', $news]);
+                }
+
+                $transaction->commit();
+                $this->redirectMsgBox(['team/index'], '操作成功');
+            } catch (\Exception $e) {
+                $transaction->rollBack();
+                throw $e;
+            }
         } else {
+            $members = User::find()
+                ->select(['id', 'fdPortrait', 'fdName', 'fdTeamID'])
+                ->andWhere(['fdStatus' => Conf::ENABLE])
+                ->andWhere(['in', 'fdTeamID', [$id, 0]])
+                ->all();
+
             return $this->render('update', [
-                'model' => $model,
+                'team'    => $team,
+                'members' => $members,
             ]);
         }
     }
