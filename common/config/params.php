@@ -50,6 +50,7 @@ return [
         'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=4261850071,2329649290&fm=27&gp=0.jpg',
         'https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=1244525275,867989435&fm=27&gp=0.jpg',
         'https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=253394805,2252880835&fm=27&gp=0.jpg',
-        'https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=2374174844,3560175017&fm=27&gp=0.jpg'
+        'https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=2374174844,3560175017&fm=27&gp=0.jpg',
+        'https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=1965350828,1166357149&fm=27&gp=0.jpg'
     ]
 ];
