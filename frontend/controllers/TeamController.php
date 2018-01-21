@@ -155,9 +155,12 @@ class TeamController extends BaseController
         }
 
         if ($data = Yii::$app->request->post()) {
+
             // 过滤非法数据
-            if (!$memberIDs = $this->_filterIllegalMembers($data['members'], $id)) {
-                throw new ForbiddenHttpException('非法参数');
+            if (!empty($data['members'])) {
+                $memberIDs = $this->_filterIllegalMembers($data['members'], $id);
+            } else {
+                $memberIDs = [];
             }
 
             // 已经加入团队的成员
@@ -168,8 +171,8 @@ class TeamController extends BaseController
                 // 更新team信息
                 TeamService::factory()->update([
                     'id'          => $id,
-                    'name'        => $data['name'],
-                    'description' => $data['desc'],
+                    'name'        => !empty($data['name']) ? $data['name'] : '',
+                    'description' => !empty($data['desc']) ? $data['desc'] : '',
                     'status'      => Conf::ENABLE
                 ]);
 
