@@ -70,12 +70,14 @@ $this->params['breadcrumbs'][] = $this->title;
                     },
                     'filter' => ['1' => '可用', '2' => '禁用'],
                 ],
-                 'fdCreate',
-                // 'fdUpdate',
                 [
-                    'label' => '成员管理',
+                    'label' => '创建时间',
+                    'attribute' => 'fdCreate',
+                    'headerOptions' => ['width' => 80]
+                ],
+                [
                     'value' => function ($searchModel) {
-                        return '<a href="'. \yii\helpers\Url::to(['project/members', 'id' => $searchModel->id]) .'">设置</a>';
+                        return '<a href="'. \yii\helpers\Url::to(['project/members', 'id' => $searchModel->id]) .'"><span class="label label-success">成员管理</span></a>';
                     },
                     'format' => 'html',
                     'headerOptions' => ['width' => 80]

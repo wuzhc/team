@@ -23,21 +23,21 @@ class RbacController extends Controller
      */
     public function actionInit()
     {
-        echo "Begin: \n";
+        echo "正在初始化rbac... \n";
 
         $auth = Yii::$app->authManager;
 
         // 添加规则
         $userGroupRule = new UserGroupRule();
         $auth->add($userGroupRule);
-        echo "- Add userGroupRule successfully \n";
+        echo "- 成功添加角色规则 \n";
 
         // 超级管理员角色
         $super = $auth->createRole('super');
         $super->ruleName = $userGroupRule->name;
         $super->description = '超级管理员';
         $auth->add($super);
-        echo "- Add super role successfully \n";
+        echo "- 成功添加超级管理员角色（super） \n";
 
         // 管理员角色
         $admin = $auth->createRole('admin');
@@ -45,7 +45,7 @@ class RbacController extends Controller
         $admin->description = '普通管理员';
         $auth->add($admin);
         $auth->addChild($super, $admin);
-        echo "- Add the admin role and make it a child role of the super role successfully\n";
+        echo "- 成功添加管理员角色（admin），并作为超级管理员角色的子角色 \n";
 
         // 普通成员
         $member = $auth->createRole('member');
@@ -53,7 +53,7 @@ class RbacController extends Controller
         $member->description = '普通成员';
         $auth->add($member);
         $auth->addChild($admin, $member);
-        echo "- Add the member role and make it a child role of the admin role successfully\n";
+        echo "- 成功添加成员角色（member），并作为管理员角色的子角色 \n";
 
         // 游客
         $guest = $auth->createRole('guest');
@@ -61,7 +61,7 @@ class RbacController extends Controller
         $guest->description = '游客';
         $auth->add($guest);
         $auth->addChild($member, $guest);
-        echo "- Add the guest role and make it a child role of the member role successfully\n";
+        echo "- 成功添加游客角色（guest），并作为成员角色的子角色 \n";
 
         // 导入成员
         $importUser = $auth->createPermission('importUser');
@@ -69,7 +69,7 @@ class RbacController extends Controller
         $importUser->ruleName = null;
         $auth->add($importUser);
         $auth->addChild($admin, $importUser);
-        echo "- Add importUser permission and assign to admin role successfully\n";
+        echo "- 成功添加导入成员权限（importUser），并赋给了管理员角色 \n";
 
         // 设置管理员
         $setAdmin = $auth->createPermission('setAdmin');
@@ -77,7 +77,7 @@ class RbacController extends Controller
         $setAdmin->ruleName = null;
         $auth->add($setAdmin);
         $auth->addChild($super, $setAdmin);
-        echo "- Add setAdmin permission and assign to super role successfully\n";
+        echo "- 成功添加设置管理管理权限（setAdmin），并赋给了超级管理员角色 \n";
 
         // 删除普通成员
         $delMember = $auth->createPermission('delMember');
@@ -85,7 +85,7 @@ class RbacController extends Controller
         $delMember->ruleName = null;
         $auth->add($delMember);
         $auth->addChild($admin, $delMember);
-        echo "- Add delMember permission and assign to admin role successfully\n";
+        echo "- 成功添加删除成员权限（delMember），并赋给了管理角色 \n";
 
         // 创建团队
         $createTeam = $auth->createPermission('createTeam');
@@ -93,7 +93,7 @@ class RbacController extends Controller
         $createTeam->ruleName = null;
         $auth->add($createTeam);
         $auth->addChild($admin, $createTeam);
-        echo "- Add createTeam permission and assign to admin role successfully\n";
+        echo "- 成功添加创建团队权限（createTeam），并赋给了管理角色 \n";
 
         // 编辑团队
         $editTeam = $auth->createPermission('editTeam');
@@ -101,7 +101,7 @@ class RbacController extends Controller
         $editTeam->ruleName = null;
         $auth->add($editTeam);
         $auth->addChild($admin, $editTeam);
-        echo "- Add editTeam permission and assign to admin role successfully\n";
+        echo "- 成功添加编辑团队权限（editTeam），并赋给了管理角色 \n";
 
         // 删除团队
         $delTeam = $auth->createPermission('delTeam');
@@ -109,7 +109,7 @@ class RbacController extends Controller
         $delTeam->ruleName = null;
         $auth->add($delTeam);
         $auth->addChild($admin, $delTeam);
-        echo "- Add delTeam permission and assign to admin role successfully\n";
+        echo "- 成功添加删除团队权限（delTeam），并赋给了管理角色 \n";
 
         // 创建项目
         $createProject = $auth->createPermission('createProject');
@@ -117,7 +117,7 @@ class RbacController extends Controller
         $createProject->ruleName = null;
         $auth->add($createProject);
         $auth->addChild($admin, $createProject);
-        echo "- Add createProject permission and assign to admin role successfully\n";
+        echo "- 成功添加创建项目权限（createProject），并赋给了管理角色 \n";
 
         // 编辑项目
         $editProject = $auth->createPermission('editProject');
@@ -125,7 +125,7 @@ class RbacController extends Controller
         $editProject->ruleName = null;
         $auth->add($editProject);
         $auth->addChild($admin, $editProject);
-        echo "- Add editProject permission and assign to admin role successfully\n";
+        echo "- 成功添加编辑项目权限（editProject），并赋给了管理角色 \n";
 
         // 删除项目
         $delProject = $auth->createPermission('delProject');
@@ -133,9 +133,17 @@ class RbacController extends Controller
         $delProject->ruleName = null;
         $auth->add($delProject);
         $auth->addChild($admin, $delProject);
-        echo "- Add delProject permission and assign to admin role successfully\n";
+        echo "- 成功添加删除项目权限（delProject），并赋给了管理角色 \n";
 
-        echo "- All done \n";
+        // 项目成员管理
+        $setMembers = $auth->createPermission('setMembers');
+        $setMembers->description = '项目人员管理';
+        $setMembers->ruleName = null;
+        $auth->add($setMembers);
+        $auth->addChild($admin, $setMembers);
+        echo "- 成功添加项目成员管理权限（setMembers），并赋给了管理角色 \n";
+
+        echo "初始化完成 \n";
     }
 
     /**
@@ -145,14 +153,15 @@ class RbacController extends Controller
     public function actionClear()
     {
         do {
-            fwrite(STDOUT, "Are you sure clear all rbac? [y/n] \n");
+            fwrite(STDOUT, "你确定要删除所有的rbac吗? [y/n] \n");
             $act = trim(fgets(STDIN));
             if ($act == 'n') {
                 exit;
             } elseif ($act == 'y') {
+                echo "正在删除... \n";
                 $auth = Yii::$app->authManager;
                 $auth->removeAll();
-                echo "Remove all successfully \n";
+                echo "删除完成 \n";
                 exit;
             }
         } while (true);
@@ -165,15 +174,16 @@ class RbacController extends Controller
     public function actionReset()
     {
         do {
-            fwrite(STDOUT, "Are you sure reset all rbac? [y/n] \n");
+            fwrite(STDOUT, "你确定要重置rbac吗? [y/n] \n");
             $act = trim(fgets(STDIN));
             if ($act == 'n') {
                 exit;
             } elseif ($act == 'y') {
+                echo "正在重置... \n";
                 $auth = Yii::$app->authManager;
                 $auth->removeAll();
                 $this->actionInit();
-                echo "Reset all successfully \n";
+                echo "重置完成 \n";
                 exit;
             }
         } while (true);

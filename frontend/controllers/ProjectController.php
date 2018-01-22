@@ -8,6 +8,7 @@ use common\services\TeamService;
 use Yii;
 use common\models\Project;
 use common\models\ProjectSearch;
+use yii\base\InvalidParamException;
 use yii\filters\AccessControl;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -166,9 +167,20 @@ class ProjectController extends BaseController
 
     /**
      * 成员管理
+     * @since 2018-01-22
      */
     public function actionMembers($id)
     {
+        if (empty($id)) {
+            throw new InvalidParamException('参数错误');
+        }
+
+        /** @var Project $project */
+        $project = Project::findOne(['id' => $id]);
+        if (!$project || $project->fdCompanyID != $this->companyID) {
+            throw new NotFoundHttpException('页面不存在');
+        }
+
         if ($data = Yii::$app->request->post() && Yii::$app->request->isAjax) {
 
         } else {

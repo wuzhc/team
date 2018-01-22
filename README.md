@@ -30,14 +30,17 @@ CREATE DATABASE team DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci
     'tablePrefix' => 'tb',
 ],
 ```
-- 迁移数据库表  
-> 一般执行./yii migrate/up all 即可
+- 创建数据库表并初始化数据
 ```bash
-./yii migrate/up all               Upgrades the application by applying new migrations.
-./yii migrate/down                 Downgrades the application by reverting old migrations.
-./yii migrate/history              Displays the migration history.
-./yii migrate/redo                 Redoes the last few migrations.
+./yii migrate/up all                
 ```
+![数据库表迁移](https://github.com/wuzhc/manage/blob/master/docs/images/dbInit.png)
+
+- 初始化权限
+```bash
+./yii rbac/init 
+```
+![权限初始化](https://github.com/wuzhc/manage/blob/master/docs/images/rbacInit.png)
 
 本地网址：
 > 最好是自己配置虚拟域名，然后team/frontend/web作为root目录
