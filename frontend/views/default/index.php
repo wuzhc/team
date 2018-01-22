@@ -20,7 +20,7 @@ $directoryAsset = Yii::$app->assetManager->getPublishedUrl('@vendor/almasaeed201
                 <div class="icon">
                     <i class="ion ion-person-add"></i>
                 </div>
-                <a href="#" class="small-box-footer">
+                <a href="<?= \yii\helpers\Url::to(['task/index', 'projectID' => $project['id']])?>" class="small-box-footer">
                     进入 <i class="fa fa-arrow-circle-right"></i>
                 </a>
             </div>

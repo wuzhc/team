@@ -4,6 +4,8 @@ namespace common\services;
 
 use common\config\Conf;
 use common\models\Project;
+use common\models\TaskCategory;
+use common\models\TaskLabel;
 use Yii;
 
 
@@ -78,5 +80,53 @@ class TaskService extends AbstractService
     {
         /** @var yii\redis\Connection $redis */
         $redis = Yii::$app->redis;
+    }
+
+    /**
+     * 创建任务分类
+     * @param int $projectID
+     * @param string $name
+     * @return bool
+     * @since 2018-01-22
+     */
+    public function saveTaskCategory($projectID, $name)
+    {
+        if (!$projectID || !$name) {
+            return false;
+        }
+
+        $taskCategory = new TaskCategory();
+        $taskCategory->fdName = trim(strip_tags($name));
+        $taskCategory->fdProjectID = $projectID;
+
+        $res = $taskCategory->save();
+        if (!$res && YII_DEBUG) {
+            var_dump($taskCategory->getErrors());
+            exit;
+        }
+
+        return $res;
+    }
+
+    /**
+     * 获取所有任务分类
+     * @param $projectID
+     * @return array|\yii\db\ActiveRecord[]
+     * @since 2018-01-22
+     */
+    public function getTaskCategories($projectID)
+    {
+        return TaskCategory::find()->where(['fdProjectID' => $projectID, 'fdStatus' => Conf::ENABLE])->all();
+    }
+
+    /**
+     * 获取所有任务标签
+     * @param $projectID
+     * @return array|\yii\db\ActiveRecord[]
+     * @since 2018-01-22
+     */
+    public function getTaskLabels($projectID)
+    {
+        return TaskLabel::find()->where(['fdProjectID' => $projectID, 'fdStatus' => Conf::ENABLE])->all();
     }
 }

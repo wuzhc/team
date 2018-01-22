@@ -10,6 +10,9 @@ namespace common\config;
  */
 class Conf
 {
+    const SUCCESS = 1;
+    const FAILED = 0;
+
     const ENABLE = 1; // 可用状态
     const DISABLE = 2; // 不可用
 

@@ -3,8 +3,12 @@
 namespace frontend\controllers;
 
 use common\config\Conf;
+use common\models\ProjectUserMap;
+use common\services\ProjectService;
 use common\services\TaskService;
 use common\services\TeamService;
+use common\services\UserService;
+use common\utils\ResponseUtil;
 use Yii;
 use common\models\Project;
 use common\models\ProjectSearch;
@@ -93,7 +97,7 @@ class ProjectController extends BaseController
         if ($model->load(Yii::$app->request->post())) {
             // 默认数据
             $model->fdCreatorID = Yii::$app->user->id;
-            $model->fdCompanyID = Yii::$app->user->identity->fdCompanyID;
+            $model->fdCompanyID = $this->companyID;
             $model->fdCreate = date('Y-m-d H:i:s');
             $model->fdUpdate = date('Y-m-d H:i:s');
             $model->fdStatus = Conf::ENABLE;
@@ -181,12 +185,65 @@ class ProjectController extends BaseController
             throw new NotFoundHttpException('页面不存在');
         }
 
-        if ($data = Yii::$app->request->post() && Yii::$app->request->isAjax) {
+        if (($data = Yii::$app->request->post()) && Yii::$app->request->isAjax) {
+            // 过滤非法成员ID
+            $memberIDs = $this->_filterMemberIDs($data['members']);
+            if (!$memberIDs) {
+                ResponseUtil::jsonCORS(['status' => 0, 'msg' => '设置失败，因为没有选择成员']);
+            }
 
+            // 已经加入项目的成员
+            $hasJoinMemberIDs = ProjectService::factory()->getHasJoinProjectMemberIDs($id);
+
+            // 新增成员
+            $newMemberIDs = array_diff($memberIDs, $hasJoinMemberIDs);
+
+            // 被移除成员
+            $removeMemberIDs = array_diff($hasJoinMemberIDs, $memberIDs);
+
+            $transaction = Yii::$app->db->beginTransaction();
+            try {
+                ProjectService::factory()->saveProjectUserMap($id, $newMemberIDs);
+                ProjectService::factory()->removeProjectUserMap($id, $removeMemberIDs);
+                $transaction->commit();
+                ResponseUtil::jsonCORS(['status' => 1, 'msg' => '设置成功']);
+            } catch (\Exception $e) {
+                $transaction->rollBack();
+                throw $e;
+            }
         } else {
             return $this->render('members', [
                 'teams' => TeamService::factory()->getAllTeamMembers($this->companyID)
             ]);
         }
+    }
+
+    /**
+     * 过滤提交的用户ID
+     * @param $memberIDs
+     * @return array
+     */
+    private function _filterMemberIDs($memberIDs)
+    {
+        if (empty($memberIDs) || !is_array($memberIDs)) {
+            return [];
+        }
+
+        $memberIDs = array_filter(array_unique($memberIDs));
+        $allMemberIDs = UserService::factory()->getUserIDs([
+            'companyID' => $this->companyID,
+            'status'    => Conf::USER_ENABLE
+        ]);
+
+        return array_intersect($memberIDs, $allMemberIDs);
+    }
+
+    /**
+     * 获取已加入项目的成员
+     * @param $id
+     */
+    public function actionGetHasJoinMemberIDs   ($id)
+    {
+        ResponseUtil::jsonCORS(['memberIDs' => ProjectService::factory()->getHasJoinProjectMemberIDs($id)]);
     }
 }

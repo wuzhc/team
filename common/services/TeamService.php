@@ -1,6 +1,7 @@
 <?php
 
 namespace common\services;
+
 use common\config\Conf;
 use common\models\Project;
 use common\models\Team;
@@ -95,13 +96,12 @@ class TeamService extends AbstractService
     {
         $data = [];
 
-        $allMembers = User::find()
-            ->select(['id', 'fdName', 'fdPortrait', 'fdTeamID', 'fdRoleID'])
-            ->andWhere(['fdCompanyID' => $companyID])
-            ->andWhere(['fdStatus' => Conf::ENABLE])
-            ->orderBy(['fdRoleID' => SORT_ASC])
-            ->all();
-
+        $allMembers = UserService::factory()->getUsers([
+            'select'    => ['id', 'fdName', 'fdPortrait', 'fdTeamID', 'fdRoleID'],
+            'companyID' => $companyID,
+            'status'    => Conf::USER_ENABLE,
+            'order'     => ['fdRoleID' => SORT_ASC]
+        ]);
         if (!$allMembers) {
             return $data;
         }
@@ -138,10 +138,10 @@ class TeamService extends AbstractService
             $data[] = $temp;
         }
 
-        // 剩余未加入团队的成员
+        // 其他未加入团队的成员
         $data[] = [
-            'id' => 0,
-            'name' => '其他',
+            'id'      => 0,
+            'name'    => '其他',
             'members' => isset($teamMemberMap[0]) ? $teamMemberMap[0] : []
         ];
 
@@ -156,16 +156,16 @@ class TeamService extends AbstractService
      */
     public function getNotJoinTeamMembers($companyID)
     {
-        return User::find()
-            ->select(['id', 'fdName', 'fdPortrait'])
-            ->andWhere(['fdCompanyID' => $companyID])
-            ->andWhere(['fdTeamID' => 0])
-            ->andWhere(['fdStatus' => Conf::ENABLE])
-            ->all();
+        return UserService::factory()->getUsers([
+            'select'    => ['id', 'fdName', 'fdPortrait'],
+            'teamID'    => 0,
+            'status'    => Conf::ENABLE,
+            'companyID' => $companyID
+        ]);
     }
 
     /**
-     * 已经加入到某个团队的成员
+     * 已经加入到某个团队成员
      * @param int $teamID 团队ID，对应tbTeam.id
      * @param array $select 需要返回的字段
      * @return array|\yii\db\ActiveRecord[]
@@ -173,11 +173,11 @@ class TeamService extends AbstractService
      */
     public function getHasJoinTeamMembers($teamID, $select = [])
     {
-        return User::find()
-            ->select($select ?: ['id', 'fdName', 'fdPortrait', 'fdPosition'])
-            ->andWhere(['fdTeamID' => $teamID])
-            ->andWhere(['fdStatus' => Conf::ENABLE])
-            ->all();
+        return UserService::factory()->getUsers([
+            'select'    => $select ?: ['id', 'fdName', 'fdPortrait'],
+            'teamID'    => $teamID,
+            'status'    => Conf::ENABLE,
+        ]);
     }
 
     /**

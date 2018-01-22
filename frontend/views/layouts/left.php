@@ -37,7 +37,7 @@ $identify = Yii::$app->user->identity;
                     ['label' => 'Menu Yii2', 'options' => ['class' => 'header']],
                     ['label' => '动态', 'icon' => 'file-code-o', 'url' => ['/default/dynamic']],
                     ['label' => '团队', 'icon' => 'fa fa-group', 'url' => ['/team/index']],
-                    ['label' => '任务', 'icon' => 'dashboard', 'url' => ['/task/index']],
+                    ['label' => '任务', 'icon' => 'dashboard', 'url' => ['/task/index','projectID' => 1]],
                     ['label' => '项目', 'icon' => 'dashboard', 'url' => ['/project/index'], 'visible' => ($identify->fdRoleID === \common\config\Conf::ROLE_SUPER || $identify->fdRoleID === \common\config\Conf::ROLE_ADMIN)],
                     ['label' => 'Login', 'url' => ['site/login'], 'visible' => Yii::$app->user->isGuest],
                     [

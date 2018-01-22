@@ -7,7 +7,7 @@ $directoryAsset = Yii::$app->assetManager->getPublishedUrl('@vendor/almasaeed201
 
         <div class="box box-solid">
             <div class="box-header with-border">
-                <h3 class="box-title">Folders</h3>
+                <h3 class="box-title">清单</h3>
 
                 <div class="box-tools">
                     <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
@@ -16,13 +16,13 @@ $directoryAsset = Yii::$app->assetManager->getPublishedUrl('@vendor/almasaeed201
             </div>
             <div class="box-body no-padding">
                 <ul class="nav nav-pills nav-stacked">
-                    <li class="active"><a href="#"><i class="fa fa-inbox"></i> Inbox
-                            <span class="label label-primary pull-right">12</span></a></li>
-                    <li><a href="#"><i class="fa fa-envelope-o"></i> Sent</a></li>
-                    <li><a href="#"><i class="fa fa-file-text-o"></i> Drafts</a></li>
-                    <li><a href="#"><i class="fa fa-filter"></i> Junk <span class="label label-warning pull-right">65</span></a>
-                    </li>
-                    <li><a href="#"><i class="fa fa-trash-o"></i> Trash</a></li>
+                    <?php if (!empty($categories)) { ?>
+                        <?php foreach ($categories as $k => $category) { ?>
+                            <li>
+                                <a href="javaScript:void(0)" data-id="<?=$category->id?>"><i class="fa fa-inbox"></i><?= $category->fdName?></a>
+                            </li>
+                        <?php } ?>
+                    <?php } ?>
                 </ul>
             </div>
             <!-- /.box-body -->
@@ -30,7 +30,7 @@ $directoryAsset = Yii::$app->assetManager->getPublishedUrl('@vendor/almasaeed201
         <!-- /. box -->
         <div class="box box-solid">
             <div class="box-header with-border">
-                <h3 class="box-title">Labels</h3>
+                <h3 class="box-title">标签</h3>
 
                 <div class="box-tools">
                     <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
@@ -39,9 +39,13 @@ $directoryAsset = Yii::$app->assetManager->getPublishedUrl('@vendor/almasaeed201
             </div>
             <div class="box-body no-padding">
                 <ul class="nav nav-pills nav-stacked">
-                    <li><a href="#"><i class="fa fa-circle-o text-red"></i> Important</a></li>
-                    <li><a href="#"><i class="fa fa-circle-o text-yellow"></i> Promotions</a></li>
-                    <li><a href="#"><i class="fa fa-circle-o text-light-blue"></i> Social</a></li>
+                    <?php if (!empty($labels)) { ?>
+                        <?php foreach ($labels as $k => $label) { ?>
+                            <li>
+                                <a href="javaScript:void(0)" ><i class="fa fa-circle-o text-<?= $label->fdColor?>"></i><?= $label->fdName?></a>
+                            </li>
+                        <?php } ?>
+                    <?php } ?>
                 </ul>
             </div>
             <!-- /.box-body -->
@@ -52,14 +56,9 @@ $directoryAsset = Yii::$app->assetManager->getPublishedUrl('@vendor/almasaeed201
     <div class="col-md-9">
         <div class="box">
             <div class="box-header with-border">
-                <h3 class="box-title">Inbox</h3>
+                <h3 class="box-title">课堂2.0版本</h3>
+                <a href="javaScript:void(0)" class="btn-sm btn-danger pull-right" id="team-url">新建任务</a>
 
-                <div class="box-tools pull-right">
-                    <div class="has-feedback">
-                        <input type="text" class="form-control input-sm" placeholder="Search Mail">
-                        <span class="glyphicon glyphicon-search form-control-feedback"></span>
-                    </div>
-                </div>
                 <!-- /.box-tools -->
             </div>
             <!-- /.box-header -->
@@ -70,19 +69,41 @@ $directoryAsset = Yii::$app->assetManager->getPublishedUrl('@vendor/almasaeed201
                     </button>
                     <div class="btn-group">
                         <button type="button" class="btn btn-default btn-sm"><i class="fa fa-trash-o"></i></button>
-                        <button type="button" class="btn btn-default btn-sm"><i class="fa fa-reply"></i></button>
-                        <button type="button" class="btn btn-default btn-sm"><i class="fa fa-share"></i></button>
+                    </div>
+                    <!-- Single button -->
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Action <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a href="#">Action</a></li>
+                            <li><a href="#">Another action</a></li>
+                            <li><a href="#">Something else here</a></li>
+                            <li role="separator" class="divider"></li>
+                            <li><a href="#">Separated link</a></li>
+                        </ul>
+                    </div>
+                    <!-- Single button -->
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Action <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a href="#">Action</a></li>
+                            <li><a href="#">Another action</a></li>
+                            <li><a href="#">Something else here</a></li>
+                            <li role="separator" class="divider"></li>
+                            <li><a href="#">Separated link</a></li>
+                        </ul>
+                    </div>
+                    <div class="box-tools pull-right">
+                        <div class="has-feedback">
+                            <input type="text" class="form-control input-sm" placeholder="Search Mail">
+                            <span class="glyphicon glyphicon-search form-control-feedback"></span>
+                        </div>
                     </div>
                     <!-- /.btn-group -->
                     <button type="button" class="btn btn-default btn-sm"><i class="fa fa-refresh"></i></button>
-                    <div class="pull-right">
-                        1-50/200
-                        <div class="btn-group">
-                            <button type="button" class="btn btn-default btn-sm"><i class="fa fa-chevron-left"></i></button>
-                            <button type="button" class="btn btn-default btn-sm"><i class="fa fa-chevron-right"></i></button>
-                        </div>
-                        <!-- /.btn-group -->
-                    </div>
                     <!-- /.pull-right -->
                 </div>
                 <div class="table-responsive mailbox-messages">

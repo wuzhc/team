@@ -162,11 +162,9 @@ if (Yii::$app->controller->action->id === 'login') {
     <!--弹窗-->
 
     <div class="wrapper">
-
         <?= $this->render('header.php', ['directoryAsset' => $directoryAsset]) ?>
         <?= $this->render('left.php', ['directoryAsset' => $directoryAsset]) ?>
         <?= $this->render('content.php', ['content' => $content, 'directoryAsset' => $directoryAsset]) ?>
-
     </div>
 
     <?php $this->endBody() ?>

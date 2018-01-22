@@ -127,7 +127,7 @@ class RbacController extends Controller
         $auth->addChild($admin, $editProject);
         echo "- 成功添加编辑项目权限（editProject），并赋给了管理角色 \n";
 
-        // 删除项目
+        // 删除项目权限
         $delProject = $auth->createPermission('delProject');
         $delProject->description = '编辑项目';
         $delProject->ruleName = null;
@@ -135,13 +135,37 @@ class RbacController extends Controller
         $auth->addChild($admin, $delProject);
         echo "- 成功添加删除项目权限（delProject），并赋给了管理角色 \n";
 
-        // 项目成员管理
+        // 项目成员管理权限
         $setMembers = $auth->createPermission('setMembers');
         $setMembers->description = '项目人员管理';
         $setMembers->ruleName = null;
         $auth->add($setMembers);
         $auth->addChild($admin, $setMembers);
         echo "- 成功添加项目成员管理权限（setMembers），并赋给了管理角色 \n";
+
+        // 创建任务权限
+        $createTask = $auth->createPermission('createTask');
+        $createTask->description = '创建任务';
+        $createTask->ruleName = null;
+        $auth->add($createTask);
+        $auth->addChild($member, $createTask);
+        echo "- 成功添加创建任务权限（createTask），并赋给了普通成员角色 \n";
+
+        // 编辑任务权限
+        $editTask = $auth->createPermission('editTask');
+        $editTask->description = '编辑任务';
+        $editTask->ruleName = null;
+        $auth->add($editTask);
+        $auth->addChild($member, $editTask);
+        echo "- 成功添加编辑任务权限（editTask），并赋给了普通成员角色 \n";
+
+        // 删除任务权限
+        $delTask = $auth->createPermission('delTask');
+        $delTask->description = '编辑任务';
+        $delTask->ruleName = null;
+        $auth->add($delTask);
+        $auth->addChild($member, $delTask);
+        echo "- 成功添加删除任务权限（delTask），并赋给了普通成员角色 \n";
 
         echo "初始化完成 \n";
     }

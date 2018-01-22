@@ -8,6 +8,7 @@ use common\models\User;
 use common\utils\ClientUtil;
 use common\utils\VerifyUtil;
 use Yii;
+use yii\helpers\ArrayHelper;
 
 /**
  * Class UserService
@@ -210,5 +211,82 @@ class UserService extends AbstractService
         } else {
             return false;
         }
+    }
+
+    /**
+     * 获取用户
+     * @param array $args
+     * @see findUserCriteria
+     * @return array|\yii\db\ActiveRecord[]
+     * @since 2018-01-22
+     */
+    public function getUsers(array $args)
+    {
+        return $this->findUserCriteria($args)->all();
+    }
+
+    /**
+     * 获取用户ID
+     * @param array $args
+     * @see findUserCriteria
+     * @return array
+     * @since 2018-01-22
+     */
+    public function getUserIDs(array $args)
+    {
+        $args['select'] or $args['select'] = ['id'];
+        $users = $this->findUserCriteria($args)->all();
+        return $users ? ArrayHelper::getColumn($users, 'id') : [];
+    }
+
+    /**
+     * 统计用户总数
+     * @see findUserCriteria
+     * @param array $args
+     * @return int|string
+     */
+    public function countUsers(array $args)
+    {
+        return $this->findUserCriteria($args)->count();
+    }
+
+    /**
+     * 用户查询条件
+     * @param $args
+     * @return \yii\db\ActiveQuery
+     */
+    protected function findUserCriteria($args)
+    {
+        $user = User::find();
+
+        if (is_numeric($args['limit'])) {
+            $user->limit($args['limit']);
+        }
+        if (is_numeric($args['offset'])) {
+            $user->offset($args['offset']);
+        }
+        if (is_numeric($args['status'])) {
+            $user->andWhere(['fdStatus' => $args['status']]);
+        }
+        if (is_numeric($args['teamID'])) {
+            $user->andWhere(['fdTeamID' => $args['teamID']]);
+        }
+        if (is_numeric($args['companyID'])) {
+            $user->andWhere(['fdCompanyID' => $args['companyID']]);
+        }
+        if (is_array($args['select'])) {
+            $user->select($args['select']);
+        }
+        if (is_array($args['order'])) {
+            $user->orderBy($args['order']);
+        }
+        if (is_array($args['group'])) {
+            $user->groupBy($args['group']);
+        }
+        if ($args['with']) {
+            $user->with($args['with']);
+        }
+
+        return $user;
     }
 }
