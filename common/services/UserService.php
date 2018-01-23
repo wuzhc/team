@@ -289,4 +289,38 @@ class UserService extends AbstractService
 
         return $user;
     }
+
+    /**
+     * 获取用户姓名
+     * 优先级：姓名 > 邮箱 > 手机 > 账号
+     * @param User|int $user
+     * @return string
+     * @since 2018-01-23
+     */
+    public function getUserName($user)
+    {
+        $user = $this->getUserInstance($user);
+        if (null === $user) {
+            return '';
+        }
+
+        return $user->fdName ?: $user->fdEmail ?: $user->fdPhone ?: $user->fdLogin;
+    }
+
+    /**
+     * 获取用户登录账号
+     * 优先级：邮箱号 > 手机号 > 账号
+     * @param User|int $user
+     * @return string
+     * @since 2018-01-23
+     */
+    public function getUserAccount($user)
+    {
+        $user = $this->getUserInstance($user);
+        if (null === $user) {
+            return '';
+        }
+
+        return $user->fdEmail ?: $user->fdPhone ?: $user->fdLogin;
+    }
 }

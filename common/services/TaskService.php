@@ -4,6 +4,7 @@ namespace common\services;
 
 use common\config\Conf;
 use common\models\Project;
+use common\models\Task;
 use common\models\TaskCategory;
 use common\models\TaskLabel;
 use Yii;
@@ -128,5 +129,94 @@ class TaskService extends AbstractService
     public function getTaskLabels($projectID)
     {
         return TaskLabel::find()->where(['fdProjectID' => $projectID, 'fdStatus' => Conf::ENABLE])->all();
+    }
+
+    /**
+     * 获取任务
+     * @param int $projectID
+     * @param array $args
+     * @return array|\yii\db\ActiveRecord[]
+     * @since 2018-01-23
+     */
+    public function getTasks($projectID, array $args)
+    {
+        if (empty($projectID)) {
+            if (YII_DEBUG) {
+                Yii::$app->end('getTask(): ProjectID is empty');
+            }
+            return [];
+        }
+
+        $args['projectID'] = $projectID;
+        return $this->findTaskCriteria($args)->all();
+    }
+
+    /**
+     * 任务总数
+     * @param $projectID
+     * @param array $args
+     * @return int
+     * @since 2018-01-23
+     */
+    public function countTasks($projectID, array $args)
+    {
+        if (empty($projectID)) {
+            return 0;
+        }
+
+        $args['projectID'] = $projectID;
+        return (int)$this->findTaskCriteria($args)->count();
+    }
+
+    /**
+     * @param array $args
+     * @return \yii\db\ActiveQuery
+     */
+    protected function findTaskCriteria(array $args)
+    {
+        $task = Task::find();
+
+        if (is_numeric($args['creatorID'])) {
+            $task->andWhere(['fdCreatorID' => $args['creatorID']]);
+        }
+        if (is_numeric($args['companyID'])) {
+            $task->andWhere(['fdCompanyID' => $args['companyID']]);
+        }
+        if (is_numeric($args['projectID'])) {
+            $task->andWhere(['fdProjectID' => $args['projectID']]);
+        }
+        if (is_numeric($args['categoryID'])) {
+            $task->andWhere(['fdTaskCategoryID' => $args['categoryID']]);
+        }
+        if (is_numeric($args['process'])) {
+            $task->andWhere(['fdProgress' => $args['process']]);
+        }
+        if (is_numeric($args['status'])) {
+            $task->andWhere(['fdStatus' => $args['status']]);
+        }
+        if (is_numeric($args['labelID'])) {
+            $task->joinWith(['TaskLabel label'], true, 'INNER JOIN');
+            $task->where(['label.fdTaskLabelID' => $args['labelID']]);
+        }
+        if (!empty($args['select'])) {
+            $task->select($args['select']);
+        }
+        if (is_array($args['group'])) {
+            $task->groupBy($args['group']);
+        }
+        if (is_array($args['order'])) {
+            $task->orderBy($args['order']);
+        }
+        if (is_numeric($args['limit'])) {
+            $task->limit($args['limit']);
+        }
+        if (is_numeric($args['offset'])) {
+            $task->offset($args['offset']);
+        }
+        if (is_bool($args['asArray'])) {
+            $task->asArray($args['asArray']);
+        }
+
+        return $task;
     }
 }

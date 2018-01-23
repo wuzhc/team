@@ -9,11 +9,11 @@ class AdminLtePluginAsset extends AssetBundle
 {
     public $sourcePath = '@vendor/almasaeed2010/adminlte/plugins';
     public $js = [
-        'bootstrap-wysihtml5/bootstrap3-wysihtml5.all.min.js',
+        'iCheck/icheck.min.js'
         // more plugin Js here
     ];
     public $css = [
-        'bootstrap-wysihtml5/bootstrap3-wysihtml5.css',
+        'iCheck/flat/blue.css',
         // more plugin CSS here
     ];
     public $depends = [

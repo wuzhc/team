@@ -8,13 +8,16 @@ use common\models\Project;
 use common\models\Task;
 use common\services\ProjectService;
 use common\services\TaskService;
+use common\services\UserService;
 use common\utils\ResponseUtil;
 use Yii;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
+use yii\helpers\StringHelper;
 use yii\web\Controller;
 use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
+use yii\web\User;
 
 class TaskController extends Controller
 {
@@ -64,20 +67,67 @@ class TaskController extends Controller
     /**
      * 任务列表
      * @param int $projectID
+     * @param int $categoryID
+     * @param int $labelID
+     * @param int $me
      * @return string
-     * @since 2018-01-22
+     * @since 2018-01-23
      */
-    public function actionIndex($projectID)
+    public function actionIndex()
     {
-        return $this->render('index', [
-            'labels'     => TaskService::factory()->getTaskLabels($projectID),
-            'categories' => TaskService::factory()->getTaskCategories($projectID)
-        ]);
+        return $this->render('index');
     }
 
-    public function actionList($projectID, $categoryID)
+    /**
+     * 列表数据
+     * @param $projectID
+     * @param $categoryID
+     * @param int $labelID
+     * @param int $me
+     */
+    public function actionList($projectID)
     {
+//        if (Yii::$app->request->isAjax) {
+        if (true) {
+            $params = Yii::$app->request->get();
+            $args = [
+                'userID'     => isset($params['me']) && $params['me'] == 1 ? Yii::$app->user->id : null,
+                'labelID'    => !empty($params['labelID']) ? $params['labelID'] : null,
+                'categoryID' => !empty($params['categoryID']) ? $params['categoryID'] : null,
+            ];
 
+            $total = null;
+            if (!empty($params['totalInit'])) {
+                $total = TaskService::factory()->countTasks($projectID, $args);
+            }
+
+            $args['limit'] = !empty($params['limit']) ? $params['limit'] : 10;
+            $args['offset'] = !empty($params['offset']) ? $params['offset'] : 0;
+            $args['order'] = !empty($params['order']) ? $params['order'] : 'id desc';
+
+            $list = [];
+            $tasks = TaskService::factory()->getTasks($projectID, $args);
+
+            /** @var Task $task */
+            foreach ((array)$tasks as $task) {
+                $temp = [];
+                $temp['id'] = $task->id;
+                $temp['originName'] = $task->fdName;
+                $temp['name'] = StringHelper::truncate($task->fdName, 28);
+                $temp['create'] = $task->fdCreate;
+                $temp['update'] = $task->fdUpdate;
+                $temp['process'] = $task->fdProgress;
+                $temp['creator'] = UserService::factory()->getUserName($task->fdCreatorID);
+                $list[] = $temp;
+            }
+
+            ResponseUtil::jsonCORS([
+                'data' => [
+                    'total' => $total,
+                    'list'  => $list
+                ]
+            ]);
+        }
     }
 
     /**
@@ -154,5 +204,47 @@ class TaskController extends Controller
 
         $res = Task::updateAll(['fdStatus' => Conf::DISABLE], ['id' => $taskID]);
         ResponseUtil::jsonCORS(['status' => $res ? Conf::SUCCESS : Conf::FAILED]);
+    }
+
+    /**
+     * 任务统计数据（完成数+总数）
+     * @param int $projectID 项目ID
+     * @since 2018-01-23
+     */
+    public function actionStatTasks($projectID)
+    {
+        $tasks = [];
+
+        $categories = TaskService::factory()->getTasks($projectID, [
+            'status'  => Conf::ENABLE,
+            'group'   => ['fdTaskCategoryID'],
+            'asArray' => true,
+            'select'  => ['count(id) as total', 'fdTaskCategoryID as cid']
+        ]);
+
+        $completeCategories = TaskService::factory()->getTasks($projectID, [
+            'status'  => Conf::ENABLE,
+            'group'   => ['fdTaskCategoryID'],
+            'asArray' => true,
+            'process' => Conf::TASK_FINISH,
+            'select'  => ['count(id) as completeTotal', 'fdTaskCategoryID as cid']
+        ]);
+
+        $map = [];
+        foreach ($completeCategories as $category) {
+            $map[$category['cid']] = $category['completeTotal'];
+        }
+
+        foreach ($categories as $category) {
+            $temp = [];
+            $temp['cid'] = $category['cid'];
+            $temp['allTasks'] = $category['total'];
+            $temp['completeTasks'] = isset($map[$category['cid']]) ? $map[$category['cid']] : 0;
+            $tasks[] = $temp;
+        }
+
+        ResponseUtil::jsonCORS([
+            'tasks' => $tasks
+        ]);
     }
 }

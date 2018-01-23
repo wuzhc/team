@@ -72,10 +72,7 @@ class DefaultController extends BaseController
      */
     public function actionIndex()
     {
-        /** @var User $user */
-        $user = Yii::$app->user->identity;
-
-        $projects = TaskService::factory()->getProjectStatByCompanyID($user->fdCompanyID);
+        $projects = TaskService::factory()->getProjectStatByCompanyID($this->companyID);
         return $this->render('index', [
             'projects' => $projects
         ]);

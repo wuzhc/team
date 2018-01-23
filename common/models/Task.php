@@ -14,8 +14,8 @@ use Yii;
  * @property int $fdProjectID 所属项目,对应tbProject.id
  * @property int $fdTaskCategoryID 任务归类,对应tbTaskCategory.id
  * @property string $fdDescription 描述
- * @property int $fdProgress 任务进度,0默认，1开始，2编辑，3结束
- * @property int $fdStatus 1可用，2已删除
+ * @property int $fdProgress 任务进度,0默认，1开始，2已完成
+ * @property int $fdStatus 1可用，2已删除,3正在编辑
  * @property string $fdCreate 创建时间
  * @property string $fdUpdate 更新时间
  */

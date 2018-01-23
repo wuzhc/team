@@ -189,7 +189,10 @@ class TeamController extends BaseController
                 }
 
                 $transaction->commit();
-                $this->redirectMsgBox(['team/index'], '操作成功');
+//                $this->redirectMsgBox(['team/index'], '操作成功');
+                Yii::$app->session->setFlash('success', '操作成功');
+                $this->redirect(['team/index']);
+
             } catch (\Exception $e) {
                 $transaction->rollBack();
                 throw $e;

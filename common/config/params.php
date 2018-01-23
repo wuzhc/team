@@ -20,7 +20,7 @@ return [
         \common\config\Conf::ROLE_GUEST => '游客',
     ],
 
-    // 背景颜色
+    // 背景颜色样式类
     'bgColor' => [
         'bg-aqua',
         'bg-blue',
@@ -35,6 +35,31 @@ return [
         'bg-black',
         'bg-maroon',
         'bg-lime',
+    ],
+
+    // 颜色样式类1
+    'colorOne' => [
+        'aqua',
+        'blue',
+        'orange',
+        'navy',
+        'red',
+        'purple',
+        'green',
+        'fuchsia',
+        'yellow',
+        'olive',
+        'black',
+        'maroon',
+        'lime',
+    ],
+
+    // 颜色样式类2
+    'colorTwo' => [
+        'danger',
+        'success',
+        'warning',
+        'primary'
     ],
 
     // 默认头像

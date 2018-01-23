@@ -8,8 +8,7 @@ $directoryAsset = Yii::$app->assetManager->getPublishedUrl('@vendor/almasaeed201
     <div class="col-md-3">
         <?php if (Yii::$app->user->can('importUser')) { ?>
         <div class="box box-solid">
-            <a href="<?= Url::to(['team/create'])?>" class="btn btn-success" style="width: 49%">新建团队</a>
-            <a href="<?= Url::to(['user/import'])?>" class="btn btn-success" style="width: 49%">导入成员</a>
+            <a href="<?= Url::to(['team/create'])?>" class="btn btn-success" style="width: 100%">新建团队</a>
         </div>
         <?php } ?>
         <div class="box box-solid">
