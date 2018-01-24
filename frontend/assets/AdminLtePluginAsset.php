@@ -13,7 +13,7 @@ class AdminLtePluginAsset extends AssetBundle
         // more plugin Js here
     ];
     public $css = [
-        'iCheck/flat/blue.css',
+        'iCheck/flat/green.css',
         // more plugin CSS here
     ];
     public $depends = [

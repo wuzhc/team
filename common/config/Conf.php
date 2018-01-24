@@ -28,9 +28,10 @@ class Conf
     const ROLE_GUEST = 3; // 游客
 
     /** 任务完成进度 */
-    const TASK_DEFAULT = 0; // 默认
+    const TASK_STOP = 0; // 停止（默认状态）
     const TASK_BEGIN = 1; // 开始处理
-    const TASK_FINISH = 2; // 已完成
+    const TASK_PAUSE = 2; // 暂停
+    const TASK_FINISH = 3; // 已完成
 
     /** mongo集合名称 */
     const M_USER_LOGIN_LOG = 'userLoginLog';

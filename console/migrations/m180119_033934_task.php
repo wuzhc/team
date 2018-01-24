@@ -30,7 +30,7 @@ class m180119_033934_task extends Migration
             'fdCompanyID'      => $this->integer(11)->notNull()->comment('所属公司,对应tbCompany.id'),
             'fdProjectID'      => $this->integer(11)->notNull()->comment('所属项目,对应tbProject.id'),
             'fdTaskCategoryID' => $this->integer(11)->defaultValue(0)->comment('任务归类ID,对应tbTaskCategory.id'),
-            'fdProgress'       => $this->smallInteger(1)->defaultValue(0)->comment('任务进度,0默认，1开始，2已完成'),
+            'fdProgress'       => $this->smallInteger(1)->defaultValue(0)->comment('任务进度,0默认，1开始，2暂停，3完成'),
             'fdStatus'         => $this->smallInteger(1)->defaultValue(0)->comment('1可用，2已删除,3正在编辑'),
             'fdCreate'         => $this->dateTime()->notNull()->comment('创建时间'),
             'fdUpdate'         => $this->dateTime()->notNull()->comment('更新时间'),

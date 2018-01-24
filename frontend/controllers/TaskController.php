@@ -11,6 +11,7 @@ use common\services\TaskService;
 use common\services\UserService;
 use common\utils\ResponseUtil;
 use Yii;
+use yii\base\InvalidParamException;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\helpers\StringHelper;
@@ -41,7 +42,7 @@ class TaskController extends Controller
                             }
                             $projectID = Yii::$app->request->get('projectID');
                             if (!$projectID) {
-                                throw new NotFoundHttpException('参数错误');
+                                return false;
                             }
                             if (!(Project::findOne(['id' => $projectID, 'fdStatus' => Conf::ENABLE]))) {
                                 throw new NotFoundHttpException('数据不存在');
@@ -101,9 +102,9 @@ class TaskController extends Controller
                 $total = TaskService::factory()->countTasks($projectID, $args);
             }
 
-            $args['limit'] = !empty($params['limit']) ? $params['limit'] : 10;
-            $args['offset'] = !empty($params['offset']) ? $params['offset'] : 0;
-            $args['order'] = !empty($params['order']) ? $params['order'] : 'id desc';
+            $args['limit'] = !empty($params['pageSize']) ? $params['pageSize'] : 10;
+            $args['offset'] = !empty($params['page']) ? ($params['page'] - 1) * $args['limit'] : 0;
+            $args['order'] = ['id' => SORT_DESC];
 
             $list = [];
             $tasks = TaskService::factory()->getTasks($projectID, $args);
@@ -246,5 +247,55 @@ class TaskController extends Controller
         ResponseUtil::jsonCORS([
             'tasks' => $tasks
         ]);
+    }
+
+    public function actionHandle()
+    {
+        if (Yii::$app->request->isAjax) {
+            $action = Yii::$app->request->get('action');
+            $taskID = Yii::$app->request->get('taskID');
+            if (!$action || !$taskID) {
+                throw new ForbiddenHttpException('参数错误');
+            }
+
+            $task = Task::findOne(['id' => $taskID, 'fdStatus' => Conf::ENABLE]);
+            if (!$task) {
+                throw new NotFoundHttpException('任务不存在或已删除');
+            }
+            if ($task->fdCreatorID != Yii::$app->user->id) {
+                throw new ForbiddenHttpException('禁止操作');
+            }
+
+            if ($task->fdProgress == Conf::TASK_STOP && $action === 'begin') {
+                $attribute['fdProgress'] = Conf::TASK_BEGIN;
+            } elseif ($task->fdProgress == Conf::TASK_BEGIN && $action === 'stop') {
+                $attribute['fdProgress'] = Conf::TASK_STOP;
+            } elseif ($action === 'finish') {
+                $attribute['fdProgress'] = Conf::TASK_FINISH;
+            } else {
+                throw new ForbiddenHttpException('禁止操作');
+            }
+
+            // 更新任务进度
+            Task::updateAll($attribute, ['id' => $task->id]);
+
+            // 返回进度
+            $task = Task::findOne(['id' => $taskID, 'fdStatus' => Conf::ENABLE]);
+            switch ($task->fdProgress) {
+                case Conf::TASK_STOP:
+                    $action = 'stop';
+                    break;
+                case Conf::TASK_BEGIN:
+                    $action = 'begin';
+                    break;
+                case Conf::TASK_FINISH:
+                    $action = 'finish';
+                    break;
+                default:
+                    throw new NotFoundHttpException('数据不存在');
+            }
+
+            ResponseUtil::jsonCORS(['action' => $action]);
+        }
     }
 }
