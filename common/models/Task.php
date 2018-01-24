@@ -13,6 +13,7 @@ use Yii;
  * @property int $fdCompanyID 所属公司,对应tbCompany.id
  * @property int $fdProjectID 所属项目,对应tbProject.id
  * @property int $fdTaskCategoryID 任务归类,对应tbTaskCategory.id
+ * @property int $fdLevel 任务等级
  * @property string $fdDescription 描述
  * @property int $fdProgress 任务进度,0默认，1开始，2已完成
  * @property int $fdStatus 1可用，2已删除,3正在编辑
@@ -36,7 +37,7 @@ class Task extends \yii\db\ActiveRecord
     {
         return [
             [['fdName', 'fdCreatorID', 'fdCompanyID', 'fdProjectID', 'fdCreate', 'fdUpdate'], 'required'],
-            [['fdCreatorID', 'fdCompanyID', 'fdProjectID', 'fdProgress', 'fdStatus', 'fdTaskCategoryID'], 'integer'],
+            [['fdCreatorID', 'fdCompanyID', 'fdProjectID', 'fdProgress', 'fdStatus', 'fdTaskCategoryID', 'fdLevel'], 'integer'],
             [['fdCreate', 'fdUpdate'], 'safe'],
             [['fdName'], 'string', 'max' => 32],
             [['fdDescription'], 'string', 'max' => 255],
@@ -54,6 +55,7 @@ class Task extends \yii\db\ActiveRecord
             'fdCreatorID' => 'Fd Creator ID',
             'fdCompanyID' => 'Fd Company ID',
             'fdProjectID' => 'Fd Project ID',
+            'fdLevel' => 'Fd Level',
             'fdTaskCategoryID' => 'Fd Category ID',
             'fdDescription' => 'Fd Description',
             'fdProgress' => 'Fd Progress',

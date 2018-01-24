@@ -6,6 +6,7 @@ namespace frontend\controllers;
 use common\config\Conf;
 use common\models\Project;
 use common\models\Task;
+use common\models\TaskCategory;
 use common\services\ProjectService;
 use common\services\TaskService;
 use common\services\UserService;
@@ -80,21 +81,19 @@ class TaskController extends Controller
     }
 
     /**
-     * 列表数据
      * @param $projectID
-     * @param $categoryID
-     * @param int $labelID
-     * @param int $me
      */
     public function actionList($projectID)
     {
-//        if (Yii::$app->request->isAjax) {
-        if (true) {
+        if (Yii::$app->request->isAjax) {
             $params = Yii::$app->request->get();
+            $progress = isset($params['progress']) ? $params['progress'] : null;
+            $categoryID = !empty($params['categoryID']) ? $params['categoryID'] : null;
+            $userID = isset($params['me']) && $params['me'] == 1 ? Yii::$app->user->id : null;
             $args = [
-                'userID'     => isset($params['me']) && $params['me'] == 1 ? Yii::$app->user->id : null,
-                'labelID'    => !empty($params['labelID']) ? $params['labelID'] : null,
-                'categoryID' => !empty($params['categoryID']) ? $params['categoryID'] : null,
+                'userID'     => $userID,
+                'progress'   => $progress,
+                'categoryID' => $categoryID,
             ];
 
             $total = null;
@@ -117,15 +116,24 @@ class TaskController extends Controller
                 $temp['name'] = StringHelper::truncate($task->fdName, 28);
                 $temp['create'] = $task->fdCreate;
                 $temp['update'] = $task->fdUpdate;
-                $temp['process'] = $task->fdProgress;
+                $temp['progress'] = $task->fdProgress;
                 $temp['creator'] = UserService::factory()->getUserName($task->fdCreatorID);
+                $temp['level'] = Yii::$app->params['taskLevel'][$task->fdLevel];
                 $list[] = $temp;
+            }
+
+            $info = [];
+            if ($categoryID) {
+                $category = TaskCategory::findOne(['id' => $categoryID]);
+                $info['id'] = $category->id;
+                $info['name'] = $category->fdName;
             }
 
             ResponseUtil::jsonCORS([
                 'data' => [
                     'total' => $total,
-                    'list'  => $list
+                    'list'  => $list,
+                    'info'  => $info
                 ]
             ]);
         }
@@ -224,11 +232,11 @@ class TaskController extends Controller
         ]);
 
         $completeCategories = TaskService::factory()->getTasks($projectID, [
-            'status'  => Conf::ENABLE,
-            'group'   => ['fdTaskCategoryID'],
-            'asArray' => true,
-            'process' => Conf::TASK_FINISH,
-            'select'  => ['count(id) as completeTotal', 'fdTaskCategoryID as cid']
+            'status'   => Conf::ENABLE,
+            'group'    => ['fdTaskCategoryID'],
+            'asArray'  => true,
+            'progress' => Conf::TASK_FINISH,
+            'select'   => ['count(id) as completeTotal', 'fdTaskCategoryID as cid']
         ]);
 
         $map = [];
@@ -249,6 +257,54 @@ class TaskController extends Controller
         ]);
     }
 
+    /**
+     * 完成任务
+     * @throws ForbiddenHttpException
+     * @throws NotFoundHttpException
+     * @since 2018-01-24
+     */
+    public function actionFinish()
+    {
+        if (Yii::$app->request->isAjax) {
+            $taskID = Yii::$app->request->get('taskID');
+            if (!$taskID) {
+                throw new ForbiddenHttpException('参数错误');
+            }
+
+            $task = $this->_checkTaskAccess($taskID);
+
+            if ($task->fdProgress == Conf::TASK_FINISH) {
+                $attribute['fdProgress'] = Conf::TASK_STOP;
+            } else {
+                $attribute['fdProgress'] = Conf::TASK_FINISH;
+            }
+
+            // 更新任务进度
+            Task::updateAll($attribute, ['id' => $task->id]);
+
+            // 返回进度
+            $task = Task::findOne(['id' => $taskID, 'fdStatus' => Conf::ENABLE]);
+            switch ($task->fdProgress) {
+                case Conf::TASK_STOP:
+                    $action = 'begin';
+                    break;
+                case Conf::TASK_FINISH:
+                    $action = 'finish';
+                    break;
+                default:
+                    throw new NotFoundHttpException('数据不存在');
+            }
+
+            ResponseUtil::jsonCORS(['action' => $action]);
+        }
+    }
+
+    /**
+     * 处理任务
+     * @throws ForbiddenHttpException
+     * @throws NotFoundHttpException
+     * @since 2018-01-24
+     */
     public function actionHandle()
     {
         if (Yii::$app->request->isAjax) {
@@ -258,20 +314,12 @@ class TaskController extends Controller
                 throw new ForbiddenHttpException('参数错误');
             }
 
-            $task = Task::findOne(['id' => $taskID, 'fdStatus' => Conf::ENABLE]);
-            if (!$task) {
-                throw new NotFoundHttpException('任务不存在或已删除');
-            }
-            if ($task->fdCreatorID != Yii::$app->user->id) {
-                throw new ForbiddenHttpException('禁止操作');
-            }
+            $task = $this->_checkTaskAccess($taskID);
 
             if ($task->fdProgress == Conf::TASK_STOP && $action === 'begin') {
                 $attribute['fdProgress'] = Conf::TASK_BEGIN;
             } elseif ($task->fdProgress == Conf::TASK_BEGIN && $action === 'stop') {
                 $attribute['fdProgress'] = Conf::TASK_STOP;
-            } elseif ($action === 'finish') {
-                $attribute['fdProgress'] = Conf::TASK_FINISH;
             } else {
                 throw new ForbiddenHttpException('禁止操作');
             }
@@ -288,14 +336,30 @@ class TaskController extends Controller
                 case Conf::TASK_BEGIN:
                     $action = 'begin';
                     break;
-                case Conf::TASK_FINISH:
-                    $action = 'finish';
-                    break;
                 default:
                     throw new NotFoundHttpException('数据不存在');
             }
 
             ResponseUtil::jsonCORS(['action' => $action]);
         }
+    }
+
+    /**
+     * @param $taskID
+     * @return Task
+     * @throws ForbiddenHttpException
+     * @throws NotFoundHttpException
+     */
+    private function _checkTaskAccess($taskID)
+    {
+        $task = Task::findOne(['id' => $taskID, 'fdStatus' => Conf::ENABLE]);
+        if (!$task) {
+            throw new NotFoundHttpException('任务不存在或已删除');
+        }
+        if ($task->fdCreatorID != Yii::$app->user->id) {
+            throw new ForbiddenHttpException('禁止操作');
+        }
+
+        return $task;
     }
 }

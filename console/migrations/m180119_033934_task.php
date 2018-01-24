@@ -30,8 +30,9 @@ class m180119_033934_task extends Migration
             'fdCompanyID'      => $this->integer(11)->notNull()->comment('所属公司,对应tbCompany.id'),
             'fdProjectID'      => $this->integer(11)->notNull()->comment('所属项目,对应tbProject.id'),
             'fdTaskCategoryID' => $this->integer(11)->defaultValue(0)->comment('任务归类ID,对应tbTaskCategory.id'),
-            'fdProgress'       => $this->smallInteger(1)->defaultValue(0)->comment('任务进度,0默认，1开始，2暂停，3完成'),
+            'fdProgress'       => $this->smallInteger(1)->defaultValue(0)->comment('任务进度,0停止，1开始，2完成'),
             'fdStatus'         => $this->smallInteger(1)->defaultValue(0)->comment('1可用，2已删除,3正在编辑'),
+            'fdLevel'          => $this->smallInteger(1)->defaultValue(0)->comment('0默认，1着急，2特急，4优化'),
             'fdCreate'         => $this->dateTime()->notNull()->comment('创建时间'),
             'fdUpdate'         => $this->dateTime()->notNull()->comment('更新时间'),
         ], $tableOptions);
@@ -64,7 +65,8 @@ class m180119_033934_task extends Migration
             'fdTaskCategoryID' => 2,
             'fdCreate'         => date('Y-m-d H:i:s'),
             'fdUpdate'         => date('Y-m-d H:i:s'),
-            'fdStatus'         => \common\config\Conf::ENABLE
+            'fdStatus'         => \common\config\Conf::ENABLE,
+            'fdLevel'          => 2
         ]);
 
         $this->insert($this->tableName, [
@@ -76,7 +78,8 @@ class m180119_033934_task extends Migration
             'fdCreate'         => date('Y-m-d H:i:s'),
             'fdUpdate'         => date('Y-m-d H:i:s'),
             'fdStatus'         => \common\config\Conf::ENABLE,
-            'fdProgress'       => \common\config\Conf::TASK_FINISH
+            'fdProgress'       => \common\config\Conf::TASK_FINISH,
+            'fdLevel'          => 1,
         ]);
 
         $this->insert($this->tableName, [
@@ -88,7 +91,8 @@ class m180119_033934_task extends Migration
             'fdCreate'         => date('Y-m-d H:i:s'),
             'fdUpdate'         => date('Y-m-d H:i:s'),
             'fdStatus'         => \common\config\Conf::ENABLE,
-            'fdProgress'       => \common\config\Conf::TASK_BEGIN
+            'fdProgress'       => \common\config\Conf::TASK_BEGIN,
+            'fdLevel'          => 3,
         ]);
 
         $this->insert($this->tableName, [
@@ -100,7 +104,8 @@ class m180119_033934_task extends Migration
             'fdCreate'         => date('Y-m-d H:i:s'),
             'fdUpdate'         => date('Y-m-d H:i:s'),
             'fdStatus'         => \common\config\Conf::ENABLE,
-            'fdProgress'       => \common\config\Conf::TASK_BEGIN
+            'fdProgress'       => \common\config\Conf::TASK_BEGIN,
+            'fdLevel'          => 3,
         ]);
     }
 

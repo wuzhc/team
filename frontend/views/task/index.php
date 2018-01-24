@@ -17,9 +17,8 @@ AppAsset::registerJsFile($this, 'js/template.js')
         <div class="col-md-9">
             <div class="box box-success">
                 <div class="box-header with-border">
-                    <h3 class="box-title">课堂2.0版本</h3>
-                    <a href="javaScript:void(0)" class="btn-sm btn-danger pull-right" id="team-url">新建任务</a>
-
+                    <h3 class="box-title" id="task-category-title">全部</h3>
+                    <a href="javaScript:void(0)" class="btn-sm btn-danger pull-right hidden" id="task-category-url">新建任务</a>
                     <!-- /.box-tools -->
                 </div>
                 <!-- /.box-header -->
@@ -32,11 +31,16 @@ AppAsset::registerJsFile($this, 'js/template.js')
                                 任务进度 <span class="caret"></span>
                             </button>
                             <ul class="dropdown-menu">
-                                <li><a href="#" data-status="stop">未处理</a></li>
-                                <li><a href="#" data-status="begin">正在处理</a></li>
-                                <li><a href="#" data-status="finish">已完成</a></li>
+                                <li><a href="#" data-type="stop">未处理</a></li>
+                                <li><a href="#" data-type="begin">正在处理</a></li>
+                                <li><a href="#" data-type="finish">已完成</a></li>
                             </ul>
                         </div>
+                        <a href="<?= Url::to(['task/index', 'projectID' => $_GET['projectID']]) ?>" title="刷新页面">
+                            <button type="button" class="btn btn-default btn-sm">
+                                <i class="fa fa-refresh"></i>
+                            </button>
+                        </a>
                         <div class="box-tools pull-right">
                             <div class="has-feedback">
                                 <input type="text" class="form-control input-sm" placeholder="Search Mail">
@@ -81,24 +85,24 @@ AppAsset::registerJsFile($this, 'js/template.js')
     <script type="text/html" id="task-template">
         <% for(var i = 0, len = list.length; i < len; i++) { %>
         <tr>
-            <td title="标记为完成任务"><input type="checkbox" value="<%=list[i].id%>" <% if (list[i].process == 2) { %>
+            <td title="标记为完成任务"><input type="checkbox" value="<%=list[i].id%>" <% if (list[i].progress == 2) { %>
                 checked=true <% } %>>
             </td>
             <td class="mailbox-star"><a href="#"><i class="fa fa-star-o text-yellow"></i></a></td>
             <td class="mailbox-name"><a href="read-mail.html"><%=list[i].creator%></a></td>
             <td class="mailbox-subject">
-                <a href="#" class="text-black" title="<%=list[i].originName%>">
-                    <small class="text-success">优化</small>&nbsp;&nbsp;
+                <a href="<?= Url::to(['task/view', 'projectID' => $_GET['projectID']])?>" class="text-black" title="<%=list[i].originName%>">
+                    <i class="fa fa-circle-o <%=list[i].level%>"></i>&nbsp;&nbsp;
                     <%=list[i].name%>
                 </a>
             </td>
             <td class="mailbox-date"><%=list[i].create%></td>
             <td class="mailbox-attachment">
-                <% if (list[i].process == 0) { %>
+                <% if (list[i].progress == 0) { %>
                 <a href="javascript:void(0)" class="text-success" data-id="<%=list[i].id%>">
                     <i class="fa fa-circle" title="点击开始任务"></i>
                 </a>
-                <% } else if (list[i].process == 1) { %>
+                <% } else if (list[i].progress == 1) { %>
                 <a href="javascript:void(0)" class="text-red" data-id="<%=list[i].id%>">
                     <i class="fa fa-play" title="点击停止任务"></i>
                 </a>
@@ -130,10 +134,11 @@ AppAsset::registerJsFile($this, 'js/template.js')
             var curPage = 1;
             var totalPage = 0;
             var projectID = "<?= $_GET['projectID'] ?>";
+            var categoryID = null;
 
             $('#task-index').on('click', '#task-category>li', function () {
-                var categoryID = $(this).data('id');
-                renderList({categoryID: categoryID});
+                categoryID = $(this).data('id');
+                renderList();
             })
             // Enable check and uncheck all functionality
                 .on('click', '.checkbox-toggle', function () {
@@ -186,27 +191,81 @@ AppAsset::registerJsFile($this, 'js/template.js')
                         renderList();
                     }
                 })
+                // 开始任务
                 .on('click', '.fa-circle', function () {
                     var self = $(this);
-                    handleTask(self, 'begin', '', function(cls, cls2){
+                    handleTask(self, 'begin', '', function (cls, cls2) {
                         self.removeClass().addClass(cls);
                         self.parent().removeClass().addClass(cls2);
                     });
                 })
+                // 暂停任务
                 .on('click', '.fa-play', function () {
                     var self = $(this);
-                    handleTask(self, 'stop', '', function(cls, cls2){
+                    handleTask(self, 'stop', '', function (cls, cls2) {
                         self.removeClass().addClass(cls);
                         self.parent().removeClass().addClass(cls2);
                     });
                 })
+                // 取消完成任务
+                .on('ifUnchecked', '.mailbox-messages input[type="checkbox"]', function () {
+                    var self = $(this);
+                    var taskID = self.val();
+                    finishTask(taskID);
+                })
+                // 完成任务
                 .on('ifChecked', '.mailbox-messages input[type="checkbox"]', function () {
-                    handleTask($(this), 'finish', $(this).val());
+                    var self = $(this);
+                    var taskID = self.val();
+                    finishTask(taskID);
+                })
+                // 任务状态选择
+                .on('click', '.dropdown-menu>li>a', function (e) {
+                    e.preventDefault();
+                    var params = {};
+                    var type = $(this).data('type');
+                    if (type === 'stop') {
+                        params.progress = 0;
+                    } else if (type === 'begin') {
+                        params.progress = 1;
+                    } else if (type === 'finish') {
+                        params.progress = 2;
+                    }
+                    renderList(params);
                 });
 
+            // 完成任务
+            function finishTask(taskID) {
+                if (!taskID) {
+                    $.showBox({msg: '参数有误'});
+                    return false;
+                }
+
+                $.ajax({
+                    type: 'GET',
+                    url: "<?= Url::to(['task/finish', 'projectID' => $_GET['projectID']])?>",
+                    data: {
+                        taskID: taskID
+                    },
+                    dataType: 'json'
+                }).done(function (data) {
+                    if (data.action === 'begin') {
+                        self.parents('tr').children().find('.mailbox-attachment>a').html('<i class="fa fa-circle" title="点击开始任务"></i>');
+                    } else if (data.action === 'stop') {
+                        self.parents('tr').children().find('.mailbox-attachment>a>i').remove();
+                    }
+
+                }).fail(function (XMLHttpRequest, textStatus, errorThrown) {
+                    var msg = XMLHttpRequest.responseText || '系统繁忙～';
+                    $.showBox({msg: msg, seconds: 3000});
+                })
+            }
+
+            // 处理任务进度
             function handleTask(selector, action, value, callback) {
                 var taskID = value || selector.parent().data('id');
                 if (!taskID || !action) {
+                    $.showBox({msg: '参数有误'});
                     return false;
                 }
 
@@ -226,13 +285,9 @@ AppAsset::registerJsFile($this, 'js/template.js')
                     } else if (data.action === 'stop') {
                         cls = 'fa fa-circle';
                         cls2 = 'text-success';
-                    } else if (data.action === 'finish') {
-                        cls = '';
-                        cls2 = '';
                     }
 
                     callback && callback(cls, cls2);
-
 
                 }).fail(function (XMLHttpRequest, textStatus, errorThrown) {
                     var msg = XMLHttpRequest.responseText || '系统繁忙～';
@@ -242,11 +297,13 @@ AppAsset::registerJsFile($this, 'js/template.js')
 
             var ajaxBort = null;
 
+            // 渲染列表
             function renderList(options) {
                 var params = $.extend({
                     totalInit: 1,
                     pageSize: 10,
-                    page: curPage
+                    page: curPage,
+                    categoryID: categoryID
                 }, options);
                 var url = "<?=\yii\helpers\Url::to(['task/list', 'projectID' => $_GET['projectID']])?>";
 
@@ -258,6 +315,7 @@ AppAsset::registerJsFile($this, 'js/template.js')
                     dataType: 'json'
                 }).done(function (data) {
 
+                    // 页码设置
                     $('#task-cur-page').text(curPage);
                     if (params.totalInit === 1) {
                         if (data.data.total > 0) {
@@ -282,6 +340,16 @@ AppAsset::registerJsFile($this, 'js/template.js')
                         $('.btn-next').attr('disabled', true);
                     } else {
                         $('.btn-next').removeAttr('disabled');
+                    }
+
+                    // 标题链接
+                    var info = data.data.info || {};
+                    if (info) {
+                        $('#task-category-title').text(info.name);
+                        $('#task-category-url').removeClass('hidden').attr('href', "<?= Url::to(['task/create'])?>&categoryID="+info.id+'&projectID='+projectID);
+                    } else {
+                        $('#task-category-title').text('全部');
+                        $('#task-category-url').addClass('hidden');
                     }
 
                     var list = data.data.list || [];

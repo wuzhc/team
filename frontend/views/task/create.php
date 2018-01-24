@@ -9,11 +9,11 @@ $this->registerJsFile(
 );
 ?>
 <div class="row">
-    <div class="col-md-3">
-        <?= \common\widgets\TaskCategory::widget() ?>
-    </div>
+<!--    <div class="col-md-3">-->
+<!--        --><?//= \common\widgets\TaskCategory::widget() ?>
+<!--    </div>-->
     <!-- /.col -->
-    <div class="col-md-9">
+    <div class="col-md-12">
         <div class="box box-success">
             <div class="box-header with-border">
                 <h3 class="box-title">课堂2.0版本</h3>

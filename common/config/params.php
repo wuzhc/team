@@ -12,6 +12,14 @@ return [
         '3' => '帐号被冻结'
     ],
 
+    // 任务等级样式类
+    'taskLevel' => [
+        0 => 'text-primary',
+        1 => 'text-warning',
+        2 => 'text-red',
+        3 => 'text-success',
+    ],
+
     // 角色
     'role' => [
         \common\config\Conf::ROLE_SUPER => '超级管理员',

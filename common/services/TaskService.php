@@ -188,15 +188,11 @@ class TaskService extends AbstractService
         if (is_numeric($args['categoryID'])) {
             $task->andWhere(['fdTaskCategoryID' => $args['categoryID']]);
         }
-        if (is_numeric($args['process'])) {
-            $task->andWhere(['fdProgress' => $args['process']]);
+        if (is_numeric($args['progress'])) {
+            $task->andWhere(['fdProgress' => $args['progress']]);
         }
         if (is_numeric($args['status'])) {
             $task->andWhere(['fdStatus' => $args['status']]);
-        }
-        if (is_numeric($args['labelID'])) {
-            $task->joinWith(['TaskLabel label'], true, 'INNER JOIN');
-            $task->where(['label.fdTaskLabelID' => $args['labelID']]);
         }
         if (!empty($args['select'])) {
             $task->select($args['select']);
