@@ -1,4 +1,6 @@
 <?php
+use common\config\Conf;
+
 return [
     'adminEmail' => 'admin@example.com',
     'supportEmail' => 'support@example.com',
@@ -14,7 +16,7 @@ return [
 
     // 任务等级样式类
     'taskLevel' => [
-        0 => 'text-primary',
+        0 => 'text-yellow',
         1 => 'text-warning',
         2 => 'text-red',
         3 => 'text-success',
@@ -22,10 +24,10 @@ return [
 
     // 角色
     'role' => [
-        \common\config\Conf::ROLE_SUPER => '超级管理员',
-        \common\config\Conf::ROLE_ADMIN => '普通管理员',
-        \common\config\Conf::ROLE_MEMBER => '普通成员',
-        \common\config\Conf::ROLE_GUEST => '游客',
+        Conf::ROLE_SUPER => '超级管理员',
+        Conf::ROLE_ADMIN => '普通管理员',
+        Conf::ROLE_MEMBER => '普通成员',
+        Conf::ROLE_GUEST => '游客',
     ],
 
     // 背景颜色样式类
@@ -85,5 +87,33 @@ return [
         'https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=253394805,2252880835&fm=27&gp=0.jpg',
         'https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=2374174844,3560175017&fm=27&gp=0.jpg',
         'https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=1965350828,1166357149&fm=27&gp=0.jpg'
-    ]
+    ],
+
+    // 操作动作
+    'handleAction' => [
+        Conf::ACTION_CREATE => '创建',
+        Conf::ACTION_EDIT   => '编辑',
+        Conf::ACTION_DEL    => '删除',
+        Conf::ACTION_ASSIGN => '指派',
+        Conf::ACTION_MOVE   => '移动',
+        Conf::ACTION_ALERT  => '提醒',
+    ],
+
+    // 操作目标
+    'handleTarget' => [
+        Conf::TARGET_PROJECT => '项目',
+        Conf::TARGET_TEAM    => '团队',
+        Conf::TARGET_USER    => '用户',
+        Conf::TARGET_TASK    => '任务',
+        Conf::TARGET_DOC     => '文档',
+    ],
+
+    // 操作目标类型
+    'handelTargetType' => [
+        Conf::TYPE_PROJECT => '项目',
+        Conf::TYPE_TEAM    => '团队',
+        Conf::TYPE_USER    => '用户',
+        Conf::TYPE_TASK    => '任务',
+        Conf::TYPE_DOC     => '文档',
+    ],
 ];

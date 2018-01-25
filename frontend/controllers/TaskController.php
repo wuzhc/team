@@ -12,16 +12,13 @@ use common\services\TaskService;
 use common\services\UserService;
 use common\utils\ResponseUtil;
 use Yii;
-use yii\base\InvalidParamException;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\helpers\StringHelper;
-use yii\web\Controller;
 use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
-use yii\web\User;
 
-class TaskController extends Controller
+class TaskController extends BaseController
 {
     public $layout = 'main-member';
 
@@ -68,20 +65,19 @@ class TaskController extends Controller
 
     /**
      * 任务列表
-     * @param int $projectID
-     * @param int $categoryID
-     * @param int $labelID
-     * @param int $me
      * @return string
      * @since 2018-01-23
      */
     public function actionIndex()
     {
-        return $this->render('index');
+        return $this->render('index', [
+            'projectID' => Yii::$app->request->get('projectID')
+        ]);
     }
 
     /**
      * @param $projectID
+     * @since 2018-01-24
      */
     public function actionList($projectID)
     {
@@ -117,23 +113,17 @@ class TaskController extends Controller
                 $temp['create'] = $task->fdCreate;
                 $temp['update'] = $task->fdUpdate;
                 $temp['progress'] = $task->fdProgress;
+                $temp['categoryID'] = $task->fdTaskCategoryID;
                 $temp['creator'] = UserService::factory()->getUserName($task->fdCreatorID);
                 $temp['level'] = Yii::$app->params['taskLevel'][$task->fdLevel];
                 $list[] = $temp;
-            }
-
-            $info = [];
-            if ($categoryID) {
-                $category = TaskCategory::findOne(['id' => $categoryID]);
-                $info['id'] = $category->id;
-                $info['name'] = $category->fdName;
             }
 
             ResponseUtil::jsonCORS([
                 'data' => [
                     'total' => $total,
                     'list'  => $list,
-                    'info'  => $info
+                    'info'  => $this->_getTaskCategory($categoryID)
                 ]
             ]);
         }
@@ -141,6 +131,8 @@ class TaskController extends Controller
 
     /**
      * 创建任务清单
+     * @param $projectID
+     * @since 2018-01-23
      */
     public function actionCreateTaskCategory($projectID)
     {
@@ -150,41 +142,104 @@ class TaskController extends Controller
         }
     }
 
-
-    public function actionCreate($projectID)
+    /**
+     * 新建任务
+     * @param $projectID
+     * @param $categoryID
+     * @return string
+     * @throws ForbiddenHttpException
+     */
+    public function actionCreate($projectID, $categoryID)
     {
         if (!Yii::$app->user->can('createTask')) {
             throw new ForbiddenHttpException('禁止操作');
         }
 
         if ($data = Yii::$app->request->post()) {
+            if (empty($data['name'])) {
+                ResponseUtil::jsonCORS(['status' => 0, 'msg' => '参数错误']);
+            }
 
+            $args = [
+                'name'       => $data['name'],
+                'creatorID'  => Yii::$app->user->id,
+                'companyID'  => $this->companyID,
+                'level'      => $data['level'],
+                'categoryID' => $categoryID,
+                'projectID'  => $projectID,
+                'content'    => $data['content']
+            ];
+
+            list($status, $msg) = TaskService::factory()->save($args) ? [1, '创建成功'] : [0, '创建失败'];
+            ResponseUtil::jsonCORS([
+                'status' => $status,
+                'msg'    => $msg
+            ]);
         } else {
             return $this->render('create', [
-                'labels'     => TaskService::factory()->getTaskLabels($projectID),
-                'categories' => TaskService::factory()->getTaskCategories($projectID)
+                'categoryID' => $categoryID,
+                'projectID'  => $projectID,
+                'category'   => $this->_getTaskCategory($categoryID)
             ]);
         }
     }
 
-    public function actionUpdate($projectID)
+    /**
+     * 编辑任务
+     * @param $projectID
+     * @param $categoryID
+     * @param $taskID
+     * @return string
+     * @throws ForbiddenHttpException
+     */
+    public function actionUpdate($projectID, $categoryID, $taskID)
     {
-        if (Yii::$app->user->can('editTask')) {
-            throw new ForbiddenHttpException('禁止操作');
+        if (!Yii::$app->user->can('editTask')) {
+            throw new ForbiddenHttpException('对不起，你无权编辑任务');
         }
 
-        if ($data = Yii::$app->request->post()) {
+        $this->_checkTaskAccess($taskID, $projectID, $categoryID);
 
+        if ($data = Yii::$app->request->post()) {
+            if (empty($data['name'])) {
+                ResponseUtil::jsonCORS(['status' => 0, 'msg' => '参数错误']);
+            }
+
+            $args = [
+                'name'    => $data['name'],
+                'level'   => $data['level'],
+                'content' => $data['content']
+            ];
+
+            list($status, $msg) = TaskService::factory()->update($taskID, $args) ? [1, '编辑成功'] : [0, '编辑失败'];
+            ResponseUtil::jsonCORS([
+                'status' => $status,
+                'msg'    => $msg
+            ]);
         } else {
-            return $this->render('update');
+            $task = Task::find()->where(['id' => $taskID])->one();
+            return $this->render('update', [
+                'task'       => $task,
+                'projectID'  => $projectID,
+                'categoryID' => $categoryID,
+            ]);
         }
     }
 
-    public function actionView($projectID)
+    /**
+     * 任务详情
+     * @param $projectID
+     * @param $taskID
+     * @param $categoryID
+     * @return string
+     */
+    public function actionView($projectID, $taskID, $categoryID)
     {
+        $task = Task::find()->where(['id' => $taskID])->one();
         return $this->render('view', [
-            'labels'     => TaskService::factory()->getTaskLabels($projectID),
-            'categories' => TaskService::factory()->getTaskCategories($projectID)
+            'task'       => $task,
+            'projectID'  => $projectID,
+            'categoryID' => $categoryID,
         ]);
     }
 
@@ -263,7 +318,7 @@ class TaskController extends Controller
      * @throws NotFoundHttpException
      * @since 2018-01-24
      */
-    public function actionFinish()
+    public function actionFinish($projectID)
     {
         if (Yii::$app->request->isAjax) {
             $taskID = Yii::$app->request->get('taskID');
@@ -271,7 +326,7 @@ class TaskController extends Controller
                 throw new ForbiddenHttpException('参数错误');
             }
 
-            $task = $this->_checkTaskAccess($taskID);
+            $task = $this->_checkTaskAccess($taskID, $projectID);
 
             if ($task->fdProgress == Conf::TASK_FINISH) {
                 $attribute['fdProgress'] = Conf::TASK_STOP;
@@ -305,7 +360,7 @@ class TaskController extends Controller
      * @throws NotFoundHttpException
      * @since 2018-01-24
      */
-    public function actionHandle()
+    public function actionHandle($projectID)
     {
         if (Yii::$app->request->isAjax) {
             $action = Yii::$app->request->get('action');
@@ -314,7 +369,7 @@ class TaskController extends Controller
                 throw new ForbiddenHttpException('参数错误');
             }
 
-            $task = $this->_checkTaskAccess($taskID);
+            $task = $this->_checkTaskAccess($taskID, $projectID);
 
             if ($task->fdProgress == Conf::TASK_STOP && $action === 'begin') {
                 $attribute['fdProgress'] = Conf::TASK_BEGIN;
@@ -345,14 +400,19 @@ class TaskController extends Controller
     }
 
     /**
-     * @param $taskID
+     * @param int $taskID
+     * @param int $projectID
      * @return Task
      * @throws ForbiddenHttpException
      * @throws NotFoundHttpException
      */
-    private function _checkTaskAccess($taskID)
+    private function _checkTaskAccess($taskID, $projectID)
     {
-        $task = Task::findOne(['id' => $taskID, 'fdStatus' => Conf::ENABLE]);
+        $task = Task::findOne([
+            'id'          => $taskID,
+            'fdStatus'    => Conf::ENABLE,
+            'fdProjectID' => $projectID,
+        ]);
         if (!$task) {
             throw new NotFoundHttpException('任务不存在或已删除');
         }
@@ -361,5 +421,23 @@ class TaskController extends Controller
         }
 
         return $task;
+    }
+
+    /**
+     * 获取任务清单信息
+     * @param $categoryID
+     * @return array
+     */
+    private function _getTaskCategory($categoryID)
+    {
+        $data = [];
+
+        if ($categoryID) {
+            $category = TaskCategory::findOne(['id' => $categoryID]);
+            $data['id'] = $category->id;
+            $data['name'] = $category->fdName;
+        }
+
+        return $data;
     }
 }

@@ -37,7 +37,7 @@
             </li>
             <?php if (!empty($categories)) { ?>
                 <?php foreach ($categories as $k => $category) { ?>
-                    <li <?= isset($categoryID) && ($category->id == $categoryID) ? 'class="active"' : ''?> data-id="<?=$category->id?>">
+                    <li data-id="<?=$category->id?>">
                         <a href="javascript:void(0)" id="task-category-<?=$category->id?>">
                             <h4 class="control-sidebar-subheading">
                                 <?= \yii\helpers\StringHelper::truncate($category->fdName, 20)?>
@@ -57,9 +57,11 @@
     <!-- /.box-body -->
 </div>
 <!-- /. box -->
+
+
 <div class="box box-solid">
     <div class="box-header with-border">
-        <h3 class="box-title">标签</h3>
+        <h3 class="box-title">任务等级</h3>
 
         <div class="box-tools">
             <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
@@ -67,19 +69,56 @@
         </div>
     </div>
     <div class="box-body no-padding">
-        <ul class="nav nav-pills nav-stacked" id="task-label">
-            <?php if (!empty($labels)) { ?>
-                <?php foreach ($labels as $k => $label) { ?>
-                    <li>
-                        <a href="javaScript:void(0)" ><i class="fa fa-circle-o text-<?= $label->fdColor?>"></i><?= $label->fdName?></a>
-                    </li>
-                <?php } ?>
-            <?php } ?>
+        <ul class="nav nav-pills nav-stacked">
+            <li>
+                <a href="javaScript:void(0)">
+                    <i class="fa fa-circle-o text-primary"></i>蓝色
+                </a>
+            </li>
+            <li>
+                <a href="javaScript:void(0)">
+                    <i class="fa fa-circle-o text-yellow"></i>黄色
+                </a>
+            </li>
+            <li>
+                <a href="javaScript:void(0)">
+                    <i class="fa fa-circle-o text-orange"></i>橙色
+                </a>
+            </li>
+            <li>
+                <a href="javaScript:void(0)">
+                    <i class="fa fa-circle-o text-red"></i>红色
+                </a>
+            </li>
         </ul>
     </div>
     <!-- /.box-body -->
 </div>
 <!-- /.box -->
+
+<!--<div class="box box-solid">-->
+<!--    <div class="box-header with-border">-->
+<!--        <h3 class="box-title">标签</h3>-->
+<!---->
+<!--        <div class="box-tools">-->
+<!--            <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>-->
+<!--            </button>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--    <div class="box-body no-padding">-->
+<!--        <ul class="nav nav-pills nav-stacked" id="task-label">-->
+<!--            --><?php //if (!empty($labels)) { ?>
+<!--                --><?php //foreach ($labels as $k => $label) { ?>
+<!--                    <li>-->
+<!--                        <a href="javaScript:void(0)" ><i class="fa fa-circle-o text---><?//= $label->fdColor?><!--"></i>--><?//= $label->fdName?><!--</a>-->
+<!--                    </li>-->
+<!--                --><?php //} ?>
+<!--            --><?php //} ?>
+<!--        </ul>-->
+<!--    </div>-->
+<!--    <!-- /.box-body -->
+<!--</div>-->
+<!--<!-- /.box -->
 
 <script>
     <?php $this->beginBlock('taskCategory') ?>

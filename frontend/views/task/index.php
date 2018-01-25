@@ -18,7 +18,7 @@ AppAsset::registerJsFile($this, 'js/template.js')
             <div class="box box-success">
                 <div class="box-header with-border">
                     <h3 class="box-title" id="task-category-title">全部</h3>
-                    <a href="javaScript:void(0)" class="btn-sm btn-danger pull-right hidden" id="task-category-url">新建任务</a>
+                    <a href="javaScript:void(0)" class="btn btn-sm btn-danger pull-right" id="task-category-url">新建任务</a>
                     <!-- /.box-tools -->
                 </div>
                 <!-- /.box-header -->
@@ -91,7 +91,7 @@ AppAsset::registerJsFile($this, 'js/template.js')
             <td class="mailbox-star"><a href="#"><i class="fa fa-star-o text-yellow"></i></a></td>
             <td class="mailbox-name"><a href="read-mail.html"><%=list[i].creator%></a></td>
             <td class="mailbox-subject">
-                <a href="<?= Url::to(['task/view', 'projectID' => $_GET['projectID']])?>" class="text-black" title="<%=list[i].originName%>">
+                <a href="<?= Url::to(['task/view', 'projectID' => $_GET['projectID']])?>&taskID=<%=list[i].id%>&categoryID=<%=list[i].categoryID%>" class="text-black" title="<%=list[i].originName%>">
                     <i class="fa fa-circle-o <%=list[i].level%>"></i>&nbsp;&nbsp;
                     <%=list[i].name%>
                 </a>
@@ -113,6 +113,11 @@ AppAsset::registerJsFile($this, 'js/template.js')
                     <i class="fa fa-trash-o" title="删除任务"></i>
                 </a>
             </td>
+            <td>
+                <a href="<?=Url::to(['task/update', 'projectID' => $_GET['projectID']])?>&categoryID=<%=list[i].categoryID%>&taskID=<%=list[i].id%>" class="text-muted">
+                    <i class="fa fa-edit" title="编辑任务"></i>
+                </a>
+            </td>
         </tr>
         <% } %>
     </script>
@@ -122,7 +127,7 @@ AppAsset::registerJsFile($this, 'js/template.js')
             <p>
             <p class="lead">现在还没有新任务，点击创建一个新任务试试吧.</p>
             <a class="btn btn-lg btn-success"
-               href="<?= \yii\helpers\Url::to(['task/create']) ?>&projectID=1&categoryID=1">新建任务</a>
+               href="<?= \yii\helpers\Url::to(['task/create']) ?>&projectID=1&categoryID=<%=info.id%>">新建任务</a>
             </p>
         </div>
     </script>
@@ -134,7 +139,7 @@ AppAsset::registerJsFile($this, 'js/template.js')
             var curPage = 1;
             var totalPage = 0;
             var projectID = "<?= $_GET['projectID'] ?>";
-            var categoryID = null;
+            var categoryID = "<?= $_GET['categoryID']?>";
 
             $('#task-index').on('click', '#task-category>li', function () {
                 categoryID = $(this).data('id');
@@ -289,8 +294,8 @@ AppAsset::registerJsFile($this, 'js/template.js')
 
                     callback && callback(cls, cls2);
 
-                }).fail(function (XMLHttpRequest, textStatus, errorThrown) {
-                    var msg = XMLHttpRequest.responseText || '系统繁忙～';
+                }).fail(function (xhr, status, error) {
+                    var msg = xhr.responseText || '系统繁忙～';
                     $.showBox({msg: msg, seconds: 3000});
                 })
             }
@@ -344,12 +349,12 @@ AppAsset::registerJsFile($this, 'js/template.js')
 
                     // 标题链接
                     var info = data.data.info || {};
-                    if (info) {
-                        $('#task-category-title').text(info.name);
-                        $('#task-category-url').removeClass('hidden').attr('href', "<?= Url::to(['task/create'])?>&categoryID="+info.id+'&projectID='+projectID);
-                    } else {
+                    if ($.isEmptyObject(info)) {
                         $('#task-category-title').text('全部');
-                        $('#task-category-url').addClass('hidden');
+                        $('#task-category-url').addClass('disabled');
+                    } else {
+                        $('#task-category-title').text(info.name);
+                        $('#task-category-url').removeClass('disabled').attr('href', "<?= Url::to(['task/create'])?>&categoryID="+info.id+'&projectID='+projectID);
                     }
 
                     var list = data.data.list || [];
@@ -363,7 +368,7 @@ AppAsset::registerJsFile($this, 'js/template.js')
                             radioClass: 'iradio_flat-green'
                         });
                     } else {
-                        html = template.render('none-task-template');
+                        html = template.render('none-task-template', {info: info});
                         $('#task-list').html(html);
                     }
                 }).fail(function () {

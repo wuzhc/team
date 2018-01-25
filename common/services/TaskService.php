@@ -6,8 +6,10 @@ use common\config\Conf;
 use common\models\Project;
 use common\models\Task;
 use common\models\TaskCategory;
+use common\models\TaskContent;
 use common\models\TaskLabel;
 use Yii;
+use yii\db\Exception;
 
 
 /**
@@ -27,6 +29,83 @@ class TaskService extends AbstractService
     public static function factory($className = __CLASS__)
     {
         return parent::factory($className);
+    }
+
+    /**
+     * 新建任务
+     * @param $args
+     * @return bool
+     * @throws Exception
+     * @since 2018-01-25
+     */
+    public function save($args)
+    {
+        $transaction = Yii::$app->db->beginTransaction();
+        try {
+            $task = new Task();
+            $task->fdName = $args['name'];
+            $task->fdCreatorID = $args['creatorID'];
+            $task->fdCompanyID = $args['companyID'];
+            $task->fdLevel = $args['level'];
+            $task->fdProgress = Conf::TASK_STOP;
+            $task->fdTaskCategoryID = $args['categoryID'];
+            $task->fdProjectID = $args['projectID'];
+            $task->fdCreate = date('Y-m-d H:i:s');
+            $task->fdUpdate = date('Y-m-d H:i:s');
+            $task->fdStatus = Conf::ENABLE;
+            $res = $task->save();
+
+            if ($res && $task->id) {
+                $taskContent = new TaskContent();
+                $taskContent->fdTaskID = $task->id;
+                $taskContent->fdContent = $args['content'];
+                $taskContent->save();
+            } else {
+                var_dump($task->getErrors());
+                exit;
+            }
+
+            $transaction->commit();
+            return $res;
+        } catch (Exception $e) {
+            $transaction->rollBack();
+            throw $e;
+        }
+    }
+
+    /**
+     * 编辑任务
+     * @param int $taskID
+     * @param array $args
+     * @return bool
+     * @throws Exception
+     * @since 2018-01-25
+     */
+    public function update($taskID, array $args)
+    {
+        $transaction = Yii::$app->db->beginTransaction();
+        try {
+            $task = Task::findOne(['id' => $taskID]);
+            $task->fdName = $args['name'];
+            $task->fdLevel = $args['level'];
+            $task->fdUpdate = date('Y-m-d H:i:s');
+            $res = $task->update();
+
+            if ($res && $task->id) {
+                $taskContent = TaskContent::findOne(['fdTaskID' => $taskID]);
+                $taskContent->fdContent = $args['content'];
+                $taskContent->update();
+            } else {
+                var_dump($task->getErrors());
+                exit;
+            }
+
+            $transaction->commit();
+            return $res;
+        } catch (Exception $e) {
+            $transaction->rollBack();
+            throw $e;
+        }
     }
 
     /**

@@ -1,7 +1,11 @@
 <?php
+/** @property \common\models\Task $task */
 
+use yii\helpers\Url;
+use yii\helpers\Html;
 use frontend\assets\AdminLtePluginAsset;
 use frontend\assets\AppAsset;
+use yii\helpers\HtmlPurifier;
 
 $this->title = '新建任务';
 $this->registerJsFile('//unpkg.com/wangeditor/release/wangEditor.min.js', [
@@ -10,7 +14,7 @@ $this->registerJsFile('//unpkg.com/wangeditor/release/wangEditor.min.js', [
 ]);
 AdminLtePluginAsset::register($this);
 ?>
-    <div class="row" id="task-create">
+    <div class="row" id="task-update">
         <div class="col-md-3">
             <?= \common\widgets\TaskCategory::widget() ?>
         </div>
@@ -18,37 +22,45 @@ AdminLtePluginAsset::register($this);
         <div class="col-md-9">
             <div class="box box-success">
                 <div class="box-header with-border">
-                    <h3 class="box-title"><?= isset($category['name']) ? $category['name'] : '未知' ?></h3>
+                    <h3 class="box-title"><?= Html::encode($task->category->fdName) ?></h3>
+                    <a href="<?= Yii::$app->request->referrer ?>" class="btn btn-sm btn-default pull-right">返回任务列表</a>
                 </div>
                 <!-- /.box-header -->
                 <div class="box-body">
                     <input id="csrf-token" name="<?= Yii::$app->request->csrfParam ?>" type="hidden"
                            value="<?= Yii::$app->request->csrfToken ?>">
                     <div class="form-group">
-                        <input class="form-control" placeholder="标题" name="title">
+                        <input class="form-control" placeholder="标题" name="title"
+                               value="<?= Html::encode($task->fdName) ?>">
                         <span class="help-block text-red hidden">标题不能为空.</span>
                     </div>
                     <div class="form-group">
-                        <input type="text" class="form-control" value="<?= $category['name'] ?>" readonly>
+                        <input type="text" class="form-control" value="<?= Html::encode($task->category->fdName) ?>"
+                               readonly>
                     </div>
                     <div class="form-group">
                         <div id="editor">
+                            <?=HtmlPurifier::process($task->taskContent->fdContent)?>
                         </div>
                         <span class="help-block text-red hidden">标题不能为空.</span>
                     </div>
                     <div class="form-group">
                         任务等级：
                         <label class="radio-inline">
-                            <input type="radio" name="level" value="0" checked="checked"> 蓝色
+                            <input type="radio" name="level" value="0" <?= $task->fdLevel == 0 ? 'checked="checked"' :
+                                '' ?>> 蓝色
                         </label>
                         <label class="radio-inline">
-                            <input type="radio" name="level" value="2"> 黄色
+                            <input type="radio" name="level" value="1" <?= $task->fdLevel == 1 ? 'checked="checked"' :
+                                '' ?>> 黄色
                         </label>
                         <label class="radio-inline">
-                            <input type="radio" name="level" value="1"> 橙色
+                            <input type="radio" name="level" value="2" <?= $task->fdLevel == 2 ? 'checked="checked"' :
+                                '' ?>> 橙色
                         </label>
                         <label class="radio-inline">
-                            <input type="radio" name="level" value="2"> 红色
+                            <input type="radio" name="level" value="3" <?= $task->fdLevel == 3 ? 'checked="checked"' :
+                                '' ?>> 红色
                         </label>
                     </div>
                     <div class="form-group">
@@ -62,12 +74,12 @@ AdminLtePluginAsset::register($this);
                 <!-- /.box-body -->
                 <div class="box-footer">
                     <div class="pull-right">
-                        <button type="button" class="btn btn-default"><i class="fa fa-pencil"></i> 草稿</button>
+                        <!--                        <button type="button" class="btn btn-default"><i class="fa fa-pencil"></i> 草稿</button>-->
                         <button type="button" class="btn btn-success" id="submit-task"><i class="fa fa-envelope-o"></i>
                             确定
                         </button>
                     </div>
-                    <button type="reset" class="btn btn-default"><i class="fa fa-times"></i> 返回</button>
+                    <!--                    <button type="reset" class="btn btn-default"><i class="fa fa-times"></i> 返回</button>-->
                 </div>
                 <!-- /.box-footer -->
             </div>
@@ -79,6 +91,7 @@ AdminLtePluginAsset::register($this);
     <script>
         <?php $this->beginBlock('jquery') ?>
         $(function () {
+            var taskID = "<?= $task->id?>";
             var projectID = "<?= $projectID?>";
             var categoryID = "<?= $categoryID?>";
 
@@ -88,17 +101,17 @@ AdminLtePluginAsset::register($this);
             editor.customConfig.pasteFilterStyle = false;
             editor.customConfig.uploadImgShowBase64 = true;
             editor.create();
-//        editor.txt.html('写点什么吧');
+//            editor.txt.html();
 
             $('input[type="radio"]').iCheck({
                 checkboxClass: 'icheckbox_flat-green',
                 radioClass: 'iradio_flat-green'
             });
 
-            $('#task-create').on('click', '#task-category>li', function () {
+            $('#task-update').on('click', '#task-category>li', function () {
                 if (confirm('确定要切换到任务列表页吗？')) {
                     var categoryID = $(this).data('id');
-                    var url = "<?= \yii\helpers\Url::to([
+                    var url = "<?= Url::to([
                             'task/index',
                             'projectID' => $projectID
                         ])?>&categoryID=" + categoryID;
@@ -115,8 +128,9 @@ AdminLtePluginAsset::register($this);
                         nameInput.next('.help-block').addClass('hidden');
                     }
 
-                    var url = "<?= \yii\helpers\Url::to([
-                        'task/create',
+                    var url = "<?= Url::to([
+                        'task/update',
+                        'taskID'     => $task->id,
                         'projectID'  => $projectID,
                         'categoryID' => $categoryID
                     ])?>";
@@ -133,10 +147,11 @@ AdminLtePluginAsset::register($this);
                     }).done(function (data) {
                         if (data.status === 1) {
                             $.showBox({
-                                msg: '创建成功',
+                                msg: '编辑成功',
                                 callback: function () {
-                                    window.location.href = "<?=\yii\helpers\Url::to([
-                                        'task/index',
+                                    window.location.href = "<?=Url::to([
+                                        'task/view',
+                                        'taskID'     => $task->id,
                                         'projectID'  => $projectID,
                                         'categoryID' => $categoryID
                                     ])?>"
@@ -144,7 +159,7 @@ AdminLtePluginAsset::register($this);
                             });
                         } else {
                             $.showBox({
-                                msg: '创建失败【' + data.msg + '】'
+                                msg: '编辑失败【' + data.msg + '】'
                             });
                         }
                     }).fail(function (xhr, status, error) {
