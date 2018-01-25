@@ -69,10 +69,9 @@ $this->params['breadcrumbs'][] = $this->title;
                     }
 
                     $.each($('input[name="members"]'), function () {
-                        console.log($(this).data('id'));
-                        console.log(memberIDs);
                         if ($.inArray((String)($(this).data('id')), memberIDs) !== -1) {
                             $(this).attr('checked', 'checked');
+                            $(this).next('img').addClass('img-circle').removeClass('img-thumbnail');
                         }
                     });
                 });

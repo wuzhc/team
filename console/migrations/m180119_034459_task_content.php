@@ -29,6 +29,13 @@ class m180119_034459_task_content extends Migration
             'fdContent' => $this->text()->comment('任务内容')
         ], $tableOptions);
 
+        $this->batchInsert($this->tableName, ['fdTaskID', 'fdContent'], [
+            [1, 'aaaaaaaaaaaaaaaaaaa'],
+            [2, 'bbbbbbbbbbbbbbbbbbb'],
+            [3, 'ccccccccccccccccccc'],
+            [4, 'ddddddddddddddddddd'],
+            [5, 'eeeeeeeeeeeeeeeeeee'],
+        ]);
         $this->createIndex('taskID', $this->tableName, 'fdTaskID');
     }
 

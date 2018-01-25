@@ -40,7 +40,7 @@ AdminLtePluginAsset::register($this);
                     </div>
                     <div class="form-group">
                         <div id="editor">
-                            <?=HtmlPurifier::process($task->taskContent->fdContent)?>
+
                         </div>
                         <span class="help-block text-red hidden">标题不能为空.</span>
                     </div>
@@ -97,11 +97,10 @@ AdminLtePluginAsset::register($this);
 
             var E = window.wangEditor;
             var editor = new E('#editor');
-            // 或者 var editor = new E( document.getElementById('editor') )
             editor.customConfig.pasteFilterStyle = false;
             editor.customConfig.uploadImgShowBase64 = true;
             editor.create();
-//            editor.txt.html();
+            editor.txt.html('<?=addslashes(HtmlPurifier::process($task->taskContent->fdContent))?>');
 
             $('input[type="radio"]').iCheck({
                 checkboxClass: 'icheckbox_flat-green',
@@ -109,14 +108,14 @@ AdminLtePluginAsset::register($this);
             });
 
             $('#task-update').on('click', '#task-category>li', function () {
-                if (confirm('确定要切换到任务列表页吗？')) {
+//                if (confirm('确定要切换到任务列表页吗？')) {
                     var categoryID = $(this).data('id');
                     var url = "<?= Url::to([
                             'task/index',
                             'projectID' => $projectID
                         ])?>&categoryID=" + categoryID;
                     window.location.href = url;
-                }
+//                }
             })
                 .on('click', '#submit-task', function () {
                     var nameInput = $('input[name="title"]');

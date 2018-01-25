@@ -99,21 +99,12 @@ return [
         Conf::ACTION_ALERT  => '提醒',
     ],
 
-    // 操作目标
-    'handleTarget' => [
+    // 操作目标类型
+    'handleTargetType' => [
         Conf::TARGET_PROJECT => '项目',
         Conf::TARGET_TEAM    => '团队',
         Conf::TARGET_USER    => '用户',
         Conf::TARGET_TASK    => '任务',
         Conf::TARGET_DOC     => '文档',
-    ],
-
-    // 操作目标类型
-    'handelTargetType' => [
-        Conf::TYPE_PROJECT => '项目',
-        Conf::TYPE_TEAM    => '团队',
-        Conf::TYPE_USER    => '用户',
-        Conf::TYPE_TASK    => '任务',
-        Conf::TYPE_DOC     => '文档',
     ],
 ];

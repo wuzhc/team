@@ -137,8 +137,9 @@ AdminLtePluginAsset::register($this);
                                 callback: function () {
                                     window.location.href = "<?=\yii\helpers\Url::to([
                                         'task/index',
+                                        'me' => 1,
                                         'projectID'  => $projectID,
-                                        'categoryID' => $categoryID
+                                        'categoryID' => $categoryID,
                                     ])?>"
                                 }
                             });

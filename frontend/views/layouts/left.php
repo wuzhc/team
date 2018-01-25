@@ -9,7 +9,7 @@ $identify = Yii::$app->user->identity;
         <!-- Sidebar user panel -->
         <div class="user-panel">
             <div class="pull-left image">
-                <img src="<?= $directoryAsset ?>/img/user2-160x160.jpg" class="img-circle" alt="User Image"/>
+                <img src="<?= \common\services\UserService::factory()->getUserPortrait(Yii::$app->user->identity) ?>" class="img-circle" alt="User Image"/>
             </div>
             <div class="pull-left info">
                 <p><?=$identify->fdName?></p>

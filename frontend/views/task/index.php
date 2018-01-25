@@ -4,8 +4,7 @@ use frontend\assets\AdminLtePluginAsset;
 use frontend\assets\AppAsset;
 use yii\helpers\Url;
 
-$this->title = '任务列表';
-$directoryAsset = Yii::$app->assetManager->getPublishedUrl('@vendor/almasaeed2010/adminlte/dist');
+$this->title = $_GET['me'] == 1 ? '我的任务' : '所有任务';
 AdminLtePluginAsset::register($this);
 AppAsset::registerJsFile($this, 'js/template.js')
 ?>
@@ -18,7 +17,7 @@ AppAsset::registerJsFile($this, 'js/template.js')
             <div class="box box-success">
                 <div class="box-header with-border">
                     <h3 class="box-title" id="task-category-title">全部</h3>
-                    <a href="javaScript:void(0)" class="btn btn-sm btn-danger pull-right" id="task-category-url">新建任务</a>
+                    <a href="javaScript:void(0)" class="btn btn-sm btn-danger pull-right hidden" id="task-category-url">新建任务</a>
                     <!-- /.box-tools -->
                 </div>
                 <!-- /.box-header -->
@@ -36,7 +35,7 @@ AppAsset::registerJsFile($this, 'js/template.js')
                                 <li><a href="#" data-type="finish">已完成</a></li>
                             </ul>
                         </div>
-                        <a href="<?= Url::to(['task/index', 'projectID' => $_GET['projectID']]) ?>" title="刷新页面">
+                        <a href="<?= Url::to(['task/index', 'projectID' => $_GET['projectID']]) ?>" id="task-fresh" title="刷新页面">
                             <button type="button" class="btn btn-default btn-sm">
                                 <i class="fa fa-refresh"></i>
                             </button>
@@ -308,7 +307,8 @@ AppAsset::registerJsFile($this, 'js/template.js')
                     totalInit: 1,
                     pageSize: 10,
                     page: curPage,
-                    categoryID: categoryID
+                    categoryID: categoryID,
+                    me: "<?=$_GET['me']?>",
                 }, options);
                 var url = "<?=\yii\helpers\Url::to(['task/list', 'projectID' => $_GET['projectID']])?>";
 
@@ -349,13 +349,16 @@ AppAsset::registerJsFile($this, 'js/template.js')
 
                     // 标题链接
                     var info = data.data.info || {};
-                    if ($.isEmptyObject(info)) {
+                    if (!info.id || !info.name) {
                         $('#task-category-title').text('全部');
-                        $('#task-category-url').addClass('disabled');
+                        $('#task-category-url').addClass('hidden');
                     } else {
                         $('#task-category-title').text(info.name);
-                        $('#task-category-url').removeClass('disabled').attr('href', "<?= Url::to(['task/create'])?>&categoryID="+info.id+'&projectID='+projectID);
+                        $('#task-category-url').removeClass('hidden').attr('href', "<?= Url::to(['task/create'])?>&categoryID="+info.id+'&projectID='+projectID);
                     }
+
+                    // 刷新页面
+                    $('#task-fresh').attr('href', "<?= Url::to(['task/index', 'me' => $_GET['me']])?>&categoryID="+info.id+'&projectID='+projectID);
 
                     var list = data.data.list || [];
                     var len = list.length;
@@ -371,8 +374,9 @@ AppAsset::registerJsFile($this, 'js/template.js')
                         html = template.render('none-task-template', {info: info});
                         $('#task-list').html(html);
                     }
-                }).fail(function () {
-                    $.showBox({msg: '系统繁忙~'});
+                }).fail(function (xhr, status, error) {
+                    var msg = xhr.responseText || error;
+                    $.showBox({msg: msg});
                 })
             }
 

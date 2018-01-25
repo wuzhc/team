@@ -51,17 +51,10 @@ class Conf
     const ACTION_MOVE = 5; // 移动
     const ACTION_ALERT = 6; // 提醒
 
-    /*target 操作目标*/
+    /*target 操作目标类型*/
     const TARGET_PROJECT = 1; // 项目
     const TARGET_TEAM = 2; // 团队
     const TARGET_USER = 3; // 用户
     const TARGET_TASK = 4; // 任务
     const TARGET_DOC = 5; // 文档
-
-    /*type 操作目标类型*/
-    const TYPE_PROJECT = 1; // 项目
-    const TYPE_TEAM = 2; // 团队
-    const TYPE_USER = 3; // 用户
-    const TYPE_TASK = 4; // 任务
-    const TYPE_DOC = 5; // 文档
 }

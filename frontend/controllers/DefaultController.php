@@ -4,6 +4,7 @@ namespace frontend\controllers;
 
 use common\models\Project;
 use common\models\User;
+use common\services\LogService;
 use common\services\ProjectService;
 use common\services\TaskService;
 use common\utils\ResponseUtil;
@@ -59,10 +60,6 @@ class DefaultController extends BaseController
             'error'   => [
                 'class' => 'yii\web\ErrorAction',
             ],
-            'captcha' => [
-                'class'           => 'yii\captcha\CaptchaAction',
-                'fixedVerifyCode' => YII_ENV_TEST ? 'testme' : null,
-            ],
         ];
     }
 
@@ -85,6 +82,17 @@ class DefaultController extends BaseController
     public function actionDynamic()
     {
         return $this->render('dynamic');
+    }
+
+    /**
+     * 获取动态内容
+     * @since 2018-01-25
+     */
+    public function actionGetDynamic()
+    {
+        ResponseUtil::jsonCORS([
+           'rows' => LogService::factory()->getHandleLogs([])
+        ]);
     }
 
     /**

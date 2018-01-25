@@ -1,5 +1,5 @@
 <div class="box box-solid">
-    <a href="<?= \yii\helpers\Url::to(['task/index', 'projectID' => $projectID, 'categoryID' => $categoryID, 'me' => ($me+1)%2])?>" class="btn btn-success" style="width: 100%"><?= $me == 1 ? '所有项目任务' : '我的任务'?></a>
+    <a href="<?= \yii\helpers\Url::to(['task/index', 'projectID' => $projectID, 'categoryID' => $categoryID, 'me' => ($me+1)%2])?>" class="btn btn-success" style="width: 100%"><?= $me == 1 ? '返回所有项目任务' : '返回我的任务'?></a>
 </div>
 
 <div class="box box-solid">
@@ -125,7 +125,7 @@
     $(function () {
 
         (function () {
-            var url = "<?=\yii\helpers\Url::to(['task/stat-tasks'])?>";
+            var url = "<?=\yii\helpers\Url::to(['task/stat-tasks', 'isMe' => $_GET['me']])?>";
             $.ajax({
                 type: 'GET',
                 url: url,

@@ -34,7 +34,7 @@ class TaskService extends AbstractService
     /**
      * 新建任务
      * @param $args
-     * @return bool
+     * @return int
      * @throws Exception
      * @since 2018-01-25
      */
@@ -66,7 +66,7 @@ class TaskService extends AbstractService
             }
 
             $transaction->commit();
-            return $res;
+            return $res ? (int)$task->id : 0;
         } catch (Exception $e) {
             $transaction->rollBack();
             throw $e;

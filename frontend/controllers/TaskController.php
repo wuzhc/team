@@ -7,6 +7,7 @@ use common\config\Conf;
 use common\models\Project;
 use common\models\Task;
 use common\models\TaskCategory;
+use common\services\LogService;
 use common\services\ProjectService;
 use common\services\TaskService;
 use common\services\UserService;
@@ -15,6 +16,7 @@ use Yii;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\helpers\StringHelper;
+use yii\web\BadRequestHttpException;
 use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 
@@ -40,14 +42,14 @@ class TaskController extends BaseController
                             }
                             $projectID = Yii::$app->request->get('projectID');
                             if (!$projectID) {
-                                return false;
+                                throw new BadRequestHttpException('参数错误');
                             }
                             if (!(Project::findOne(['id' => $projectID, 'fdStatus' => Conf::ENABLE]))) {
                                 throw new NotFoundHttpException('数据不存在');
                             }
                             // 项目访问权限检测
                             if (!ProjectService::factory()->checkUserAccessProject(Yii::$app->user->id, $projectID)) {
-                                return false;
+                                throw new ForbiddenHttpException('你还不是我们项目的成员，联系一下管理员试试吧');
                             }
                             return true;
                         }
@@ -85,9 +87,9 @@ class TaskController extends BaseController
             $params = Yii::$app->request->get();
             $progress = isset($params['progress']) ? $params['progress'] : null;
             $categoryID = !empty($params['categoryID']) ? $params['categoryID'] : null;
-            $userID = isset($params['me']) && $params['me'] == 1 ? Yii::$app->user->id : null;
+            $creatorID = isset($params['me']) && $params['me'] == 1 ? Yii::$app->user->id : null;
             $args = [
-                'userID'     => $userID,
+                'creatorID'  => $creatorID,
                 'progress'   => $progress,
                 'categoryID' => $categoryID,
             ];
@@ -160,7 +162,7 @@ class TaskController extends BaseController
                 ResponseUtil::jsonCORS(['status' => 0, 'msg' => '参数错误']);
             }
 
-            $args = [
+            $taskID = TaskService::factory()->save([
                 'name'       => $data['name'],
                 'creatorID'  => Yii::$app->user->id,
                 'companyID'  => $this->companyID,
@@ -168,13 +170,25 @@ class TaskController extends BaseController
                 'categoryID' => $categoryID,
                 'projectID'  => $projectID,
                 'content'    => $data['content']
-            ];
-
-            list($status, $msg) = TaskService::factory()->save($args) ? [1, '创建成功'] : [0, '创建失败'];
-            ResponseUtil::jsonCORS([
-                'status' => $status,
-                'msg'    => $msg
             ]);
+
+            if ($taskID) {
+                LogService::factory()->saveHandleLog([
+                    'target'     => $taskID,
+                    'action'     => Conf::ACTION_CREATE,
+                    'operator'   => Yii::$app->user->id,
+                    'targetType' => Conf::TARGET_TASK,
+                ]);
+                ResponseUtil::jsonCORS([
+                    'status' => 1,
+                    'msg'    => '创建成功'
+                ]);
+            } else {
+                ResponseUtil::jsonCORS([
+                    'status' => 0,
+                    'msg'    => '创建失败'
+                ]);
+            }
         } else {
             return $this->render('create', [
                 'categoryID' => $categoryID,
@@ -198,7 +212,7 @@ class TaskController extends BaseController
             throw new ForbiddenHttpException('对不起，你无权编辑任务');
         }
 
-        $this->_checkTaskAccess($taskID, $projectID, $categoryID);
+        $this->_checkTaskAccess($taskID, $projectID);
 
         if ($data = Yii::$app->request->post()) {
             if (empty($data['name'])) {
@@ -212,14 +226,23 @@ class TaskController extends BaseController
             ];
 
             list($status, $msg) = TaskService::factory()->update($taskID, $args) ? [1, '编辑成功'] : [0, '编辑失败'];
+
+            if ($status == 1) {
+                LogService::factory()->saveHandleLog([
+                    'target'     => $taskID,
+                    'action'     => Conf::ACTION_EDIT,
+                    'operator'   => Yii::$app->user->id,
+                    'targetType' => Conf::TARGET_TASK,
+                ]);
+            }
+
             ResponseUtil::jsonCORS([
                 'status' => $status,
                 'msg'    => $msg
             ]);
         } else {
-            $task = Task::find()->where(['id' => $taskID])->one();
             return $this->render('update', [
-                'task'       => $task,
+                'task'       => Task::find()->where(['id' => $taskID])->one(),
                 'projectID'  => $projectID,
                 'categoryID' => $categoryID,
             ]);
@@ -275,23 +298,25 @@ class TaskController extends BaseController
      * @param int $projectID 项目ID
      * @since 2018-01-23
      */
-    public function actionStatTasks($projectID)
+    public function actionStatTasks($projectID, $isMe = 0)
     {
         $tasks = [];
 
         $categories = TaskService::factory()->getTasks($projectID, [
-            'status'  => Conf::ENABLE,
-            'group'   => ['fdTaskCategoryID'],
-            'asArray' => true,
-            'select'  => ['count(id) as total', 'fdTaskCategoryID as cid']
+            'status'    => Conf::ENABLE,
+            'group'     => ['fdTaskCategoryID'],
+            'asArray'   => true,
+            'creatorID' => $isMe == 1 ? Yii::$app->user->id : null,
+            'select'    => ['count(id) as total', 'fdTaskCategoryID as cid']
         ]);
 
         $completeCategories = TaskService::factory()->getTasks($projectID, [
-            'status'   => Conf::ENABLE,
-            'group'    => ['fdTaskCategoryID'],
-            'asArray'  => true,
-            'progress' => Conf::TASK_FINISH,
-            'select'   => ['count(id) as completeTotal', 'fdTaskCategoryID as cid']
+            'status'    => Conf::ENABLE,
+            'group'     => ['fdTaskCategoryID'],
+            'asArray'   => true,
+            'progress'  => Conf::TASK_FINISH,
+            'creatorID' => $isMe == 1 ? Yii::$app->user->id : null,
+            'select'    => ['count(id) as completeTotal', 'fdTaskCategoryID as cid']
         ]);
 
         $map = [];
@@ -323,7 +348,7 @@ class TaskController extends BaseController
         if (Yii::$app->request->isAjax) {
             $taskID = Yii::$app->request->get('taskID');
             if (!$taskID) {
-                throw new ForbiddenHttpException('参数错误');
+                throw new BadRequestHttpException('参数错误');
             }
 
             $task = $this->_checkTaskAccess($taskID, $projectID);
@@ -366,7 +391,7 @@ class TaskController extends BaseController
             $action = Yii::$app->request->get('action');
             $taskID = Yii::$app->request->get('taskID');
             if (!$action || !$taskID) {
-                throw new ForbiddenHttpException('参数错误');
+                throw new BadRequestHttpException('参数错误');
             }
 
             $task = $this->_checkTaskAccess($taskID, $projectID);

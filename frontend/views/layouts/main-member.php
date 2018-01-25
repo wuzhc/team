@@ -141,7 +141,7 @@ if (Yii::$app->controller->action->id === 'login') {
     <!--聊天-->
 
     <!--弹窗-->
-    <div class="modal fade" id="showMsgModal" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
+    <div class="modal fade" id="showMsgModal" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true" style="z-index: 999999">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header hidden">

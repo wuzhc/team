@@ -308,6 +308,22 @@ class UserService extends AbstractService
     }
 
     /**
+     * 获取用户偷袭
+     * @param int|User $user
+     * @return string
+     * @since 2018-01-25
+     */
+    public function getUserPortrait($user)
+    {
+        $user = $this->getUserInstance($user);
+        if (null === $user) {
+            return '';
+        }
+
+        return $user->fdPortrait ?: Yii::$app->params['defaultPortrait'][0];
+    }
+
+    /**
      * 获取用户登录账号
      * 优先级：邮箱号 > 手机号 > 账号
      * @param User|int $user
