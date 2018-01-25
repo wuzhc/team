@@ -3,7 +3,9 @@
 namespace frontend\controllers;
 
 use common\config\Conf;
+use common\models\Task;
 use common\models\User;
+use common\services\TaskService;
 use common\services\UserService;
 use common\utils\ResponseUtil;
 use common\utils\VerifyUtil;
@@ -12,6 +14,7 @@ use frontend\form\SignupForm;
 use Yii;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
+use yii\helpers\StringHelper;
 use yii\web\ForbiddenHttpException;
 
 /**
@@ -121,6 +124,98 @@ class UserController extends BaseController
     {
         Yii::$app->user->logout();
         return $this->redirect(['/user/login']);
+    }
+
+    /**
+     * 个人中心
+     * @return string
+     * @since 2018-01-25
+     */
+    public function actionProfile()
+    {
+        /** @var User $user */
+        $user = Yii::$app->user->identity;
+        return $this->render('profile', [
+            'username' => UserService::factory()->getUserName($user),
+            'portrait' => UserService::factory()->getUserPortrait($user)
+        ]);
+    }
+
+    /**
+     * @since 2018-01-24
+     */
+    public function actionTasks()
+    {
+        if (Yii::$app->request->isAjax) {
+            $params = Yii::$app->request->get();
+            $progress = isset($params['progress']) ? $params['progress'] : null;
+            $creatorID = Yii::$app->user->id;
+            $args = [
+                'creatorID'  => $creatorID,
+                'progress'   => $progress,
+            ];
+
+            $total = null;
+            if (!empty($params['totalInit'])) {
+                $total = TaskService::factory()->countCompanyTasks($this->companyID, $args);
+            }
+
+            $args['limit'] = !empty($params['pageSize']) ? $params['pageSize'] : 10;
+            $args['offset'] = !empty($params['page']) ? ($params['page'] - 1) * $args['limit'] : 0;
+            $args['order'] = ['id' => SORT_DESC];
+
+            $list = [];
+            $tasks = TaskService::factory()->getCompanyTasks($this->companyID, $args);
+
+            /** @var Task $task */
+            foreach ((array)$tasks as $task) {
+                $temp = [];
+                $temp['id'] = $task->id;
+                $temp['originName'] = $task->fdName;
+                $temp['name'] = StringHelper::truncate($task->fdName, 28);
+                $temp['create'] = $task->fdCreate;
+                $temp['update'] = $task->fdUpdate;
+                $temp['progress'] = $task->fdProgress;
+                $temp['categoryID'] = $task->fdTaskCategoryID;
+                $temp['creator'] = UserService::factory()->getUserName($task->fdCreatorID);
+                $temp['level'] = Yii::$app->params['taskLevel'][$task->fdLevel];
+                $list[] = $temp;
+            }
+
+            ResponseUtil::jsonCORS([
+                'data' => [
+                    'total' => $total,
+                    'list'  => $list,
+                ]
+            ]);
+        }
+    }
+
+    /**
+     * 个人任务数
+     * @since 2018-01-25
+     */
+    public function actionStatTasks()
+    {
+        $total = TaskService::factory()->countCompanyTasks($this->companyID, [
+            'status'    => Conf::ENABLE,
+            'asArray'   => true,
+            'creatorID' => Yii::$app->user->id,
+            'select'    => ['count(id)']
+        ]);
+
+        $complete = TaskService::factory()->countCompanyTasks($this->companyID, [
+            'status'    => Conf::ENABLE,
+            'asArray'   => true,
+            'progress'  => Conf::TASK_FINISH,
+            'creatorID' => Yii::$app->user->id,
+            'select'    => ['count(id)']
+        ]);
+
+        ResponseUtil::jsonCORS([
+            'total' => $total,
+            'complete'=> $complete
+        ]);
     }
 
     /**

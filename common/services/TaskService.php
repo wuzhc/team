@@ -211,17 +211,17 @@ class TaskService extends AbstractService
     }
 
     /**
-     * 获取任务
+     * 项目任务
      * @param int $projectID
      * @param array $args
      * @return array|\yii\db\ActiveRecord[]
      * @since 2018-01-23
      */
-    public function getTasks($projectID, array $args)
+    public function getProjectTasks($projectID, array $args)
     {
         if (empty($projectID)) {
             if (YII_DEBUG) {
-                Yii::$app->end('getTask(): ProjectID is empty');
+                Yii::$app->end('getProjectTasks(): ProjectID is empty');
             }
             return [];
         }
@@ -231,19 +231,61 @@ class TaskService extends AbstractService
     }
 
     /**
-     * 任务总数
+     * 公司任务
+     * @param $companyID
+     * @param array $args
+     * @return array|\yii\db\ActiveRecord[]
+     */
+    public function getCompanyTasks($companyID, array $args)
+    {
+        if (empty($companyID)) {
+            if (YII_DEBUG) {
+                Yii::$app->end('getCompanyTasks(): $companyID is empty');
+            }
+            return [];
+        }
+
+        $args['companyID'] = $companyID;
+        return $this->findTaskCriteria($args)->all();
+    }
+
+    /**
+     * 项目任务总数
      * @param $projectID
      * @param array $args
      * @return int
      * @since 2018-01-23
      */
-    public function countTasks($projectID, array $args)
+    public function countProjectTasks($projectID, array $args)
     {
         if (empty($projectID)) {
+            if (YII_DEBUG) {
+                Yii::$app->end('getProjectTasks(): ProjectID is empty');
+            }
             return 0;
         }
 
         $args['projectID'] = $projectID;
+        return (int)$this->findTaskCriteria($args)->count();
+    }
+
+    /**
+     * 公司任务总数
+     * @param $companyID
+     * @param array $args
+     * @return int
+     * @since 2018-01-23
+     */
+    public function countCompanyTasks($companyID, array $args)
+    {
+        if (empty($companyID)) {
+            if (YII_DEBUG) {
+                Yii::$app->end('countCompanyTasks(): $companyID is empty');
+            }
+            return 0;
+        }
+
+        $args['companyID'] = $companyID;
         return (int)$this->findTaskCriteria($args)->count();
     }
 

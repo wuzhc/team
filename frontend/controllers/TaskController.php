@@ -96,7 +96,7 @@ class TaskController extends BaseController
 
             $total = null;
             if (!empty($params['totalInit'])) {
-                $total = TaskService::factory()->countTasks($projectID, $args);
+                $total = TaskService::factory()->countProjectTasks($projectID, $args);
             }
 
             $args['limit'] = !empty($params['pageSize']) ? $params['pageSize'] : 10;
@@ -104,7 +104,7 @@ class TaskController extends BaseController
             $args['order'] = ['id' => SORT_DESC];
 
             $list = [];
-            $tasks = TaskService::factory()->getTasks($projectID, $args);
+            $tasks = TaskService::factory()->getProjectTasks($projectID, $args);
 
             /** @var Task $task */
             foreach ((array)$tasks as $task) {
@@ -302,7 +302,7 @@ class TaskController extends BaseController
     {
         $tasks = [];
 
-        $categories = TaskService::factory()->getTasks($projectID, [
+        $categories = TaskService::factory()->getProjectTasks($projectID, [
             'status'    => Conf::ENABLE,
             'group'     => ['fdTaskCategoryID'],
             'asArray'   => true,
@@ -310,7 +310,7 @@ class TaskController extends BaseController
             'select'    => ['count(id) as total', 'fdTaskCategoryID as cid']
         ]);
 
-        $completeCategories = TaskService::factory()->getTasks($projectID, [
+        $completeCategories = TaskService::factory()->getProjectTasks($projectID, [
             'status'    => Conf::ENABLE,
             'group'     => ['fdTaskCategoryID'],
             'asArray'   => true,

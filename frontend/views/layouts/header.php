@@ -1,8 +1,12 @@
 <?php
-use yii\helpers\Html;
 
 /* @var $this \yii\web\View */
 /* @var $content string */
+
+use yii\helpers\Html;
+use yii\helpers\Url;
+use common\services\UserService;
+
 ?>
 
 <header class="main-header">
@@ -229,15 +233,13 @@ use yii\helpers\Html;
 
                 <li class="dropdown user user-menu">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                        <img src="<?= \common\services\UserService::factory()->getUserPortrait(Yii::$app->user->identity) ?>" class="user-image" alt="User Image"/>
+                        <img src="<?= UserService::factory()->getUserPortrait(Yii::$app->user->identity) ?>" class="user-image" alt="User Image"/>
                         <span class="hidden-xs"><?=Yii::$app->user->identity->fdName?></span>
                     </a>
                     <ul class="dropdown-menu">
                         <!-- User image -->
                         <li class="user-header">
-                            <img src="<?= \common\services\UserService::factory()->getUserPortrait(Yii::$app->user->identity) ?>" class="img-circle"
-                                 alt="User Image"/>
-
+                            <img src="<?= UserService::factory()->getUserPortrait(Yii::$app->user->identity) ?>" class="img-circle" alt="User Image"/>
                             <p>
                                 <?=Yii::$app->user->identity->fdPosition?>
                                 <small>加入时间 <?=Yii::$app->user->identity->fdVerify?></small>
@@ -258,7 +260,7 @@ use yii\helpers\Html;
                         <!-- Menu Footer-->
                         <li class="user-footer">
                             <div class="pull-left">
-                                <a href="#" class="btn btn-default btn-flat">资料</a>
+                                <a href="<?=\yii\helpers\Url::to(['user/profile'])?>" class="btn btn-default btn-flat">资料</a>
                             </div>
                             <div class="pull-right">
                                 <?= Html::a(
