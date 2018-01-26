@@ -34,16 +34,6 @@ class TaskController extends BaseController
                 'class' => AccessControl::className(),
                 'rules' => [
                     [
-                        'allow'         => true,
-                        'matchCallback' => function () {
-                            // 登录检测
-                            if (Yii::$app->user->isGuest) {
-                                return false;
-                            }
-                            return true;
-                        }
-                    ],
-                    [
                         'actions'       => ['index', 'list', 'create', 'create-task-category', 'stat-tasks'],
                         'allow'         => true,
                         'matchCallback' => function () {
@@ -57,7 +47,17 @@ class TaskController extends BaseController
                             }
                             return true;
                         }
-                    ]
+                    ],
+                    [
+                        'allow'         => true,
+                        'matchCallback' => function () {
+                            // 登录检测
+                            if (Yii::$app->user->isGuest) {
+                                return false;
+                            }
+                            return true;
+                        }
+                    ],
                 ],
             ]
         ];
@@ -283,8 +283,6 @@ class TaskController extends BaseController
             'target'     => (int)$task->id,
             'targetType' => Conf::TARGET_TASK
         ]);
-
-//        print_r($logs);exit;
 
         $members = ProjectService::factory()->getHasJoinProjectMembers($task->fdProjectID);
 
