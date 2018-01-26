@@ -377,7 +377,29 @@ AppAsset::registerJsFile($this, 'js/template.js');
                         params.progress = 2;
                     }
                     renderList(params);
-                });
+                })
+                .on('click', '.fa-trash-o', function (e) {
+                    e.preventDefault();
+                    if (confirm('确定要删除该任务吗？')) {
+                        var self = $(this);
+                        $.ajax({
+                            url: "<?= Url::to(['task/delete']) ?>",
+                            data: {taskID: $(this).parent().data('id')},
+                            method: 'GET',
+                            dataType: 'json'
+                        }).done(function(data){
+                            if (data.status == 1) {
+                                $.showBox({msg: '删除成功'});
+                                self.parents('tr').remove();
+                            } else {
+                                $.showBox({msg: '删除失败'});
+                            }
+                        }).fail(function (xhr, status, error) {
+                            var msg = xhr.responseText || error;
+                            $.showBox({msg: msg});
+                        })
+                    }
+                })
 
             // 完成任务
             function finishTask(taskID) {
@@ -388,7 +410,7 @@ AppAsset::registerJsFile($this, 'js/template.js');
 
                 $.ajax({
                     type: 'GET',
-                    url: "<?= Url::to(['task/finish', 'projectID' => $projectID])?>",
+                    url: "<?= Url::to(['task/finish'])?>",
                     data: {
                         taskID: taskID
                     },
@@ -416,7 +438,7 @@ AppAsset::registerJsFile($this, 'js/template.js');
 
                 $.ajax({
                     type: 'GET',
-                    url: "<?= Url::to(['task/handle', 'projectID' => $projectID])?>",
+                    url: "<?= Url::to(['task/handle'])?>",
                     data: {
                         action: action,
                         taskID: taskID

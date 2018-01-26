@@ -8,7 +8,7 @@ use frontend\assets\AdminLtePluginAsset;
 use frontend\assets\AppAsset;
 use yii\helpers\HtmlPurifier;
 
-$this->title = '新建任务';
+$this->title = '编辑任务';
 AdminLtePluginAsset::register($this);
 $this->registerJsFile('//unpkg.com/wangeditor/release/wangEditor.min.js', [
     AppAsset::className(),

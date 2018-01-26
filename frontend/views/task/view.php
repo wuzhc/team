@@ -2,6 +2,7 @@
 
 /* @var $task \common\models\Task */
 /* @var $logs array 任务操作日志 */
+/* @var $members array 项目成员 */
 
 use yii\helpers\Url;
 use yii\helpers\Html;
@@ -31,7 +32,7 @@ $directoryAsset = Yii::$app->assetManager->getPublishedUrl('@vendor/almasaeed201
                     <h3 class="box-title"><?= Html::encode($task->category->fdName) ?></h3>
                     <a href="<?= Url::to([
                         'task/index',
-                        'projectID' => $task->fdProjectID,
+                        'projectID'  => $task->fdProjectID,
                         'categoryID' => $task->fdTaskCategoryID
                     ]) ?>" class="btn btn-sm btn-default pull-right">返回任务列表</a>
                 </div>
@@ -42,6 +43,18 @@ $directoryAsset = Yii::$app->assetManager->getPublishedUrl('@vendor/almasaeed201
                         <h5><?= Html::encode($task->creator->fdName) ?>
                             <span class="mailbox-read-time pull-right"><?= $task->fdCreate ?></span></h5>
                     </div>
+                    <div class="maixbox-controls with-border text-left">
+                        将任务指派任务给：
+                        <select class="form-control">
+                            <option id="<?= $task->fdCreatorID ?>"><?= Html::encode($task->creator->fdName) ?></option>
+                            <?php if (is_array($members)) { ?>
+                                <?php foreach ($members as $member) { ?>
+                                    <option id="<?= $member['id'] ?>"><?= Html::encode($member['name']) ?></option>
+                                <?php } ?>
+                            <?php } ?>
+                        </select>
+                    </div>
+
                     <!-- /.mailbox-read-info -->
                     <div class="mailbox-controls with-border text-center">
                         <div class="btn-group">
@@ -150,11 +163,99 @@ $directoryAsset = Yii::$app->assetManager->getPublishedUrl('@vendor/almasaeed201
         <!-- /.col -->
     </div>
 
+
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#assign-task"
+            data-id="<?= $task->id ?>">指派任务
+    </button>
+
+    <div class="modal fade" id="assign-task" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="exampleModalLabel">将任务指派给谁</h4>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="form-group">
+                            <select class="form-control" id="project-users">
+                                <option id="<?= $task->fdCreatorID ?>"><?= Html::encode($task->creator->fdName) ?></option>
+                                <?php if (is_array($members)) { ?>
+                                    <?php foreach ($members as $member) { ?>
+                                        <option id="<?= $member['id'] ?>"><?= Html::encode($member['name']) ?></option>
+                                    <?php } ?>
+                                <?php } ?>
+                            </select>
+                        </div>
+                        <input type="hidden" id="task-id" name="taskID" value="">
+                        <input type="hidden" id="_csrf" value="<?= Yii::$app->request->csrfToken ?>">
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                    <button type="button" class="btn btn-primary" id="submit-assign">确定</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
     <script>
         <?php $this->beginBlock('jquery') ?>
         $(function () {
+
+            // 指派任务弹窗触发事件
+            $('#assign-task').on('show.bs.modal', function (event) {
+                var button = $(event.relatedTarget);
+                var taskID = button.data('id');
+                var modal = $(this);
+                modal.find('.modal-body input[name="taskID"]').val(taskID)
+            });
+
             $('#task-view').on('click', '.task-edit', function () {
+                // 编辑任务
                 window.location.href = "<?= Url::to(['task/update', 'taskID' => $task->id]) ?>"
+            }).on('click', '#submit-assign', function () {
+                var taskID = $('#task-id').val();
+                var acceptUserID = $('#project-users').val();
+                if (!taskID || !acceptUserID) {
+                    $.showBox({msg: '参数错误'});
+                    return false;
+                }
+
+                // 指派任务
+                $.ajax({
+                    url: "<?= Url::to(['task/assign'])?>",
+                    method: 'POST',
+                    dataType: 'JSON',
+                    data: {
+                        taskID: taskID,
+                        acceptUserID: acceptUserID,
+                        _csrf: $('input[name="_csrf"]').val()
+                    }
+                }).done(function (data) {
+                    if (data.status == 1) {
+                        $.showBox({
+                            msg: '指派成功', callback: function () {
+                                window.location.reload();
+                            }
+                        });
+                    } else {
+                        $.showBox({
+                            msg: '指派失败', callback: function () {
+                                $('#assign-task').modal('hide');
+                            }
+                        });
+                    }
+                }).fail(function (xhr, status, error) {
+                    var msg = xhr.responseText || '系统繁忙';
+                    $.showBox({
+                        msg: msg, callback: function () {
+                            $('#assign-task').modal('hide');
+                        }
+                    });
+                });
             });
         });
         <?php $this->endBlock() ?>
