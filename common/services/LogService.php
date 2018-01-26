@@ -229,7 +229,7 @@ class LogService extends AbstractService
 
         return $collection->insert([
             'userID'  => $user->id,
-            'date'    => new UTCDateTime(time()*1000),
+            'date'    => new UTCDateTime(),
             'loginIP' => ClientUtil::getClientIp()
         ]) ? true : false;
     }
