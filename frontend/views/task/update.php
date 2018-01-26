@@ -1,5 +1,6 @@
 <?php
-/** @property \common\models\Task $task */
+
+/** @var $task \common\models\Task */
 
 use yii\helpers\Url;
 use yii\helpers\Html;
@@ -8,22 +9,23 @@ use frontend\assets\AppAsset;
 use yii\helpers\HtmlPurifier;
 
 $this->title = '新建任务';
+AdminLtePluginAsset::register($this);
 $this->registerJsFile('//unpkg.com/wangeditor/release/wangEditor.min.js', [
     AppAsset::className(),
     'depends' => 'frontend\assets\AppAsset'
 ]);
-AdminLtePluginAsset::register($this);
+
 ?>
     <div class="row" id="task-update">
-        <div class="col-md-3">
-            <?= \common\widgets\TaskCategory::widget() ?>
-        </div>
-        <!-- /.col -->
-        <div class="col-md-9">
+        <div class="col-md-12">
             <div class="box box-success">
                 <div class="box-header with-border">
                     <h3 class="box-title"><?= Html::encode($task->category->fdName) ?></h3>
-                    <a href="<?= Yii::$app->request->referrer ?>" class="btn btn-sm btn-default pull-right">返回任务列表</a>
+                    <a href="<?= Url::to([
+                        'task/index',
+                        'projectID' => $task->fdProjectID,
+                        'categoryID' => $task->fdTaskCategoryID
+                    ]) ?>" class="btn btn-sm btn-default pull-right">返回任务列表</a>
                 </div>
                 <!-- /.box-header -->
                 <div class="box-body">
@@ -91,9 +93,6 @@ AdminLtePluginAsset::register($this);
     <script>
         <?php $this->beginBlock('jquery') ?>
         $(function () {
-            var taskID = "<?= $task->id?>";
-            var projectID = "<?= $projectID?>";
-            var categoryID = "<?= $categoryID?>";
 
             var E = window.wangEditor;
             var editor = new E('#editor');
@@ -107,65 +106,44 @@ AdminLtePluginAsset::register($this);
                 radioClass: 'iradio_flat-green'
             });
 
-            $('#task-update').on('click', '#task-category>li', function () {
-//                if (confirm('确定要切换到任务列表页吗？')) {
-                    var categoryID = $(this).data('id');
-                    var url = "<?= Url::to([
-                            'task/index',
-                            'projectID' => $projectID
-                        ])?>&categoryID=" + categoryID;
-                    window.location.href = url;
-//                }
-            })
-                .on('click', '#submit-task', function () {
-                    var nameInput = $('input[name="title"]');
-                    var name = $.trim(nameInput.val());
-                    if (!name) {
-                        nameInput.next('.help-block').removeClass('hidden');
-                        return false;
-                    } else {
-                        nameInput.next('.help-block').addClass('hidden');
-                    }
+            $('#task-update').on('click', '#submit-task', function () {
+                var nameInput = $('input[name="title"]');
+                var name = $.trim(nameInput.val());
+                if (!name) {
+                    nameInput.next('.help-block').removeClass('hidden');
+                    return false;
+                } else {
+                    nameInput.next('.help-block').addClass('hidden');
+                }
 
-                    var url = "<?= Url::to([
-                        'task/update',
-                        'taskID'     => $task->id,
-                        'projectID'  => $projectID,
-                        'categoryID' => $categoryID
-                    ])?>";
-                    $.ajax({
-                        url: url,
-                        type: 'POST',
-                        data: {
-                            name: name,
-                            level: $('input[name="level"]:checked').val(),
-                            content: editor.txt.html(),
-                            _csrf: $('input[name="_csrf"]').val()
-                        },
-                        dataType: 'json'
-                    }).done(function (data) {
-                        if (data.status === 1) {
-                            $.showBox({
-                                msg: '编辑成功',
-                                callback: function () {
-                                    window.location.href = "<?=Url::to([
-                                        'task/view',
-                                        'taskID'     => $task->id,
-                                        'projectID'  => $projectID,
-                                        'categoryID' => $categoryID
-                                    ])?>"
-                                }
-                            });
-                        } else {
-                            $.showBox({
-                                msg: '编辑失败【' + data.msg + '】'
-                            });
-                        }
-                    }).fail(function (xhr, status, error) {
-                        var msg = xhr.responseText || '系统繁忙～';
-                        $.showBox({msg: msg, seconds: 3000});
-                    });
+                $.ajax({
+                    url: "<?= Url::to(['task/update', 'taskID' => $task->id])?>",
+                    type: 'POST',
+                    data: {
+                        name: name,
+                        level: $('input[name="level"]:checked').val(),
+                        content: editor.txt.html(),
+                        _csrf: $('input[name="_csrf"]').val()
+                    },
+                    dataType: 'json'
+                }).done(function (data) {
+                    if (data.status === 1) {
+                        $.showBox({
+                            msg: '编辑成功',
+                            callback: function () {
+                                window.location.href = "<?=Url::to(['task/view', 'taskID' => $task->id])?>"
+                            }
+                        });
+                    } else {
+                        $.showBox({
+                            msg: '编辑失败【' + data.msg + '】'
+                        });
+                    }
+                }).fail(function (xhr, status, error) {
+                    var msg = xhr.responseText || '系统繁忙～';
+                    $.showBox({msg: msg, seconds: 3000});
                 });
+            });
         });
         <?php $this->endBlock() ?>
     </script>

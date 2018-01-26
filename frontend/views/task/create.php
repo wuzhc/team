@@ -1,7 +1,12 @@
 <?php
 
+/* @var $category \common\models\TaskCategory */
+/* @var $projectID int 项目ID */
+
 use frontend\assets\AdminLtePluginAsset;
 use frontend\assets\AppAsset;
+use yii\helpers\Url;
+use yii\helpers\Html;
 
 $this->title = '新建任务';
 $this->registerJsFile('//unpkg.com/wangeditor/release/wangEditor.min.js', [
@@ -11,14 +16,12 @@ $this->registerJsFile('//unpkg.com/wangeditor/release/wangEditor.min.js', [
 AdminLtePluginAsset::register($this);
 ?>
     <div class="row" id="task-create">
-        <div class="col-md-3">
-            <?= \common\widgets\TaskCategory::widget() ?>
-        </div>
-        <!-- /.col -->
-        <div class="col-md-9">
+        <div class="col-md-12">
             <div class="box box-success">
                 <div class="box-header with-border">
-                    <h3 class="box-title"><?= isset($category['name']) ? $category['name'] : '未知' ?></h3>
+                    <h3 class="box-title"><?= Html::encode($category->fdName) ?></h3>
+                    <a href="<?= Url::to(['task/index', 'projectID' => $projectID, 'categoryID' => $category->id]) ?>"
+                       class="btn btn-sm btn-default pull-right">返回任务列表</a>
                 </div>
                 <!-- /.box-header -->
                 <div class="box-body">
@@ -29,7 +32,7 @@ AdminLtePluginAsset::register($this);
                         <span class="help-block text-red hidden">标题不能为空.</span>
                     </div>
                     <div class="form-group">
-                        <input type="text" class="form-control" value="<?= $category['name'] ?>" readonly>
+                        <input type="text" class="form-control" value="<?= Html::encode($category->fdName) ?>" readonly>
                     </div>
                     <div class="form-group">
                         <div id="editor">
@@ -79,80 +82,66 @@ AdminLtePluginAsset::register($this);
     <script>
         <?php $this->beginBlock('jquery') ?>
         $(function () {
-            var projectID = "<?= $projectID?>";
-            var categoryID = "<?= $categoryID?>";
 
             var E = window.wangEditor;
             var editor = new E('#editor');
-            // 或者 var editor = new E( document.getElementById('editor') )
             editor.customConfig.pasteFilterStyle = false;
             editor.customConfig.uploadImgShowBase64 = true;
             editor.create();
-//        editor.txt.html('写点什么吧');
 
             $('input[type="radio"]').iCheck({
                 checkboxClass: 'icheckbox_flat-green',
                 radioClass: 'iradio_flat-green'
             });
 
-            $('#task-create').on('click', '#task-category>li', function () {
-                if (confirm('确定要切换到任务列表页吗？')) {
-                    var categoryID = $(this).data('id');
-                    var url = "<?= \yii\helpers\Url::to([
-                            'task/index',
-                            'projectID' => $projectID
-                        ])?>&categoryID=" + categoryID;
-                    window.location.href = url;
+            $('#task-create').on('click', '#submit-task', function () {
+                var nameInput = $('input[name="title"]');
+                var name = $.trim(nameInput.val());
+                if (!name) {
+                    nameInput.next('.help-block').removeClass('hidden');
+                    return false;
+                } else {
+                    nameInput.next('.help-block').addClass('hidden');
                 }
-            })
-                .on('click', '#submit-task', function () {
-                    var nameInput = $('input[name="title"]');
-                    var name = $.trim(nameInput.val());
-                    if (!name) {
-                        nameInput.next('.help-block').removeClass('hidden');
-                        return false;
-                    } else {
-                        nameInput.next('.help-block').addClass('hidden');
-                    }
 
-                    var url = "<?= \yii\helpers\Url::to([
-                        'task/create',
-                        'projectID'  => $projectID,
-                        'categoryID' => $categoryID
-                    ])?>";
-                    $.ajax({
-                        url: url,
-                        type: 'POST',
-                        data: {
-                            name: name,
-                            level: $('input[name="level"]:checked').val(),
-                            content: editor.txt.html(),
-                            _csrf: $('input[name="_csrf"]').val()
-                        },
-                        dataType: 'json'
-                    }).done(function (data) {
-                        if (data.status === 1) {
-                            $.showBox({
-                                msg: '创建成功',
-                                callback: function () {
-                                    window.location.href = "<?=\yii\helpers\Url::to([
-                                        'task/index',
-                                        'me' => 1,
-                                        'projectID'  => $projectID,
-                                        'categoryID' => $categoryID,
-                                    ])?>"
-                                }
-                            });
-                        } else {
-                            $.showBox({
-                                msg: '创建失败【' + data.msg + '】'
-                            });
-                        }
-                    }).fail(function (xhr, status, error) {
-                        var msg = xhr.responseText || '系统繁忙～';
-                        $.showBox({msg: msg, seconds: 3000});
-                    });
+                var url = "<?= Url::to([
+                    'task/create',
+                    'projectID'  => $projectID,
+                    'categoryID' => $category->id
+                ])?>";
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    data: {
+                        name: name,
+                        level: $('input[name="level"]:checked').val(),
+                        content: editor.txt.html(),
+                        _csrf: $('input[name="_csrf"]').val()
+                    },
+                    dataType: 'json'
+                }).done(function (data) {
+                    if (data.status === 1) {
+                        $.showBox({
+                            msg: '创建成功',
+                            callback: function () {
+                                window.location.href = "<?=Url::to([
+                                    'task/index',
+                                    'isMe'       => 1,
+                                    'projectID'  => $projectID,
+                                    'categoryID' => $category->id,
+                                ])?>"
+                            }
+                        });
+                    } else {
+                        $.showBox({
+                            msg: '创建失败【' + data.msg + '】'
+                        });
+                    }
+                }).fail(function (xhr, status, error) {
+                    var msg = xhr.responseText || '系统繁忙～';
+                    $.showBox({msg: msg, seconds: 3000});
                 });
+            });
         });
         <?php $this->endBlock() ?>
     </script>

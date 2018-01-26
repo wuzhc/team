@@ -1,16 +1,108 @@
 <?php
 
+/* @var $projectID string 项目ID */
+/* @var $isMe int 是否为我的任务，0否1是 */
+/* @var $categoryID int 分类ID */
+/* @var $categories array 任务分类清单 */
+
 use frontend\assets\AdminLtePluginAsset;
 use frontend\assets\AppAsset;
 use yii\helpers\Url;
 
-$this->title = $_GET['me'] == 1 ? '我的任务' : '所有任务';
+$this->title = $isMe == 1 ? '我的任务' : '所有任务';
 AdminLtePluginAsset::register($this);
-AppAsset::registerJsFile($this, 'js/template.js')
+AppAsset::registerJsFile($this, 'js/template.js');
+
 ?>
     <div class="row" id="task-index">
         <div class="col-md-3">
-            <?= \common\widgets\TaskCategory::widget() ?>
+            <div class="box box-solid">
+                <a href="<?= Url::to(['task/index', 'projectID' => $projectID, 'categoryID' => $categoryID, 'isMe' => ($isMe+1)%2])?>" class="btn btn-success" style="width: 100%"><?= $isMe == 1 ? '返回所有项目任务' : '返回我的任务'?></a>
+            </div>
+
+            <div class="box box-solid">
+                <div class="box-header with-border">
+                    <h3 class="box-title">清单</h3>
+                    <div class="box-tools">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="box-body no-padding">
+                    <ul class="nav nav-pills nav-stacked" id="task-category">
+                        <li data-id="0">
+                            <a href="javascript:void(0)" id="task-category-0">
+                                <h4 class="control-sidebar-subheading">
+                                    全部
+                                    <small class="task-category-info">(0/0)</small>
+                                    <span class="label label-primary pull-right task-category-rate">0%</span>
+                                </h4>
+
+                                <div class="progress progress-xxs">
+                                    <div class="progress-bar progress-bar-primary" style="width: 0%"></div>
+                                </div>
+                            </a>
+                        </li>
+                        <?php if (!empty($categories)) { ?>
+                            <?php foreach ($categories as $k => $category) { ?>
+                                <li data-id="<?=$category->id?>">
+                                    <a href="javascript:void(0)" id="task-category-<?=$category->id?>">
+                                        <h4 class="control-sidebar-subheading">
+                                            <?= \yii\helpers\StringHelper::truncate($category->fdName, 20)?>
+                                            <small class="task-category-info">(0/0)</small>
+                                            <span class="label label-<?= Yii::$app->params['colorTwo'][$k%4]?> pull-right task-category-rate">0%</span>
+                                        </h4>
+
+                                        <div class="progress progress-xxs">
+                                            <div class="progress-bar progress-bar-<?= Yii::$app->params['colorTwo'][$k%4]?>" style="width: 0%"></div>
+                                        </div>
+                                    </a>
+                                </li>
+                            <?php } ?>
+                        <?php } ?>
+                    </ul>
+                </div>
+                <!-- /.box-body -->
+            </div>
+            <!-- /. box -->
+
+
+            <div class="box box-solid">
+                <div class="box-header with-border">
+                    <h3 class="box-title">任务等级</h3>
+
+                    <div class="box-tools">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="box-body no-padding">
+                    <ul class="nav nav-pills nav-stacked">
+                        <li>
+                            <a href="javaScript:void(0)">
+                                <i class="fa fa-circle-o text-primary"></i>蓝色
+                            </a>
+                        </li>
+                        <li>
+                            <a href="javaScript:void(0)">
+                                <i class="fa fa-circle-o text-yellow"></i>黄色
+                            </a>
+                        </li>
+                        <li>
+                            <a href="javaScript:void(0)">
+                                <i class="fa fa-circle-o text-orange"></i>橙色
+                            </a>
+                        </li>
+                        <li>
+                            <a href="javaScript:void(0)">
+                                <i class="fa fa-circle-o text-red"></i>红色
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <!-- /.box-body -->
+            </div>
+            <!-- /.box -->
         </div>
         <!-- /.col -->
         <div class="col-md-9">
@@ -35,7 +127,7 @@ AppAsset::registerJsFile($this, 'js/template.js')
                                 <li><a href="#" data-type="finish">已完成</a></li>
                             </ul>
                         </div>
-                        <a href="<?= Url::to(['task/index', 'projectID' => $_GET['projectID']]) ?>" id="task-fresh" title="刷新页面">
+                        <a href="<?= Url::to(['task/index', 'projectID' => $projectID]) ?>" id="task-fresh" title="刷新页面">
                             <button type="button" class="btn btn-default btn-sm">
                                 <i class="fa fa-refresh"></i>
                             </button>
@@ -60,8 +152,12 @@ AppAsset::registerJsFile($this, 'js/template.js')
                     <div class="mailbox-controls">
                         <!-- /.btn-group -->
                         <div class="pull-right">
-                            <span id="task-cur-page"></span>-<span id="task-total-page"></span>/<span
-                                    id="task-total"></span>
+                            当前页
+                            <span id="task-cur-page"></span>
+                            -
+                            <span id="task-total-page"></span>
+                            总页/
+                            (总共<span id="task-total"></span>条记录)
                             <div class="btn-group">
                                 <button type="button" class="btn btn-default btn-sm btn-prev"><i
                                             class="fa fa-chevron-left"></i>
@@ -90,7 +186,7 @@ AppAsset::registerJsFile($this, 'js/template.js')
             <td class="mailbox-star"><a href="#"><i class="fa fa-star-o text-yellow"></i></a></td>
             <td class="mailbox-name"><a href="read-mail.html"><%=list[i].creator%></a></td>
             <td class="mailbox-subject">
-                <a href="<?= Url::to(['task/view', 'projectID' => $_GET['projectID']])?>&taskID=<%=list[i].id%>&categoryID=<%=list[i].categoryID%>" class="text-black" title="<%=list[i].originName%>">
+                <a href="<?= Url::to(['task/view'])?>&taskID=<%=list[i].id%>" class="text-black" title="<%=list[i].originName%>">
                     <i class="fa fa-circle-o <%=list[i].level%>"></i>&nbsp;&nbsp;
                     <%=list[i].name%>
                 </a>
@@ -113,7 +209,7 @@ AppAsset::registerJsFile($this, 'js/template.js')
                 </a>
             </td>
             <td>
-                <a href="<?=Url::to(['task/update', 'projectID' => $_GET['projectID']])?>&categoryID=<%=list[i].categoryID%>&taskID=<%=list[i].id%>" class="text-muted">
+                <a href="<?=Url::to(['task/update', 'projectID' => $projectID])?>&categoryID=<%=list[i].categoryID%>&taskID=<%=list[i].id%>" class="text-muted">
                     <i class="fa fa-edit" title="编辑任务"></i>
                 </a>
             </td>
@@ -137,8 +233,53 @@ AppAsset::registerJsFile($this, 'js/template.js')
 
             var curPage = 1;
             var totalPage = 0;
-            var projectID = "<?= $_GET['projectID'] ?>";
-            var categoryID = "<?= $_GET['categoryID']?>";
+            var categoryID = "<?= $categoryID?>";
+
+            // 总数初始化
+            (function () {
+                var url = "<?= Url::to(['task/stat-tasks', 'isMe' => $isMe]) ?>";
+                $.ajax({
+                    type: 'GET',
+                    url: url,
+                    data: {projectID: "<?= !empty($projectID) ? $projectID : 0 ?>"},
+                    dataType: 'json'
+                }).done(function (data) {
+                    var tasks = data.tasks || [];
+                    var map = {};
+                    for (var i in tasks) {
+                        map[tasks[i].cid] = tasks[i];
+                    }
+
+                    var aTotal = 0;
+                    var aComplete = 0;
+
+                    $.each($('#task-category>li'), function(k, v) {
+                        var cid = $(this).data('id');
+                        if (map[cid]) {
+                            var total = map[cid].allTasks;
+                            var complete = map[cid].completeTasks || 0;
+                            var rate = total > 0 && complete > 0 ? ((complete/total) * 100).toFixed(0) : 0;
+                            $(this).find('.task-category-info').text('('+ complete + '/' + total +')');
+                            $(this).find('.task-category-rate').text(rate +'%');
+                            $(this).find('.progress-bar').css({'width':rate + '%'});
+
+                            aTotal += total * 1;
+                            aComplete += complete * 1;
+                        }
+                    });
+
+                    if (aTotal > 0) {
+                        var aRate = aTotal > 0 ? ((aComplete/aTotal) * 100).toFixed(0) : 0;
+                        $('#task-category-0').find('.task-category-info').text('('+ aComplete + '/' + aTotal +')');
+                        $('#task-category-0').find('.task-category-rate').text(aRate +'%');
+                        $('#task-category-0').find('.progress-bar').css({'width':aRate + '%'});
+                    }
+
+                }).fail(function () {
+                    $.showBox({msg: '系统繁忙~'});
+                });
+
+            })();
 
             $('#task-index').on('click', '#task-category>li', function () {
                 categoryID = $(this).data('id');
@@ -247,7 +388,7 @@ AppAsset::registerJsFile($this, 'js/template.js')
 
                 $.ajax({
                     type: 'GET',
-                    url: "<?= Url::to(['task/finish', 'projectID' => $_GET['projectID']])?>",
+                    url: "<?= Url::to(['task/finish', 'projectID' => $projectID])?>",
                     data: {
                         taskID: taskID
                     },
@@ -259,8 +400,8 @@ AppAsset::registerJsFile($this, 'js/template.js')
                         self.parents('tr').children().find('.mailbox-attachment>a>i').remove();
                     }
 
-                }).fail(function (XMLHttpRequest, textStatus, errorThrown) {
-                    var msg = XMLHttpRequest.responseText || '系统繁忙～';
+                }).fail(function (xhr, status, error) {
+                    var msg = xhr.responseText || '系统繁忙～';
                     $.showBox({msg: msg, seconds: 3000});
                 })
             }
@@ -275,7 +416,7 @@ AppAsset::registerJsFile($this, 'js/template.js')
 
                 $.ajax({
                     type: 'GET',
-                    url: "<?= Url::to(['task/handle', 'projectID' => $_GET['projectID']])?>",
+                    url: "<?= Url::to(['task/handle', 'projectID' => $projectID])?>",
                     data: {
                         action: action,
                         taskID: taskID
@@ -299,21 +440,21 @@ AppAsset::registerJsFile($this, 'js/template.js')
                 })
             }
 
-            var ajaxBort = null;
+            var ajaxAbort = null;
 
             // 渲染列表
             function renderList(options) {
                 var params = $.extend({
                     totalInit: 1,
-                    pageSize: 10,
+                    pageSize: 15,
                     page: curPage,
                     categoryID: categoryID,
-                    me: "<?=$_GET['me']?>",
+                    isMe: "<?=$isMe?>"
                 }, options);
-                var url = "<?=\yii\helpers\Url::to(['task/list', 'projectID' => $_GET['projectID']])?>";
+                var url = "<?=Url::to(['task/list', 'projectID' => $projectID])?>";
 
-                ajaxBort && ajaxBort.abort();
-                ajaxBort = $.ajax({
+                ajaxAbort && ajaxAbort.abort();
+                ajaxAbort = $.ajax({
                     type: 'GET',
                     url: url,
                     data: params,
@@ -323,9 +464,9 @@ AppAsset::registerJsFile($this, 'js/template.js')
                     // 页码设置
                     $('#task-cur-page').text(curPage);
                     if (params.totalInit === 1) {
-                        if (data.data.total > 0) {
-                            totalPage = (data.data.total / params.pageSize).toFixed(0);
-                            $('#task-total').text(data.data.total);
+                        if (data.total > 0) {
+                            totalPage = Math.ceil(data.total / params.pageSize);
+                            $('#task-total').text(data.total);
                             $('#task-total-page').text(totalPage);
                         } else {
                             $('#task-total').text(0);
@@ -348,19 +489,19 @@ AppAsset::registerJsFile($this, 'js/template.js')
                     }
 
                     // 标题链接
-                    var info = data.data.info || {};
+                    var info = data.info || {};
                     if (!info.id || !info.name) {
                         $('#task-category-title').text('全部');
                         $('#task-category-url').addClass('hidden');
                     } else {
                         $('#task-category-title').text(info.name);
-                        $('#task-category-url').removeClass('hidden').attr('href', "<?= Url::to(['task/create'])?>&categoryID="+info.id+'&projectID='+projectID);
+                        $('#task-category-url').removeClass('hidden').attr('href', "<?= Url::to(['task/create', 'projectID' => $projectID])?>&categoryID="+info.id);
                     }
 
                     // 刷新页面
-                    $('#task-fresh').attr('href', "<?= Url::to(['task/index', 'me' => $_GET['me']])?>&categoryID="+info.id+'&projectID='+projectID);
+                    $('#task-fresh').attr('href', "<?= Url::to(['task/index', 'projectID' => $projectID, 'isMe' => $isMe])?>&categoryID="+info.id);
 
-                    var list = data.data.list || [];
+                    var list = data.list || [];
                     var len = list.length;
                     var html = '';
                     if (len > 0) {

@@ -1,12 +1,19 @@
 <?php
 
+/* @var $task \common\models\Task */
+/* @var $logs array 任务操作日志 */
+
 use yii\helpers\Url;
 use yii\helpers\Html;
 
 $this->title = '任务详情';
-$this->params['breadcrumbs'][] = ['label' => '任务列表', 'url' => ['task/index', 'projectID' => $projectID]];
+$this->params['breadcrumbs'][] = [
+    'label' => '任务列表',
+    'url'   => ['task/index', 'projectID' => $task->fdProjectID, 'isMe' => 1]
+];
 $this->params['breadcrumbs'][] = $this->title;
 $directoryAsset = Yii::$app->assetManager->getPublishedUrl('@vendor/almasaeed2010/adminlte/dist');
+
 ?>
     <style>
         img {
@@ -14,21 +21,19 @@ $directoryAsset = Yii::$app->assetManager->getPublishedUrl('@vendor/almasaeed201
         }
     </style>
     <div class="row" id="task-view">
-        <div class="col-md-3">
-            <?= \common\widgets\TaskCategory::widget() ?>
-        </div>
+        <!--        <div class="col-md-3">-->
+        <!--            --><? //= \common\widgets\TaskCategory::widget() ?>
+        <!--        </div>-->
         <!-- /.col -->
-        <div class="col-md-9">
+        <div class="col-md-12">
             <div class="box box-success">
                 <div class="box-header with-border">
                     <h3 class="box-title"><?= Html::encode($task->category->fdName) ?></h3>
-
-                    <div class="box-tools pull-right">
-                        <a href="#" class="btn btn-box-tool" data-toggle="tooltip" title=""
-                           data-original-title="Previous"><i class="fa fa-chevron-left"></i></a>
-                        <a href="#" class="btn btn-box-tool" data-toggle="tooltip" title=""
-                           data-original-title="Next"><i class="fa fa-chevron-right"></i></a>
-                    </div>
+                    <a href="<?= Url::to([
+                        'task/index',
+                        'projectID' => $task->fdProjectID,
+                        'categoryID' => $task->fdTaskCategoryID
+                    ]) ?>" class="btn btn-sm btn-default pull-right">返回任务列表</a>
                 </div>
                 <!-- /.box-header -->
                 <div class="box-body no-padding">
@@ -114,6 +119,22 @@ $directoryAsset = Yii::$app->assetManager->getPublishedUrl('@vendor/almasaeed201
                 <!--                    </ul>-->
                 <!--                </div>-->
                 <!-- /.box-footer -->
+                <div class="box-footer box-comments">
+                    <?php foreach ($logs as $log) { ?>
+                        <div class="box-comment">
+                            <!-- User image -->
+                            <img class="img-circle img-sm" src="<?= $log['portrait'] ?>" alt="User Image">
+                            <div class="comment-text">
+                                <span class="username">
+                                    <span class="text-muted pull-right"><?= $log['date'] ?></span>
+                                </span><!-- /.username -->
+                                <?= $log['operator'] . $log['action'], '了', $log['type'], $log['accept'] ?
+                                    '给' . $log['accept'] : '' ?>
+                            </div>
+                            <!-- /.comment-text -->
+                        </div>
+                    <?php } ?>
+                </div>
                 <div class="box-footer">
                     <div class="pull-right">
                         <button type="button" class="btn btn-default"><i class="fa fa-reply"></i> Reply</button>
@@ -132,27 +153,9 @@ $directoryAsset = Yii::$app->assetManager->getPublishedUrl('@vendor/almasaeed201
     <script>
         <?php $this->beginBlock('jquery') ?>
         $(function () {
-            var taskID = "<?= $task->id?>";
-            var projectID = "<?= $projectID?>";
-            var categoryID = "<?= $categoryID?>";
-
-            $('#task-view').on('click', '#task-category>li', function () {
-                var categoryID = $(this).data('id');
-                var url = "<?= \yii\helpers\Url::to([
-                        'task/index',
-                        'projectID' => $projectID
-                    ])?>&categoryID=" + categoryID;
-                window.location.href = url;
-            })
-            // 编辑
-                .on('click', '.task-edit', function () {
-                    window.location.href = "<?=Url::to([
-                        'task/update',
-                        'projectID' => $projectID,
-                        'taskID' => $task->id,
-                        'categoryID' => $categoryID
-                    ])?>"
-                });
+            $('#task-view').on('click', '.task-edit', function () {
+                window.location.href = "<?= Url::to(['task/update', 'taskID' => $task->id]) ?>"
+            });
         });
         <?php $this->endBlock() ?>
     </script>

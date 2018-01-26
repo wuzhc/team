@@ -8,6 +8,9 @@ use common\models\ProjectUserMap;
 use common\models\User;
 use Yii;
 use yii\helpers\ArrayHelper;
+use yii\web\BadRequestHttpException;
+use yii\web\ForbiddenHttpException;
+use yii\web\NotFoundHttpException;
 
 
 /**
@@ -116,18 +119,25 @@ class ProjectService extends AbstractService
      * @param int $projectID 项目ID
      * @param bool $isAllowByAdmin 是否允许被管理员访问，默认为true
      * @return bool
+     * @throws BadRequestHttpException
+     * @throws ForbiddenHttpException
+     * @throws NotFoundHttpException
      * @since 2018-01-22
      */
     public function checkUserAccessProject($userID, $projectID, $isAllowByAdmin = true)
     {
         if (empty($userID) || empty($projectID)) {
-            return false;
+            throw new BadRequestHttpException('参数错误');
         }
 
         /** @var User $user */
         $user = User::findOne(['id' => $userID, 'fdStatus' => Conf::USER_ENABLE]);
         if (!$user) {
-            return false;
+            throw new ForbiddenHttpException('用户数据不存在');
+        }
+
+        if (!(Project::findOne(['id' => $projectID, 'fdStatus' => Conf::ENABLE]))) {
+            throw new NotFoundHttpException('项目不存在或已删除');
         }
 
         // 允许管理员访问
