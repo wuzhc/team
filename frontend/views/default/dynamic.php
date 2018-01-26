@@ -235,7 +235,13 @@ $directoryAsset = Yii::$app->assetManager->getPublishedUrl('@vendor/almasaeed201
             <i class="portrait"><img class="img-circle img-bordered-sm portrait-img" src="<%=list[i].portrait%>" alt="User Image"></i>
             <div class="timeline-item">
                 <span class="time"><i class="fa fa-clock-o"></i><%=list[i].date%></span>
-                <h3 class="timeline-header"><a href="#"><%=list[i].operator%></a> <span class="desc"><%=list[i].action%>了<%=list[i].type%></span></h3>
+                <h3 class="timeline-header"><a href="#"><%=list[i].operator%></a>
+                    <span class="desc"><%=list[i].action%>了<%=list[i].type%>
+                    <% if (list[i].acceptor) { %>
+                        给<%=list[i].acceptor%>
+                    <% } %>
+                    </span>
+                </h3>
                 <div class="timeline-body">
                     <%=list[i].target%>
                 </div>

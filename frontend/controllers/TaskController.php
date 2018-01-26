@@ -284,6 +284,8 @@ class TaskController extends BaseController
             'targetType' => Conf::TARGET_TASK
         ]);
 
+//        print_r($logs);exit;
+
         $members = ProjectService::factory()->getHasJoinProjectMembers($task->fdProjectID);
 
         return $this->render('view', [
@@ -348,9 +350,9 @@ class TaskController extends BaseController
     {
         if (Yii::$app->request->isAjax && ($data = Yii::$app->request->post())) {
             $taskID = $data['taskID'];
-            $acceptUserID = $data['acceptUserID'];
+            $acceptor = $data['acceptor'];
 
-            if (!$taskID || !$acceptUserID) {
+            if (!$taskID || !$acceptor) {
                 throw new BadRequestHttpException('参数错误');
             }
 
@@ -360,19 +362,19 @@ class TaskController extends BaseController
             }
 
             // 检查被指派者的权限
-            if (!ProjectService::factory()->checkUserAccessProject($acceptUserID, $task->fdProjectID)) {
+            if (!ProjectService::factory()->checkUserAccessProject($acceptor, $task->fdProjectID)) {
                 throw new ForbiddenHttpException('禁止操作');
             }
 
             $res = Task::updateAll([
-                'fdCreatorID' => $acceptUserID,
+                'fdCreatorID' => $acceptor,
                 'fdProgress'  => Conf::TASK_STOP
             ], ['id' => $taskID]);
 
             if ($res) {
                 LogService::factory()->saveHandleLog([
                     'operator'   => Yii::$app->user->id,
-                    'accept'     => $acceptUserID,
+                    'acceptor'   => $acceptor,
                     'target'     => $task->id,
                     'targetType' => Conf::TARGET_TASK,
                     'action'     => Conf::ACTION_ASSIGN,

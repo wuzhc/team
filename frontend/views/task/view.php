@@ -39,36 +39,19 @@ $directoryAsset = Yii::$app->assetManager->getPublishedUrl('@vendor/almasaeed201
                 <!-- /.box-header -->
                 <div class="box-body no-padding">
                     <div class="mailbox-read-info">
-                        <h3><?= Html::encode($task->fdName) ?></h3>
-                        <h5><?= Html::encode($task->creator->fdName) ?>
-                            <span class="mailbox-read-time pull-right"><?= $task->fdCreate ?></span></h5>
+                        <h3>
+                            <?= Html::encode($task->fdName) ?>
+                            <div class="pull-right">
+                            <a href="javascript:void(0)" class="btn btn-sm btn-danger" data-toggle="modal" data-target="#assign-task" data-id="<?= $task->id ?>">指派任务</a>
+                            <a href="<?= Url::to(['task/update', 'taskID' => $task->id]) ?>" class="btn btn-sm btn-success" data-toggle="modal" data-target="#assign-task" data-id="<?= $task->id ?>">编辑</a>
+                            </div>
+                        </h3>
                     </div>
-                    <div class="maixbox-controls with-border text-left">
-                        将任务指派任务给：
-                        <select class="form-control">
-                            <option id="<?= $task->fdCreatorID ?>"><?= Html::encode($task->creator->fdName) ?></option>
-                            <?php if (is_array($members)) { ?>
-                                <?php foreach ($members as $member) { ?>
-                                    <option id="<?= $member['id'] ?>"><?= Html::encode($member['name']) ?></option>
-                                <?php } ?>
-                            <?php } ?>
-                        </select>
-                    </div>
-
                     <!-- /.mailbox-read-info -->
                     <div class="mailbox-controls with-border text-center">
-                        <div class="btn-group">
-                            <button type="button" class="task-delete btn btn-default btn-sm <?= $task->fdCreatorID ==
-                            Yii::$app->user->id ? '' : 'hidden' ?>" data-toggle="tooltip" data-container="body" title=""
-                                    data-original-title="删除">
-                                <i class="fa fa-trash-o"></i>
-                            </button>
-                            <button type="button" class="task-edit btn btn-default btn-sm <?= $task->fdCreatorID ==
-                            Yii::$app->user->id ? '' : 'hidden' ?>" data-toggle="tooltip" data-container="body" title=""
-                                    data-original-title="编辑">
-                                <i class="fa fa-edit"></i>
-                            </button>
-                        </div>
+                        <h5><?= Html::encode($task->creator->fdName) ?>
+                            <span class="mailbox-read-time"><?= $task->fdCreate ?></span>
+                        </h5>
                     </div>
                     <!-- /.mailbox-controls -->
                     <div class="mailbox-read-message" style="overflow: hidden;">
@@ -141,8 +124,8 @@ $directoryAsset = Yii::$app->assetManager->getPublishedUrl('@vendor/almasaeed201
                                 <span class="username">
                                     <span class="text-muted pull-right"><?= $log['date'] ?></span>
                                 </span><!-- /.username -->
-                                <?= $log['operator'] . $log['action'], '了', $log['type'], $log['accept'] ?
-                                    '给' . $log['accept'] : '' ?>
+                                <?= $log['operator'] . $log['action'], '了', $log['type'], $log['acceptor'] ?
+                                    '给' . $log['acceptor'] : '' ?>
                             </div>
                             <!-- /.comment-text -->
                         </div>
@@ -150,11 +133,8 @@ $directoryAsset = Yii::$app->assetManager->getPublishedUrl('@vendor/almasaeed201
                 </div>
                 <div class="box-footer">
                     <div class="pull-right">
-                        <button type="button" class="btn btn-default"><i class="fa fa-reply"></i> Reply</button>
-                        <button type="button" class="btn btn-default"><i class="fa fa-share"></i> Forward</button>
+<!--                        <button type="button" class="btn btn-default task-edit"><i class="fa fa-edit"></i> 编辑</button>-->
                     </div>
-                    <button type="button" class="btn btn-default"><i class="fa fa-trash-o"></i> Delete</button>
-                    <button type="button" class="btn btn-default"><i class="fa fa-print"></i> Print</button>
                 </div>
                 <!-- /.box-footer -->
             </div>
@@ -162,11 +142,6 @@ $directoryAsset = Yii::$app->assetManager->getPublishedUrl('@vendor/almasaeed201
         </div>
         <!-- /.col -->
     </div>
-
-
-    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#assign-task"
-            data-id="<?= $task->id ?>">指派任务
-    </button>
 
     <div class="modal fade" id="assign-task" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
         <div class="modal-dialog" role="document">
@@ -180,10 +155,9 @@ $directoryAsset = Yii::$app->assetManager->getPublishedUrl('@vendor/almasaeed201
                     <form>
                         <div class="form-group">
                             <select class="form-control" id="project-users">
-                                <option id="<?= $task->fdCreatorID ?>"><?= Html::encode($task->creator->fdName) ?></option>
                                 <?php if (is_array($members)) { ?>
                                     <?php foreach ($members as $member) { ?>
-                                        <option id="<?= $member['id'] ?>"><?= Html::encode($member['name']) ?></option>
+                                        <option value="<?= $member['id'] ?>"><?= Html::encode($member['name']) ?></option>
                                     <?php } ?>
                                 <?php } ?>
                             </select>
@@ -194,7 +168,7 @@ $directoryAsset = Yii::$app->assetManager->getPublishedUrl('@vendor/almasaeed201
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
-                    <button type="button" class="btn btn-primary" id="submit-assign">确定</button>
+                    <button type="button" class="btn btn-success" id="submit-assign">确定</button>
                 </div>
             </div>
         </div>
@@ -213,13 +187,11 @@ $directoryAsset = Yii::$app->assetManager->getPublishedUrl('@vendor/almasaeed201
                 modal.find('.modal-body input[name="taskID"]').val(taskID)
             });
 
-            $('#task-view').on('click', '.task-edit', function () {
-                // 编辑任务
-                window.location.href = "<?= Url::to(['task/update', 'taskID' => $task->id]) ?>"
-            }).on('click', '#submit-assign', function () {
+            // 指派任务
+            $('#submit-assign').on('click', function () {
                 var taskID = $('#task-id').val();
-                var acceptUserID = $('#project-users').val();
-                if (!taskID || !acceptUserID) {
+                var acceptor = $('#project-users').val();
+                if (!taskID || !acceptor) {
                     $.showBox({msg: '参数错误'});
                     return false;
                 }
@@ -231,7 +203,7 @@ $directoryAsset = Yii::$app->assetManager->getPublishedUrl('@vendor/almasaeed201
                     dataType: 'JSON',
                     data: {
                         taskID: taskID,
-                        acceptUserID: acceptUserID,
+                        acceptor: acceptor,
                         _csrf: $('input[name="_csrf"]').val()
                     }
                 }).done(function (data) {

@@ -39,8 +39,8 @@ class LogService extends AbstractService
             return false;
         }
 
-        if (!empty($args['accept'])) {
-            $data['accept'] = (int)$args['accept'];
+        if (!empty($args['acceptor'])) {
+            $data['acceptor'] = (int)$args['acceptor'];
         }
 
         if (!empty($args['action']) && in_array($args['action'], array_keys(Yii::$app->params['handleAction']))) {
@@ -133,22 +133,21 @@ class LogService extends AbstractService
                 $operator = $userMap[$row['operator']]['name'];
                 $portrait = $userMap[$row['operator']]['portrait'];
             } else {
-                $user = User::findOne(['id' => $row['operator']]);
-                $operator = UserService::factory()->getUserName($user);
-                $portrait = UserService::factory()->getUserPortrait($user);
+                list($operator, $portrait) = $this->_getNameAndPortrait($row['operator']);
                 $userMap[$row['operator']]['name'] = $operator;
                 $userMap[$row['operator']]['portrait'] = $portrait;
             }
 
-            if (isset($args['accept'])) {
-                if (isset($userMap[$row['accept']])) {
-                    $accept = $userMap[$row['accept']];
+            if (isset($row['acceptor'])) {
+                if (isset($userMap[$row['acceptor']])) {
+                    $acceptor = $userMap[$row['acceptor']]['name'];
                 } else {
-                    if ($accept = UserService::factory()->getUserName($row['accept'])) {
-                        $userMap[$row['accept']] = $accept;
-                    }
+                    list($acceptor, $acceptorPortrait) = $this->_getNameAndPortrait($row['acceptor']);
+                    $userMap[$row['acceptor']]['name'] = $acceptor;
+                    $userMap[$row['acceptor']]['portrait'] = $acceptorPortrait;
                 }
-                $temp['accept'] = $accept;
+            } else {
+                $acceptor = null;
             }
 
             $day = date('Y-m-d', $row['date']['sec']);
@@ -159,6 +158,7 @@ class LogService extends AbstractService
 
             $temp['operator'] = $operator;
             $temp['portrait'] = $portrait;
+            $temp['acceptor'] = isset($acceptor) ? $acceptor : null;
             $temp['action'] = Yii::$app->params['handleAction'][$row['action']];
             $temp['target'] = $this->_targetName($row['target'], $row['targetType']);
             $temp['type'] = Yii::$app->params['handleTargetType'][$row['targetType']];
@@ -168,6 +168,24 @@ class LogService extends AbstractService
         }
 
         return $data;
+    }
+
+    /**
+     * 用户姓名和头像
+     * @param $userID
+     * @return array
+     */
+    private function _getNameAndPortrait($userID)
+    {
+        $user = User::findOne(['id' => $userID]);
+        if (!$user) {
+            return [];
+        }
+
+        return [
+            UserService::factory()->getUserName($user),
+            UserService::factory()->getUserPortrait($user),
+        ];
     }
 
     /**
