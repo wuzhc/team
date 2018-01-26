@@ -43,7 +43,7 @@ class TaskController extends BaseController
                                 throw new BadRequestHttpException('参数错误');
                             }
                             if (!ProjectService::factory()->checkUserAccessProject(Yii::$app->user->id, $projectID)) {
-                                throw new ForbiddenHttpException('你还不是我们项目的成员，联系一下管理员试试吧');
+                                throw new ForbiddenHttpException(ResponseUtil::$msg[1]);
                             }
                             return true;
                         }
@@ -164,7 +164,7 @@ class TaskController extends BaseController
     public function actionCreate($projectID, $categoryID)
     {
         if (!Yii::$app->user->can('createTask')) {
-            throw new ForbiddenHttpException('你没有创建任务的权限，练习下管理员吧');
+            throw new ForbiddenHttpException(ResponseUtil::$msg[1]);
         }
 
         if ($data = Yii::$app->request->post()) {
@@ -224,12 +224,12 @@ class TaskController extends BaseController
 
         // 项目检测
         if (!ProjectService::factory()->checkUserAccessProject(Yii::$app->user->id, $task->fdProjectID)) {
-            throw new ForbiddenHttpException('你还不是我们项目的成员，联系一下管理员试试吧');
+            throw new ForbiddenHttpException(ResponseUtil::$msg[1]);
         }
 
         // rbac检测
         if (!Yii::$app->user->can('editTask')) {
-            throw new ForbiddenHttpException('你没有编辑任务的权限，联系下管理员吧');
+            throw new ForbiddenHttpException(ResponseUtil::$msg[3]);
         }
 
         if (($data = Yii::$app->request->post()) && Yii::$app->request->isAjax) {
@@ -276,7 +276,7 @@ class TaskController extends BaseController
         }
 
         if (!ProjectService::factory()->checkUserAccessProject(Yii::$app->user->id, $task->fdProjectID)) {
-            throw new ForbiddenHttpException('你还不是我们项目的成员，联系一下管理员试试吧');
+            throw new ForbiddenHttpException(ResponseUtil::$msg[1]);
         }
 
         $logs = LogService::factory()->getHandleLogs([
@@ -303,7 +303,7 @@ class TaskController extends BaseController
     public function actionDelete($taskID)
     {
         if (!Yii::$app->user->can('delTask')) {
-            throw new ForbiddenHttpException('你没有删除任务的权限，联系下管理员吧');
+            throw new ForbiddenHttpException(ResponseUtil::$msg[4]);
         }
 
         $task = Task::findOne(['id' => $taskID, 'fdStatus' => Conf::ENABLE]);
@@ -312,7 +312,7 @@ class TaskController extends BaseController
         }
 
         if (!ProjectService::factory()->checkUserAccessProject(Yii::$app->user->id, $task->fdProjectID)) {
-            throw new ForbiddenHttpException('你还不是我们项目的成员，联系一下管理员试试吧');
+            throw new ForbiddenHttpException(ResponseUtil::$msg[1]);
         }
 
         if ($task->fdCreatorID != Yii::$app->user->id) {
@@ -361,7 +361,7 @@ class TaskController extends BaseController
 
             // 检查被指派者的权限
             if (!ProjectService::factory()->checkUserAccessProject($acceptor, $task->fdProjectID)) {
-                throw new ForbiddenHttpException('禁止操作');
+                throw new ForbiddenHttpException('对不起，接受者不是我们项目组的');
             }
 
             $res = Task::updateAll([
@@ -445,7 +445,7 @@ class TaskController extends BaseController
             }
 
             if (!ProjectService::factory()->checkUserAccessProject(Yii::$app->user->id, $task->fdProjectID)) {
-                throw new ForbiddenHttpException('你还不是我们项目的成员，联系一下管理员试试吧');
+                throw new ForbiddenHttpException(ResponseUtil::$msg[1]);
             }
 
             if ($task->fdProgress == Conf::TASK_FINISH) {
@@ -493,7 +493,7 @@ class TaskController extends BaseController
             }
 
             if (!ProjectService::factory()->checkUserAccessProject(Yii::$app->user->id, $task->fdProjectID)) {
-                throw new ForbiddenHttpException('你还不是我们项目的成员，联系一下管理员试试吧');
+                throw new ForbiddenHttpException(ResponseUtil::$msg[1]);
             }
 
             if ($task->fdProgress == Conf::TASK_STOP && $action === 'begin') {

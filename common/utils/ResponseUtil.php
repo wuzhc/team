@@ -15,6 +15,13 @@ use yii\helpers\Json;
  */
 class ResponseUtil
 {
+    public static $msg = [
+        1 => '你不是我们项目组的，联系下管理员吧',
+        2 => '你没有创建任务的权限，联系下管理员吧',
+        3 => '你没有编辑任务的权限，联系下管理员吧',
+        4 => '你没有删除任务的权限，联系下管理员吧',
+    ];
+
     /**
      * 支持jsonp跨域
      * @param array  $data
