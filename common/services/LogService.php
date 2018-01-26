@@ -74,7 +74,7 @@ class LogService extends AbstractService
             return false;
         }
 
-        $data['date'] = new UTCDateTime();
+        $data['date'] = new UTCDateTime(time() * 1000);
 
         /** @var \yii\mongodb\Connection $mongo */
         $mongo = Yii::$app->mongodb;
@@ -229,7 +229,7 @@ class LogService extends AbstractService
 
         return $collection->insert([
             'userID'  => $user->id,
-            'date'    => new UTCDateTime(new \DateTime('now',  new \DateTimeZone('PRC'))),
+            'date'    => new UTCDateTime(time() * 1000),
             'loginIP' => ClientUtil::getClientIp()
         ]) ? true : false;
     }
