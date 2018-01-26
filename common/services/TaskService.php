@@ -296,7 +296,7 @@ class TaskService extends AbstractService
      * @param array $args
      * @return \yii\db\ActiveQuery
      */
-    protected function findTaskCriteria(array $args)
+    public function findTaskCriteria(array $args)
     {
         $task = Task::find();
 

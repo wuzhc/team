@@ -72,6 +72,23 @@ return [
         'primary'
     ],
 
+    // 交通图标
+    'transportationIcon' => [
+        'fa-bicycle',
+        'fa-bus',
+        'fa-car',
+        'fa-fighter-jet',
+        'fa-motorcycle',
+        'fa-plane',
+        'fa-rocket',
+        'fa-ship',
+        'fa-space-shuttle',
+        'fa-subway',
+        'fa-taxi',
+        'fa-train',
+        'fa-truck'
+    ],
+
     // 默认头像
     'defaultPortrait' => [
         'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1516529870286&di=89856ae3625adc5fd0e31e2c58f47ec9&imgtype=jpg&src=http%3A%2F%2Fportrait3.sinaimg.cn%2F1818230762%2Fblog%2F180',

@@ -208,25 +208,20 @@ $directoryAsset = Yii::$app->assetManager->getPublishedUrl('@vendor/almasaeed201
                     }
                 }).done(function (data) {
                     if (data.status == 1) {
+                        $('#assign-task').modal('hide');
                         $.showBox({
                             msg: '指派成功', callback: function () {
                                 window.location.reload();
                             }
                         });
                     } else {
-                        $.showBox({
-                            msg: '指派失败', callback: function () {
-                                $('#assign-task').modal('hide');
-                            }
-                        });
+                        $('#assign-task').modal('hide');
+                        $.showBox({msg: '指派失败'});
                     }
                 }).fail(function (xhr, status, error) {
+                    $('#assign-task').modal('hide');
                     var msg = xhr.responseText || '系统繁忙';
-                    $.showBox({
-                        msg: msg, callback: function () {
-                            $('#assign-task').modal('hide');
-                        }
-                    });
+                    $.showBox({msg: msg});
                 });
             });
         });

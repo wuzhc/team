@@ -2,6 +2,7 @@
 
 namespace frontend\controllers;
 
+use common\config\Conf;
 use common\models\Project;
 use common\models\User;
 use common\services\LogService;
@@ -57,7 +58,7 @@ class DefaultController extends BaseController
     public function actions()
     {
         return [
-            'error'   => [
+            'error' => [
                 'class' => 'yii\web\ErrorAction',
             ],
         ];
@@ -69,9 +70,43 @@ class DefaultController extends BaseController
      */
     public function actionIndex()
     {
-        $projects = TaskService::factory()->getProjectStatByCompanyID($this->companyID);
+        // 所有总数
+        $records = TaskService::factory()->findTaskCriteria([
+            'group'     => 'fdProjectID',
+            'select'    => 'count(*) as total, fdProjectID as projectID',
+            'companyID' => $this->companyID,
+            'status'    => Conf::ENABLE
+        ])->asArray()->all();
+
+        $totalMap = [];
+        foreach ($records as $record) {
+            $totalMap[$record['projectID']] = $record['total'];
+        }
+
+        // 已完成总数
+        $completeRecords = TaskService::factory()->findTaskCriteria([
+            'group'     => 'fdProjectID',
+            'select'    => 'count(*) as total, fdProjectID as projectID',
+            'companyID' => $this->companyID,
+            'status'    => Conf::ENABLE,
+            'progress'  => Conf::TASK_FINISH
+        ])->asArray()->all();
+
+        $finishMap = [];
+        foreach ($completeRecords as $record) {
+            $finishMap[$record['projectID']] = $record['total'];
+        }
+
+        // 所有项目
+        $projects = Project::find()->select(['id', 'fdName'])->where([
+                'fdCompanyID' => $this->companyID,
+                'fdStatus'    => Conf::ENABLE
+            ])->all();
+
         return $this->render('index', [
-            'projects' => $projects
+            'projects'  => $projects,
+            'totalMap'  => $totalMap,
+            'finishMap' => $finishMap
         ]);
     }
 
@@ -91,7 +126,7 @@ class DefaultController extends BaseController
     public function actionGetDynamic()
     {
         ResponseUtil::jsonCORS([
-           'rows' => LogService::factory()->getHandleLogs([])
+            'rows' => LogService::factory()->getHandleLogs([])
         ]);
     }
 

@@ -1,6 +1,12 @@
 <?php
 
 /* @var $this yii\web\View */
+/* @var $projects array */
+/* @var $totalMap array */
+/* @var $finishMap array */
+
+use yii\helpers\Html;
+use yii\helpers\Url;
 
 $this->title = '主页';
 $directoryAsset = Yii::$app->assetManager->getPublishedUrl('@vendor/almasaeed2010/adminlte/dist');
@@ -14,13 +20,16 @@ $directoryAsset = Yii::$app->assetManager->getPublishedUrl('@vendor/almasaeed201
             <!-- small box -->
             <div class="small-box <?= Yii::$app->params['bgColor'][$k % 12]?>">
                 <div class="inner">
-                    <h4><?= $project['name']?></h4>
-                    <p><?= $project['completeTasks']?> / <?= $project['allTasks']?></p>
+                    <h4><?= Html::encode($project->fdName) ?></h4>
+                    <p>
+                        <?= !empty($finishMap[$project->id]) ? $finishMap[$project->id] : 0 ?>
+                        /
+                        <?= !empty($totalMap[$project->id]) ? $totalMap[$project->id] : 0 ?></p>
                 </div>
                 <div class="icon">
-                    <i class="ion ion-person-add"></i>
+                    <i class="fa <?= Yii::$app->params['transportationIcon'][$k%13] ?>"></i>
                 </div>
-                <a href="<?= \yii\helpers\Url::to(['task/index', 'projectID' => $project['id']])?>" class="small-box-footer">
+                <a href="<?= Url::to(['task/index', 'projectID' => $project->id])?>" class="small-box-footer">
                     进入 <i class="fa fa-arrow-circle-right"></i>
                 </a>
             </div>
