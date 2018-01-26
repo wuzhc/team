@@ -67,33 +67,6 @@ class UserService extends AbstractService
     }
 
     /**
-     * 保存登录日志
-     * @param int|User $user 用户
-     * @return bool
-     * @author wuzhc
-     * @since 2018-01-15
-     */
-    public function saveLoginLog($user)
-    {
-        $user = $this->getUserInstance($user);
-        if (null === $user) {
-            return false;
-        }
-
-        if (true === MONGO_ON) {
-            /** @var \yii\mongodb\Connection $mongo */
-            $mongo = Yii::$app->mongodb;
-            $collection = $mongo->getCollection(Conf::M_USER_LOGIN_LOG);
-
-            return $collection->insert([
-                'userID'  => $user->id,
-                'date'    => date('Y-m-d'),
-                'loginIP' => ClientUtil::getClientIp()
-            ]) ? true : false;
-        }
-    }
-
-    /**
      * 新建用户
      * @param $args
      * @return User|null
@@ -200,7 +173,7 @@ class UserService extends AbstractService
 
         // 注册登录后事件
         Yii::$app->user->on('afterLogin', function ($event) {
-            $this->saveLoginLog($event->identity->id);
+            LogService::factory()->saveLoginLog($event->identity->id);
             $event->identity->fdLastIP = ClientUtil::getClientIp();
             $event->identity->fdLastTime = date('Y-m-d H:i:s');
             $event->identity->save();

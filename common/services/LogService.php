@@ -6,6 +6,8 @@ namespace common\services;
 use common\config\Conf;
 use common\models\Task;
 use common\models\User;
+use common\utils\ClientUtil;
+use MongoDB\BSON\UTCDateTime;
 use Yii;
 use yii\mongodb\Query;
 use yii\web\Controller;
@@ -72,7 +74,7 @@ class LogService extends AbstractService
             return false;
         }
 
-        $data['date'] = new \MongoDate(time());
+        $data['date'] = new UTCDateTime();
 
         /** @var \yii\mongodb\Connection $mongo */
         $mongo = Yii::$app->mongodb;
@@ -91,10 +93,10 @@ class LogService extends AbstractService
     {
         $condition = [];
         if (!empty($args['begin'])) {
-            $condition['date']['$gt'] = new \MongoDate($args['begin']);
+            $condition['date']['$gt'] = new UTCDateTime($args['begin'] * 1000);
         }
         if (!empty($args['end'])) {
-            $condition['date']['$lt'] = new \MongoDate($args['end']);
+            $condition['date']['$lt'] = new UTCDateTime($args['end'] * 1000);
         }
         if (!empty($args['target'])) {
             $condition['target'] = (int)$args['target'];
@@ -126,6 +128,7 @@ class LogService extends AbstractService
         $data = [];
         $userMap = [];
         $hasInDay = [];
+
         foreach ($rows as $row) {
             $temp = [];
 
@@ -150,7 +153,11 @@ class LogService extends AbstractService
                 $acceptor = null;
             }
 
-            $day = date('Y-m-d', $row['date']['sec']);
+            $tz = new \DateTimeZone('PRC');
+            $date = $row['date']->toDateTime()->setTimezone($tz)->format('Y-m-d H:i:s');
+            $temp['date'] = $date;
+
+            $day = date('Y-m-d', strtotime($date));
             if (!in_array($day, $hasInDay)) {
                 $temp['day'] = $day;
                 $hasInDay[] = $day;
@@ -162,7 +169,6 @@ class LogService extends AbstractService
             $temp['action'] = Yii::$app->params['handleAction'][$row['action']];
             $temp['target'] = $this->_targetName($row['target'], $row['targetType']);
             $temp['type'] = Yii::$app->params['handleTargetType'][$row['targetType']];
-            $temp['date'] = date('Y-m-d H:i:s', $row['date']['sec']);
 
             $data[] = $temp;
         }
@@ -201,5 +207,30 @@ class LogService extends AbstractService
             default:
                 break;
         }
+    }
+
+    /**
+     * 保存登录日志
+     * @param int|User $user 用户
+     * @return bool
+     * @author wuzhc
+     * @since 2018-01-15
+     */
+    public function saveLoginLog($user)
+    {
+        $user = UserService::factory()->getUserInstance($user);
+        if (null === $user) {
+            return false;
+        }
+
+        /** @var \yii\mongodb\Connection $mongo */
+        $mongo = Yii::$app->mongodb;
+        $collection = $mongo->getCollection(Conf::M_USER_LOGIN_LOG);
+
+        return $collection->insert([
+            'userID'  => $user->id,
+            'date'    => new UTCDateTime(),
+            'loginIP' => ClientUtil::getClientIp()
+        ]) ? true : false;
     }
 }

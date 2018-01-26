@@ -13,6 +13,8 @@ return [
         '@npm'   => '@vendor/npm-asset',
     ],
     'language' => 'zh-CN',
+    'timeZone' => 'Asia/Shanghai',
+    'charset' => 'utf-8',
     'defaultRoute' => 'default',
     'vendorPath' => dirname(dirname(__DIR__)) . '/vendor',
     'components' => [
