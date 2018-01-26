@@ -125,10 +125,7 @@ AdminLtePluginAsset::register($this);
                             msg: '创建成功',
                             callback: function () {
                                 window.location.href = "<?=Url::to([
-                                    'task/index',
-                                    'isMe'       => 1,
-                                    'projectID'  => $projectID,
-                                    'categoryID' => $category->id,
+                                    'task/view',
                                 ])?>"
                             }
                         });

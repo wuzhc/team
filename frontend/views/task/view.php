@@ -22,10 +22,6 @@ $directoryAsset = Yii::$app->assetManager->getPublishedUrl('@vendor/almasaeed201
         }
     </style>
     <div class="row" id="task-view">
-        <!--        <div class="col-md-3">-->
-        <!--            --><? //= \common\widgets\TaskCategory::widget() ?>
-        <!--        </div>-->
-        <!-- /.col -->
         <div class="col-md-12">
             <div class="box box-success">
                 <div class="box-header with-border">
@@ -43,7 +39,7 @@ $directoryAsset = Yii::$app->assetManager->getPublishedUrl('@vendor/almasaeed201
                             <?= Html::encode($task->fdName) ?>
                             <div class="pull-right">
                             <a href="javascript:void(0)" class="btn btn-sm btn-danger" data-toggle="modal" data-target="#assign-task" data-id="<?= $task->id ?>">指派任务</a>
-                            <a href="<?= Url::to(['task/update', 'taskID' => $task->id]) ?>" class="btn btn-sm btn-success" data-toggle="modal" data-target="#assign-task" data-id="<?= $task->id ?>">编辑</a>
+                            <a href="<?= Url::to(['task/update', 'taskID' => $task->id]) ?>" class="btn btn-sm btn-success" data-id="<?= $task->id ?>">编辑</a>
                             </div>
                         </h3>
                     </div>
@@ -59,61 +55,6 @@ $directoryAsset = Yii::$app->assetManager->getPublishedUrl('@vendor/almasaeed201
                     </div>
                     <!-- /.mailbox-read-message -->
                 </div>
-                <!-- /.box-body -->
-                <!--                <div class="box-footer">-->
-                <!--                    <ul class="mailbox-attachments clearfix">-->
-                <!--                        <li>-->
-                <!--                            <span class="mailbox-attachment-icon"><i class="fa fa-file-pdf-o"></i></span>-->
-                <!---->
-                <!--                            <div class="mailbox-attachment-info">-->
-                <!--                                <a href="#" class="mailbox-attachment-name"><i class="fa fa-paperclip"></i>-->
-                <!--                                    Sep2014-report.pdf</a>-->
-                <!--                                <span class="mailbox-attachment-size">-->
-                <!--                          1,245 KB-->
-                <!--                          <a href="#" class="btn btn-default btn-xs pull-right"><i class="fa fa-cloud-download"></i></a>-->
-                <!--                        </span>-->
-                <!--                            </div>-->
-                <!--                        </li>-->
-                <!--                        <li>-->
-                <!--                            <span class="mailbox-attachment-icon"><i class="fa fa-file-word-o"></i></span>-->
-                <!---->
-                <!--                            <div class="mailbox-attachment-info">-->
-                <!--                                <a href="#" class="mailbox-attachment-name"><i class="fa fa-paperclip"></i> App-->
-                <!--                                    Description.docx</a>-->
-                <!--                                <span class="mailbox-attachment-size">-->
-                <!--                          1,245 KB-->
-                <!--                          <a href="#" class="btn btn-default btn-xs pull-right"><i class="fa fa-cloud-download"></i></a>-->
-                <!--                        </span>-->
-                <!--                            </div>-->
-                <!--                        </li>-->
-                <!--                        <li>-->
-                <!--                            <span class="mailbox-attachment-icon has-img"><img-->
-                <!--                                        src="-->
-                <? //= $directoryAsset ?><!--/img/photo1.png" alt="Attachment"></span>-->
-                <!---->
-                <!--                            <div class="mailbox-attachment-info">-->
-                <!--                                <a href="#" class="mailbox-attachment-name"><i class="fa fa-camera"></i> photo1.png</a>-->
-                <!--                                <span class="mailbox-attachment-size">-->
-                <!--                          2.67 MB-->
-                <!--                          <a href="#" class="btn btn-default btn-xs pull-right"><i class="fa fa-cloud-download"></i></a>-->
-                <!--                        </span>-->
-                <!--                            </div>-->
-                <!--                        </li>-->
-                <!--                        <li>-->
-                <!--                            <span class="mailbox-attachment-icon has-img"><img-->
-                <!--                                        src="-->
-                <? //= $directoryAsset ?><!--/img/photo2.png" alt="Attachment"></span>-->
-                <!---->
-                <!--                            <div class="mailbox-attachment-info">-->
-                <!--                                <a href="#" class="mailbox-attachment-name"><i class="fa fa-camera"></i> photo2.png</a>-->
-                <!--                                <span class="mailbox-attachment-size">-->
-                <!--                          1.9 MB-->
-                <!--                          <a href="#" class="btn btn-default btn-xs pull-right"><i class="fa fa-cloud-download"></i></a>-->
-                <!--                        </span>-->
-                <!--                            </div>-->
-                <!--                        </li>-->
-                <!--                    </ul>-->
-                <!--                </div>-->
                 <!-- /.box-footer -->
                 <div class="box-footer box-comments">
                     <?php foreach ($logs as $log) { ?>
