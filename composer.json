@@ -21,7 +21,8 @@
         "php-amqplib/php-amqplib": ">=2.6.1",
         "dmstr/yii2-adminlte-asset": "^2.1",
         "yiisoft/yii2-mongodb": "^2.1@dev",
-        "yiisoft/yii2-redis": "^2.0@dev"
+        "yiisoft/yii2-redis": "^2.0@dev",
+        "workerman/phpsocket.io" : ">1.0.0"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.0.0",
@@ -33,10 +34,10 @@
     "config": {
         "process-timeout": 1800
     },
-    "repositories": [
-        {
+    "repositories": {
+        "packagist": {
             "type": "composer",
-            "url": "https://asset-packagist.org"
+            "url": "https://packagist.phpcomposer.com"
         }
-    ]
+    }
 }
