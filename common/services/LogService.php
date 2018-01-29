@@ -9,9 +9,16 @@ use common\models\User;
 use common\utils\ClientUtil;
 use MongoDB\BSON\UTCDateTime;
 use Yii;
+use yii\helpers\Html;
 use yii\mongodb\Query;
-use yii\web\Controller;
 
+/**
+ * 日志服务类
+ * Class LogService
+ * @package common\services
+ * @author wuzhc <wuzhc2016@163.com>
+ * @since 2018-01-25
+ */
 class LogService extends AbstractService
 {
     /**
@@ -25,15 +32,28 @@ class LogService extends AbstractService
     }
 
     /**
+     * 保存用户操作日志
      * @param $args
      * @return bool
+     * @since 2018-01-25
      */
     public function saveHandleLog($args)
     {
         $data = [];
 
+        // 操作者
+        if (!empty($args['operatorID'])) {
+            $data['operatorID'] = (int)$args['operatorID'];
+        } else {
+            if (YII_DEBUG) {
+                Yii::$app->end('operatorID empty');
+            }
+            return false;
+        }
+
+        // 操作者
         if (!empty($args['operator'])) {
-            $data['operator'] = (int)$args['operator'];
+            $data['operator'] = $args['operator'];
         } else {
             if (YII_DEBUG) {
                 Yii::$app->end('operator empty');
@@ -41,28 +61,66 @@ class LogService extends AbstractService
             return false;
         }
 
-        if (!empty($args['acceptor'])) {
-            $data['acceptor'] = (int)$args['acceptor'];
+        // 操作者头像
+        if (!empty($args['portrait'])) {
+            $data['portrait'] = $args['portrait'];
         }
 
-        if (!empty($args['action']) && in_array($args['action'], array_keys(Yii::$app->params['handleAction']))) {
-            $data['action'] = $args['action'];
+        // 接受者
+        if (!empty($args['receiverID'])) {
+            $data['receiverID'] = (int)$args['receiverID'];
+        }
+
+        // 公司
+        if (!empty($args['companyID'])) {
+            $data['companyID'] = (int)$args['companyID'];
         } else {
             if (YII_DEBUG) {
-                Yii::$app->end('action empty or error');
+                Yii::$app->end('companyID empty');
             }
             return false;
         }
 
-        if (!empty($args['target'])) {
-            $data['target'] = (int)$args['target'];
+        // 日志标题
+        if (!empty($args['title'])) {
+            $data['title'] = $args['title'];
         } else {
             if (YII_DEBUG) {
-                Yii::$app->end('target empty');
+                Yii::$app->end('title error');
             }
             return false;
         }
 
+        // 日志内容
+        if (!empty($args['content'])) {
+            $data['content'] = $args['content'];
+        } else {
+            if (YII_DEBUG) {
+                Yii::$app->end('content error');
+            }
+            return false;
+        }
+
+        // 链接地址
+        if (!empty($args['url'])) {
+            $data['url'] = $args['url'];
+        } else {
+            if (YII_DEBUG) {
+                Yii::$app->end('url empty');
+            }
+        }
+
+        // 操作对象
+        if (!empty($args['targetID'])) {
+            $data['targetID'] = (int)$args['targetID'];
+        } else {
+            if (YII_DEBUG) {
+                Yii::$app->end('targetID empty');
+            }
+            return false;
+        }
+
+        // 操作对象类型 see Yii::$app->params['handleTargetType']
         if (!empty($args['targetType']) &&
             in_array($args['targetType'], array_keys(Yii::$app->params['handleTargetType']))
         ) {
@@ -79,7 +137,6 @@ class LogService extends AbstractService
         /** @var \yii\mongodb\Connection $mongo */
         $mongo = Yii::$app->mongodb;
         $collection = $mongo->getCollection(Conf::M_HANDLE_LOG);
-
         return $collection->insert($data) ? true : false;
     }
 
@@ -98,14 +155,14 @@ class LogService extends AbstractService
         if (!empty($args['end'])) {
             $condition['date']['$lt'] = new UTCDateTime($args['end'] * 1000);
         }
-        if (!empty($args['target'])) {
-            $condition['target'] = (int)$args['target'];
+        if (!empty($args['targetID'])) {
+            $condition['targetID'] = (int)$args['targetID'];
         }
         if (!empty($args['targetType'])) {
             $condition['targetType'] = (int)$args['targetType'];
         }
-        if (!empty($args['operator'])) {
-            $condition['operator'] = (int)$args['operator'];
+        if (!empty($args['companyID'])) {
+            $condition['companyID'] = (int)$args['companyID'];
         }
         if (!empty($args['limit'])) {
             $limit = (int)$args['limit'];
@@ -126,32 +183,10 @@ class LogService extends AbstractService
             ->all();
 
         $data = [];
-        $userMap = [];
         $hasInDay = [];
 
         foreach ($rows as $row) {
             $temp = [];
-
-            if (isset($userMap[$row['operator']])) {
-                $operator = $userMap[$row['operator']]['name'];
-                $portrait = $userMap[$row['operator']]['portrait'];
-            } else {
-                list($operator, $portrait) = $this->_getNameAndPortrait($row['operator']);
-                $userMap[$row['operator']]['name'] = $operator;
-                $userMap[$row['operator']]['portrait'] = $portrait;
-            }
-
-            if (isset($row['acceptor'])) {
-                if (isset($userMap[$row['acceptor']])) {
-                    $acceptor = $userMap[$row['acceptor']]['name'];
-                } else {
-                    list($acceptor, $acceptorPortrait) = $this->_getNameAndPortrait($row['acceptor']);
-                    $userMap[$row['acceptor']]['name'] = $acceptor;
-                    $userMap[$row['acceptor']]['portrait'] = $acceptorPortrait;
-                }
-            } else {
-                $acceptor = null;
-            }
 
             $tz = new \DateTimeZone('PRC');
             $date = $row['date']->toDateTime()->setTimezone($tz)->format('Y-m-d H:i:s');
@@ -163,50 +198,16 @@ class LogService extends AbstractService
                 $hasInDay[] = $day;
             }
 
-            $temp['operator'] = $operator;
-            $temp['portrait'] = $portrait;
-            $temp['acceptor'] = isset($acceptor) ? $acceptor : null;
-            $temp['action'] = Yii::$app->params['handleAction'][$row['action']];
-            $temp['target'] = $this->_targetName($row['target'], $row['targetType']);
-            $temp['type'] = Yii::$app->params['handleTargetType'][$row['targetType']];
-
+            $temp['url'] = $row['url'];
+            $temp['title'] = Html::encode($row['title']);
+            $temp['content'] = Html::encode($row['content']);
+            $temp['operator'] = $row['operator'];
+            $temp['operatorID'] = $row['operatorID'];
+            $temp['portrait'] = $row['portrait'] ?: Yii::$app->params['defaultPortrait'][rand(0,10)];
             $data[] = $temp;
         }
 
         return $data;
-    }
-
-    /**
-     * 用户姓名和头像
-     * @param $userID
-     * @return array
-     */
-    private function _getNameAndPortrait($userID)
-    {
-        $user = User::findOne(['id' => $userID]);
-        if (!$user) {
-            return [];
-        }
-
-        return [
-            UserService::factory()->getUserName($user),
-            UserService::factory()->getUserPortrait($user),
-        ];
-    }
-
-    /**
-     * @param $target
-     * @param $targetType
-     * @return string
-     */
-    private function _targetName($target, $targetType)
-    {
-        switch ($targetType) {
-            case Conf::TARGET_TASK:
-                return Task::findOne(['id' => $target])->fdName;
-            default:
-                break;
-        }
     }
 
     /**

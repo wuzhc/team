@@ -6,6 +6,9 @@ define('MONGO_HOST', '127.0.0.1');
 define('MONGO_PORT', '27017');
 define('MONGO_DB', 'team');
 
+/** 消息推送请求地址 */
+define('PUSH_MSG_HTTP_REQUEST', 'http://localhost:2121');
+
 return [
     'name' => 'Team',
     'aliases' => [

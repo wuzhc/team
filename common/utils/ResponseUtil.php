@@ -3,6 +3,7 @@
 namespace common\utils;
 
 
+use common\config\Conf;
 use Yii;
 use yii\helpers\Json;
 
@@ -60,10 +61,12 @@ class ResponseUtil
     /**
      * CORS跨域响应数据
      * @param array $data
+     * @param int $status 状态
+     * @param string $msg 提示内容
      * @throws \yii\base\ExitException
      * @since 2017-06-04
      */
-    public static function jsonCORS($data = [])
+    public static function jsonCORS($data = [], $status = Conf::SUCCESS, $msg = '操作成功')
     {
         // 允许跨域域名
         $allowOrigin = [
@@ -78,6 +81,14 @@ class ResponseUtil
             header('Access-Control-Allow-Origin:' . $origin);
             header("Access-Control-Allow-Headers:X-Requested-With");
             header("Access-Control-Allow-Methods:PUT,POST,GET,DELETE,OPTIONS");
+        }
+
+        if (!isset($data['status'])) {
+            $data['status'] = $status;
+        }
+
+        if (!isset($data['msg'])) {
+            $data['msg'] = $msg;
         }
 
         header("Content-Type:application/json;charset=utf-8");

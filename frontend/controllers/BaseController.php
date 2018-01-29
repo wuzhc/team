@@ -49,7 +49,7 @@ class BaseController extends Controller
         $query = parse_url($url, PHP_URL_QUERY);
         if (!$query) {
             $url .= '?showmsg=1';
-        } elseif (false === strpos($query, 'showbox')) {
+        } elseif (false === strpos($query, 'showmsg')) {
             $url .= '&showmsg=1';
         }
 

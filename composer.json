@@ -22,7 +22,8 @@
         "dmstr/yii2-adminlte-asset": "^2.1",
         "yiisoft/yii2-mongodb": "^2.1@dev",
         "yiisoft/yii2-redis": "^2.0@dev",
-        "workerman/phpsocket.io" : ">1.0.0"
+        "workerman/phpsocket.io" : ">1.0.0",
+        "guzzlehttp/guzzle": "~6.0"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.0.0",

@@ -8,17 +8,22 @@ use common\models\Project;
 use common\models\Task;
 use common\models\TaskCategory;
 use common\services\LogService;
+use common\services\MsgService;
 use common\services\ProjectService;
 use common\services\TaskService;
 use common\services\UserService;
+use common\utils\HttpClient;
 use common\utils\ResponseUtil;
 use Yii;
+use yii\debug\UserswitchAsset;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\helpers\StringHelper;
+use yii\helpers\Url;
 use yii\web\BadRequestHttpException;
 use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
+use yii\web\User;
 
 class TaskController extends BaseController
 {
@@ -163,6 +168,8 @@ class TaskController extends BaseController
      */
     public function actionCreate($projectID, $categoryID)
     {
+        $userID = Yii::$app->user->id;
+
         if (!Yii::$app->user->can('createTask')) {
             throw new ForbiddenHttpException(ResponseUtil::$msg[1]);
         }
@@ -172,9 +179,10 @@ class TaskController extends BaseController
                 ResponseUtil::jsonCORS(['status' => Conf::FAILED, 'msg' => '任务标题不能为空']);
             }
 
+            // 保存任务
             $taskID = TaskService::factory()->save([
                 'name'       => $data['name'],
-                'creatorID'  => Yii::$app->user->id,
+                'creatorID'  => $userID,
                 'companyID'  => $this->companyID,
                 'level'      => $data['level'],
                 'categoryID' => $categoryID,
@@ -183,21 +191,42 @@ class TaskController extends BaseController
             ]);
 
             if ($taskID) {
+                $url = Url::to(['task/view', 'taskID' => $taskID]);
+                $portrait = UserService::factory()->getUserPortrait($userID);
+                $username = UserService::factory()->getUserName($userID);
+                $title = '创建了新任务';
+                $content = $data['name'];
+
+                // 保存操作日志
                 LogService::factory()->saveHandleLog([
-                    'target'     => $taskID,
-                    'action'     => Conf::ACTION_CREATE,
-                    'operator'   => Yii::$app->user->id,
+                    'targetID'   => $taskID,
+                    'companyID'  => $this->companyID,
+                    'operatorID' => $userID,
                     'targetType' => Conf::TARGET_TASK,
+                    'content'    => $content,
+                    'url'        => $url,
+                    'title'      => $title,
+                    'portrait'   => $portrait,
+                    'operator'   => $username
                 ]);
-                ResponseUtil::jsonCORS([
-                    'status' => Conf::SUCCESS,
-                    'msg'    => '创建成功'
+
+                // 推送内容
+                HttpClient::request(PUSH_MSG_HTTP_REQUEST . '?action=dynamic', 'post', [
+                    'targetID'   => $taskID,
+                    'companyID'  => $this->companyID,
+                    'operatorID' => Yii::$app->user->id,
+                    'targetType' => Conf::TARGET_TASK,
+                    'content'    => $content,
+                    'url'        => $url,
+                    'title'      => $title,
+                    'portrait'   => $portrait,
+                    'date'       => date('Y-m-d H:i:s'),
+                    'operator'   => $username
                 ]);
+
+                ResponseUtil::jsonCORS(null, Conf::SUCCESS, '创建成功');
             } else {
-                ResponseUtil::jsonCORS([
-                    'status' => Conf::FAILED,
-                    'msg'    => '创建失败'
-                ]);
+                ResponseUtil::jsonCORS(null, Conf::FAILED, '创建失败');
             }
         } else {
             return $this->render('create', [
@@ -217,6 +246,8 @@ class TaskController extends BaseController
      */
     public function actionUpdate($taskID)
     {
+        $userID = Yii::$app->user->id;
+
         $task = Task::findOne(['id' => $taskID, 'fdStatus' => Conf::ENABLE]);
         if (!$task) {
             throw new NotFoundHttpException('任务不存在或已删除');
@@ -243,16 +274,42 @@ class TaskController extends BaseController
                 'content' => $data['content']
             ]);
             if ($res) {
+                $url = Url::to(['task/view', 'taskID' => $taskID]);
+                $portrait = UserService::factory()->getUserPortrait($userID);
+                $username = UserService::factory()->getUserName($userID);
+                $title = '编辑了任务';
+                $content = $data['name'];
+
+                // 保存操作日志
                 LogService::factory()->saveHandleLog([
-                    'target'     => $taskID,
-                    'action'     => Conf::ACTION_EDIT,
-                    'operator'   => Yii::$app->user->id,
+                    'targetID'   => $taskID,
+                    'companyID'  => $this->companyID,
+                    'operatorID' => $userID,
                     'targetType' => Conf::TARGET_TASK,
+                    'content'    => $content,
+                    'url'        => $url,
+                    'title'      => $title,
+                    'portrait'   => $portrait,
+                    'operator'   => $username
+                ]);
+
+                // 推送内容
+                HttpClient::request(PUSH_MSG_HTTP_REQUEST . '?action=dynamic', 'post', [
+                    'targetID'   => $taskID,
+                    'companyID'  => $this->companyID,
+                    'operatorID' => Yii::$app->user->id,
+                    'targetType' => Conf::TARGET_TASK,
+                    'content'    => $content,
+                    'url'        => $url,
+                    'title'      => $title,
+                    'portrait'   => $portrait,
+                    'date'       => date('Y-m-d H:i:s'),
+                    'operator'   => $username
                 ]);
             }
 
             list($status, $msg) = $res ? [Conf::SUCCESS, '编辑成功'] : [Conf::FAILED, '编辑失败'];
-            ResponseUtil::jsonCORS(['status' => $status, 'msg' => $msg]);
+            ResponseUtil::jsonCORS(null, $status, $msg);
         } else {
             return $this->render('update', [
                 'task' => $task,
@@ -285,7 +342,6 @@ class TaskController extends BaseController
         ]);
 
         $members = ProjectService::factory()->getHasJoinProjectMembers($task->fdProjectID);
-
         return $this->render('view', [
             'task'    => $task,
             'logs'    => $logs,
@@ -302,6 +358,8 @@ class TaskController extends BaseController
      */
     public function actionDelete($taskID)
     {
+        $userID = Yii::$app->user->id;
+
         if (!Yii::$app->user->can('delTask')) {
             throw new ForbiddenHttpException(ResponseUtil::$msg[4]);
         }
@@ -324,17 +382,44 @@ class TaskController extends BaseController
         }
 
         $res = Task::updateAll(['fdStatus' => Conf::DISABLE], ['id' => $taskID]);
-        if ($res) {
-            LogService::factory()->saveHandleLog([
-                'target'     => $task->id,
-                'operator'   => Yii::$app->user->id,
-                'action'     => Conf::ACTION_DEL,
-                'targetType' => Conf::TARGET_TASK,
-            ]);
-            ResponseUtil::jsonCORS(['status' => Conf::SUCCESS]);
+        if (!$res) {
+            ResponseUtil::jsonCORS(null, Conf::FAILED);
         }
 
-        ResponseUtil::jsonCORS(['status' => Conf::FAILED]);
+        $url = Url::to(['task/view', 'taskID' => $taskID]);
+        $portrait = UserService::factory()->getUserPortrait($userID);
+        $username = UserService::factory()->getUserName($userID);
+        $title = '删除了任务';
+        $content = $task->fdName;
+
+        // 保存操作日志
+        LogService::factory()->saveHandleLog([
+            'targetID'   => $taskID,
+            'companyID'  => $this->companyID,
+            'operatorID' => $userID,
+            'targetType' => Conf::TARGET_TASK,
+            'content'    => $content,
+            'url'        => $url,
+            'title'      => $title,
+            'portrait'   => $portrait,
+            'operator'   => $username
+        ]);
+
+        // 推送动态
+        HttpClient::request(PUSH_MSG_HTTP_REQUEST . '?action=dynamic', 'post', [
+            'targetID'   => $taskID,
+            'companyID'  => $this->companyID,
+            'operatorID' => $userID,
+            'targetType' => Conf::TARGET_TASK,
+            'content'    => $content,
+            'url'        => $url,
+            'title'      => $title,
+            'portrait'   => $portrait,
+            'date'       => date('Y-m-d H:i:s'),
+            'operator'   => $username
+        ]);
+
+        ResponseUtil::jsonCORS(null, Conf::SUCCESS);
     }
 
     /**
@@ -346,11 +431,12 @@ class TaskController extends BaseController
      */
     public function actionAssign()
     {
+        $userID = Yii::$app->user->id;
+
         if (Yii::$app->request->isAjax && ($data = Yii::$app->request->post())) {
             $taskID = $data['taskID'];
-            $acceptor = $data['acceptor'];
-
-            if (!$taskID || !$acceptor) {
+            $receiverID = $data['acceptor'];
+            if (!$taskID || !$receiverID) {
                 throw new BadRequestHttpException('参数错误');
             }
 
@@ -360,27 +446,74 @@ class TaskController extends BaseController
             }
 
             // 检查被指派者的权限
-            if (!ProjectService::factory()->checkUserAccessProject($acceptor, $task->fdProjectID)) {
+            if (!ProjectService::factory()->checkUserAccessProject($receiverID, $task->fdProjectID)) {
                 throw new ForbiddenHttpException('对不起，接受者不是我们项目组的');
             }
 
+            // 更新任务创建者
             $res = Task::updateAll([
-                'fdCreatorID' => $acceptor,
+                'fdCreatorID' => $receiverID,
                 'fdProgress'  => Conf::TASK_STOP
             ], ['id' => $taskID]);
 
-            if ($res) {
-                LogService::factory()->saveHandleLog([
-                    'operator'   => Yii::$app->user->id,
-                    'acceptor'   => $acceptor,
-                    'target'     => $task->id,
-                    'targetType' => Conf::TARGET_TASK,
-                    'action'     => Conf::ACTION_ASSIGN,
-                ]);
-                ResponseUtil::jsonCORS(['status' => Conf::SUCCESS]);
-            } else {
-                ResponseUtil::jsonCORS(['status' => Conf::FAILED]);
+            if (!$res) {
+                ResponseUtil::jsonCORS(null, Conf::FAILED);
             }
+
+            $content = $task->fdName;
+            $url = Url::to(['task/view', 'taskID' => $taskID]);
+            $portrait = UserService::factory()->getUserPortrait($userID);
+            $username = UserService::factory()->getUserName($userID);
+            $title = '把任务指派给了' . UserService::factory()->getUserName($receiverID);
+
+            // 保存操作日志
+            LogService::factory()->saveHandleLog([
+                'targetID'   => $taskID,
+                'companyID'  => $this->companyID,
+                'operatorID' => $userID,
+                'receiverID' => $receiverID,
+                'targetType' => Conf::TARGET_TASK,
+                'content'    => $content,
+                'url'        => $url,
+                'title'      => $title,
+                'portrait'   => $portrait,
+                'operator'   => $username
+            ]);
+
+            // 保存消息
+            MsgService::factory()->saveMessage([
+                'senderID'   => $userID,
+                'receiverID' => $receiverID,
+                'companyID'  => $this->companyID,
+                'title'      => $title,
+                'content'    => $content,
+                'typeID'     => Conf::MSG_HANDLE,
+                'url'        => $url,
+                'portrait'   => $portrait
+            ]);
+
+            // 消息及时推送
+            HttpClient::request(PUSH_MSG_HTTP_REQUEST . '/?action=publish', 'post', [
+                'title'    => $title,
+                'content'  => $content,
+                'portrait' => $portrait,
+                'to'       => $receiverID,
+                'typeID'   => Conf::MSG_HANDLE
+            ]);
+
+            // 推送动态
+            HttpClient::request(PUSH_MSG_HTTP_REQUEST . '?action=dynamic', 'post', [
+                'targetID'   => $taskID,
+                'companyID'  => $this->companyID,
+                'operatorID' => $userID,
+                'targetType' => Conf::TARGET_TASK,
+                'content'    => $content,
+                'url'        => $url,
+                'title'      => $title,
+                'portrait'   => $portrait,
+                'date'       => date('Y-m-d H:i:s'),
+                'operator'   => $username
+            ]);
         }
     }
 
@@ -438,20 +571,29 @@ class TaskController extends BaseController
      */
     public function actionFinish($taskID)
     {
+        $userID = Yii::$app->user->id;
+
+        /** @var \common\models\User $user */
+        $user = Yii::$app->user->identity;
+        $username = UserService::factory()->getUserName($user);
+        $portrait = UserService::factory()->getUserPortrait($user);
+
         if (Yii::$app->request->isAjax) {
             $task = Task::findOne(['id' => $taskID, 'fdStatus' => Conf::ENABLE]);
             if (!$task) {
                 throw new NotFoundHttpException('任务不存在或已删除');
             }
 
-            if (!ProjectService::factory()->checkUserAccessProject(Yii::$app->user->id, $task->fdProjectID)) {
+            if (!ProjectService::factory()->checkUserAccessProject($userID, $task->fdProjectID)) {
                 throw new ForbiddenHttpException(ResponseUtil::$msg[1]);
             }
 
             if ($task->fdProgress == Conf::TASK_FINISH) {
                 $attribute['fdProgress'] = Conf::TASK_STOP;
+                $title = '暂停了任务';
             } else {
                 $attribute['fdProgress'] = Conf::TASK_FINISH;
+                $title = '完成了任务';
             }
             Task::updateAll($attribute, ['id' => $task->id]);
 
@@ -468,6 +610,36 @@ class TaskController extends BaseController
                     throw new NotFoundHttpException('数据不存在');
             }
 
+            $url = Url::to(['task/view', 'taskID' => $taskID]);
+            $content = $task->fdName;
+
+            // 保存操作日志
+            LogService::factory()->saveHandleLog([
+                'targetID'   => $taskID,
+                'companyID'  => $this->companyID,
+                'operatorID' => $userID,
+                'targetType' => Conf::TARGET_TASK,
+                'content'    => $content,
+                'url'        => $url,
+                'title'      => $title,
+                'portrait'   => $portrait,
+                'operator'   => $username
+            ]);
+
+            // 推送动态
+            HttpClient::request(PUSH_MSG_HTTP_REQUEST . '?action=dynamic', 'post', [
+                'targetID'   => $taskID,
+                'companyID'  => $this->companyID,
+                'operatorID' => $userID,
+                'targetType' => Conf::TARGET_TASK,
+                'content'    => $content,
+                'url'        => $url,
+                'title'      => $title,
+                'portrait'   => $portrait,
+                'date'       => date('Y-m-d H:i:s'),
+                'operator'   => $username
+            ]);
+
             ResponseUtil::jsonCORS(['action' => $action]);
         }
     }
@@ -480,6 +652,13 @@ class TaskController extends BaseController
      */
     public function actionHandle()
     {
+        $userID = Yii::$app->user->id;
+
+        /** @var \common\models\User $user */
+        $user = Yii::$app->user->identity;
+        $username = UserService::factory()->getUserName($user);
+        $portrait = UserService::factory()->getUserPortrait($user);
+
         if (Yii::$app->request->isAjax) {
             $action = Yii::$app->request->get('action');
             $taskID = Yii::$app->request->get('taskID');
@@ -498,8 +677,10 @@ class TaskController extends BaseController
 
             if ($task->fdProgress == Conf::TASK_STOP && $action === 'begin') {
                 $attribute['fdProgress'] = Conf::TASK_BEGIN;
+                $title = '开始处理任务';
             } elseif ($task->fdProgress == Conf::TASK_BEGIN && $action === 'stop') {
                 $attribute['fdProgress'] = Conf::TASK_STOP;
+                $title = '暂停了任务';
             } else {
                 throw new ForbiddenHttpException('禁止操作');
             }
@@ -519,6 +700,37 @@ class TaskController extends BaseController
                 default:
                     throw new NotFoundHttpException('数据不存在');
             }
+
+            $url = Url::to(['task/view', 'taskID' => $taskID]);
+            $content = $task->fdName;
+
+            // 保存操作日志
+            LogService::factory()->saveHandleLog([
+                'targetID'   => $taskID,
+                'companyID'  => $this->companyID,
+                'operatorID' => $userID,
+                'targetType' => Conf::TARGET_TASK,
+                'content'    => $content,
+                'url'        => $url,
+                'title'      => $title,
+                'portrait'   => $portrait,
+                'operator'   => $username
+            ]);
+
+            // 推送动态
+            HttpClient::request(PUSH_MSG_HTTP_REQUEST . '?action=dynamic', 'post', [
+                'targetID'   => $taskID,
+                'companyID'  => $this->companyID,
+                'operatorID' => $userID,
+                'targetType' => Conf::TARGET_TASK,
+                'content'    => $content,
+                'url'        => $url,
+                'title'      => $title,
+                'portrait'   => $portrait,
+                'date'       => date('Y-m-d H:i:s'),
+                'operator'   => $username
+            ]);
+
 
             ResponseUtil::jsonCORS(['action' => $action]);
         }

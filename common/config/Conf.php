@@ -35,6 +35,7 @@ class Conf
     /** mongo集合名称 */
     const M_USER_LOGIN_LOG = 'userLoginLog';
     const M_HANDLE_LOG = 'handleLog';
+    const M_MSG_NOTICE = 'msgNotice';
 
     /** redis键 */
     const R_COUNTER_PROJ_TASK_NUM = 'counter:proj:';
@@ -43,18 +44,18 @@ class Conf
     const USER_PORTRAIT = 'http://file.cnweike.cn/content/0/0/0/251/255072.png?r=1516088302';
 
     /** 操作常量定义 */
-    /*action 动作*/
-    const ACTION_CREATE = 1; // 创建
-    const ACTION_EDIT = 2; // 编辑
-    const ACTION_DEL = 3; // 删除
-    const ACTION_ASSIGN = 4; // 指派
-    const ACTION_MOVE = 5; // 移动
-    const ACTION_ALERT = 6; // 提醒
-
     /*target 操作目标类型*/
     const TARGET_PROJECT = 1; // 项目
     const TARGET_TEAM = 2; // 团队
     const TARGET_USER = 3; // 用户
     const TARGET_TASK = 4; // 任务
     const TARGET_DOC = 5; // 文档
+
+    /** 消息通知 */
+    const MSG_SYSTEM = 1; // 系统通知
+    const MSG_ADMIN = 2; // 管理员通知
+    const MSG_HANDLE = 3; // 操作通知（包括指派任务，其他人操作你的文档，任务等等）
+
+    const MSG_READ = 1; // 已读
+    const MSG_UNREAD = 0; // 未读
 }

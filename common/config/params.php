@@ -106,16 +106,6 @@ return [
         'https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=1965350828,1166357149&fm=27&gp=0.jpg'
     ],
 
-    // 操作动作
-    'handleAction' => [
-        Conf::ACTION_CREATE => '创建',
-        Conf::ACTION_EDIT   => '编辑',
-        Conf::ACTION_DEL    => '删除',
-        Conf::ACTION_ASSIGN => '指派',
-        Conf::ACTION_MOVE   => '移动',
-        Conf::ACTION_ALERT  => '提醒',
-    ],
-
     // 操作目标类型
     'handleTargetType' => [
         Conf::TARGET_PROJECT => '项目',

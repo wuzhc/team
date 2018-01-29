@@ -13,8 +13,7 @@ $identify = Yii::$app->user->identity;
             </div>
             <div class="pull-left info">
                 <p><?=$identify->fdName?></p>
-
-                <a href="#"><i class="fa fa-circle text-success"></i> 在线</a>
+                <a href="#"><i class="fa fa-circle text-success"></i> 当前有&nbsp;<b id="online-people">0</b>&nbsp;人在线</a>
             </div>
         </div>
 

@@ -30,7 +30,7 @@ $directoryAsset = Yii::$app->assetManager->getPublishedUrl('@vendor/almasaeed201
     <div class="row">
         <div class="col-md-12">
             <!-- The time line -->
-            <ul class="timeline" id="task-list">
+            <ul class="timeline" id="dynamic-list">
                 <li class="text-center">
                     <h1><i class="fa fa-refresh fa-spin"></i></h1>
                 </li>
@@ -58,14 +58,11 @@ $directoryAsset = Yii::$app->assetManager->getPublishedUrl('@vendor/almasaeed201
             <div class="timeline-item">
                 <span class="time"><i class="fa fa-clock-o"></i><%=list[i].date%></span>
                 <h3 class="timeline-header"><a href="#"><%=list[i].operator%></a>
-                    <span class="desc"><%=list[i].action%>了<%=list[i].type%>
-                    <% if (list[i].acceptor) { %>
-                        给<%=list[i].acceptor%>
-                    <% } %>
+                    <span class="desc"><%=list[i].title %>
                     </span>
                 </h3>
                 <div class="timeline-body">
-                    <%=list[i].target%>
+                    <%=list[i].content%>
                 </div>
             </div>
         </li>
@@ -76,9 +73,7 @@ $directoryAsset = Yii::$app->assetManager->getPublishedUrl('@vendor/almasaeed201
         <?php $this->beginBlock('dynamic') ?>
         $(function () {
 
-            var curPage = 1;
-            var totalPage = 0;
-            var ajaxBort = null;
+            var ajaxAbort = null;
 
             // 渲染列表
             function renderList(options) {
@@ -87,8 +82,8 @@ $directoryAsset = Yii::$app->assetManager->getPublishedUrl('@vendor/almasaeed201
                 }, options);
                 var url = "<?=\yii\helpers\Url::to(['default/get-dynamic'])?>";
 
-                ajaxBort && ajaxBort.abort();
-                ajaxBort = $.ajax({
+                ajaxAbort && ajaxAbort.abort();
+                ajaxAbort = $.ajax({
                     type: 'GET',
                     url: url,
                     data: params,
@@ -99,7 +94,7 @@ $directoryAsset = Yii::$app->assetManager->getPublishedUrl('@vendor/almasaeed201
                     var html = '';
                     if (len > 0) {
                         html = template.render('dynamic-template', {list: list});
-                        $('#task-list').html(html);
+                        $('#dynamic-list').html(html);
                     } else {
                         $('#dynamic-list').html('');
                     }
