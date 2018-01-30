@@ -13,7 +13,7 @@ use yii\redis\Connection;
 
 /**
  * 消息推送
- * 命令： ./yii push-msg/run -t=start|stop|restart|reload|status -d=true
+ * 命令： ./yii push-msg/start start daemon
  * Class PushMsgController
  * @package console\controllers
  * @author wuzhc <wuzhc2016@163.com>

@@ -27,8 +27,11 @@ $this->registerJsFile('//cdn.bootcss.com/socket.io/1.3.7/socket.io.js', [
             <span class="sr-only">Toggle navigation</span>
         </a>
 
-        <div class="navbar-custom-menu">
+        <ul class="nav navbar-nav">
+            <li><a href="<?=Url::to(['default/index'])?>">首页</a></li>
+        </ul>
 
+        <div class="navbar-custom-menu">
             <ul class="nav navbar-nav">
                 <!-- Messages: style can be found in dropdown.less-->
                 <!--操作消息通知-->
@@ -191,17 +194,17 @@ $this->registerJsFile('//cdn.bootcss.com/socket.io/1.3.7/socket.io.js', [
                             </p>
                         </li>
                         <!-- Menu Body -->
-                        <li class="user-body">
-                            <div class="col-xs-4 text-center">
-                                <a href="#">Followers</a>
-                            </div>
-                            <div class="col-xs-4 text-center">
-                                <a href="#">Sales</a>
-                            </div>
-                            <div class="col-xs-4 text-center">
-                                <a href="#">Friends</a>
-                            </div>
-                        </li>
+<!--                        <li class="user-body">-->
+<!--                            <div class="col-xs-4 text-center">-->
+<!--                                <a href="#">Followers</a>-->
+<!--                            </div>-->
+<!--                            <div class="col-xs-4 text-center">-->
+<!--                                <a href="#">Sales</a>-->
+<!--                            </div>-->
+<!--                            <div class="col-xs-4 text-center">-->
+<!--                                <a href="#">Friends</a>-->
+<!--                            </div>-->
+<!--                        </li>-->
                         <!-- Menu Footer-->
                         <li class="user-footer">
                             <div class="pull-left">

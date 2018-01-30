@@ -16,6 +16,7 @@ use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\helpers\StringHelper;
 use yii\web\ForbiddenHttpException;
+use yii\web\NotFoundHttpException;
 
 /**
  * UserController implements the CRUD actions for User model.
@@ -128,16 +129,23 @@ class UserController extends BaseController
 
     /**
      * 个人中心
+     * @param null|int $userID 用户ID
      * @return string
+     * @throws ForbiddenHttpException
+     * @throws NotFoundHttpException
      * @since 2018-01-25
      */
-    public function actionProfile()
+    public function actionProfile($userID = null)
     {
-        /** @var User $user */
-        $user = Yii::$app->user->identity;
+        if ($userID) {
+            $user = $this->_checkUserAccess($userID);
+        } else {
+            /** @var User $user */
+            $user = Yii::$app->user->identity;
+        }
+
         return $this->render('profile', [
-            'username' => UserService::factory()->getUserName($user),
-            'portrait' => UserService::factory()->getUserPortrait($user)
+            'user' => $user,
         ]);
     }
 
@@ -149,24 +157,32 @@ class UserController extends BaseController
         if (Yii::$app->request->isAjax) {
             $params = Yii::$app->request->get();
             $progress = isset($params['progress']) ? $params['progress'] : null;
-            $creatorID = Yii::$app->user->id;
+
+            if (!empty($params['userID'])) {
+                $user = $this->_checkUserAccess($params['userID']);
+                $userID = $user->id;
+            } else {
+                $userID = Yii::$app->user->id;
+            }
+
             $args = [
-                'creatorID'  => $creatorID,
-                'progress'   => $progress,
+                'creatorID' => $userID,
+                'progress'  => $progress,
             ];
 
+            // 总数
             $total = null;
-            if (!empty($params['totalInit'])) {
+            if (!empty($params['totalInit']) && $params['totalInit'] == 1) {
                 $total = TaskService::factory()->countCompanyTasks($this->companyID, $args);
             }
 
             $args['limit'] = !empty($params['pageSize']) ? $params['pageSize'] : 10;
             $args['offset'] = !empty($params['page']) ? ($params['page'] - 1) * $args['limit'] : 0;
             $args['order'] = ['id' => SORT_DESC];
-
-            $list = [];
             $tasks = TaskService::factory()->getCompanyTasks($this->companyID, $args);
 
+            // 列表数据
+            $list = [];
             /** @var Task $task */
             foreach ((array)$tasks as $task) {
                 $temp = [];
@@ -183,10 +199,8 @@ class UserController extends BaseController
             }
 
             ResponseUtil::jsonCORS([
-                'data' => [
-                    'total' => $total,
-                    'list'  => $list,
-                ]
+                'total' => $total,
+                'list'  => $list,
             ]);
         }
     }
@@ -213,8 +227,8 @@ class UserController extends BaseController
         ]);
 
         ResponseUtil::jsonCORS([
-            'total' => $total,
-            'complete'=> $complete
+            'total'    => $total,
+            'complete' => $complete
         ]);
     }
 
@@ -257,71 +271,21 @@ class UserController extends BaseController
     }
 
     /**
-     * 导入成员
-     * @return string
+     * 检测用户可操作权限
+     * @param $userID
+     * @return null|User
      * @throws ForbiddenHttpException
+     * @throws NotFoundHttpException
      */
-    public function actionImport()
+    private function _checkUserAccess($userID)
     {
-        // 权限检测，只有超级管理员和普通管理员才能执行
-        if (!Yii::$app->user->can('importUser')) {
-            throw new ForbiddenHttpException(Yii::t('yii', 'You are not allowed to perform this action.'));
+        $user = User::findOne(['id' => $userID, 'fdStatus' => Conf::USER_ENABLE]);
+        if (!$user) {
+            throw new NotFoundHttpException('用户不存在或已删除');
         }
-
-        if (Yii::$app->request->isAjax && ($data = Yii::$app->request->post())) {
-            if (!$data['accounts']) {
-                ResponseUtil::jsonCORS(['status' => 0, 'msg' => '账号不能为空']);
-            }
-
-            $existAccounts = []; // 已存在的账号
-            $newAccounts = []; // 新账号
-            $accounts = array_unique(array_filter(explode(',', $data['accounts'])));
-
-            foreach ($accounts as $account) {
-                $account = trim($account);
-
-                // 账号已经存在
-                if (UserService::factory()->getUserObjByAccount($account)) {
-                    $exists[] = $account;
-                    continue;
-                }
-
-                $temp = [
-                    'name'  => '',
-                    'phone' => '',
-                    'email' => '',
-                    'login' => 't_' . VerifyUtil::getRandomCode(8, 3)
-                ];
-
-                if (VerifyUtil::checkPhone($account)) {
-                    $temp['phone'] = $account;
-                    $temp['name'] = $account;
-                } elseif (VerifyUtil::checkEmail($account)) {
-                    $temp['email'] = $account;
-                    $temp['name'] = $account;
-                } else {
-                    $temp['login'] = $account;
-                    $temp['name'] = $account;
-                }
-
-                $newAccounts[] = $temp;
-            }
-
-            // 成员入库
-            if ($newAccounts) {
-                UserService::factory()->batchCreateUser($this->companyID, $newAccounts);
-                ResponseUtil::jsonCORS([
-                    'status' => 0,
-                    'exists' => $existAccounts
-                ]);
-            }
-
-            ResponseUtil::jsonCORS([
-                'status' => 1,
-                'exists' => $existAccounts
-            ]);
+        if ($user->fdCompanyID != $this->companyID) {
+            throw new ForbiddenHttpException('这不是你公司的成员，你无权查看他的信息');
         }
-
-        return $this->render('import-user');
+        return $user;
     }
 }

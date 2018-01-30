@@ -27,7 +27,7 @@ class m170810_010439_user extends Migration
             'fdLogin'     => $this->string(32)->notNull()->comment('账号'),
             'fdPhone'     => $this->string(11)->comment('手机号码'),
             'fdEmail'     => $this->string(64)->comment('邮箱地址'),
-            'fdStatus'    => $this->smallInteger(1)->defaultValue(0)->comment('账号状态0未完成注册，1正常，2冻结'),
+            'fdStatus'    => $this->smallInteger(1)->defaultValue(0)->comment('账号状态0删除，1正常，2冻结'),
             'fdRoleID'    => $this->smallInteger(1)->defaultValue(0)->comment('身份，0超级管理员,1管理员，2成员，3游客'),
             'fdCompanyID' => $this->integer(11)->notNull()->comment('所属公司，对应tbCompany.id'),
             'fdTeamID'    => $this->integer(11)->defaultValue(0)->comment('所属团队,对应tbTeam.id'),

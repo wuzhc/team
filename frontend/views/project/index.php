@@ -77,7 +77,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 ],
                 [
                     'value' => function ($searchModel) {
-                        return '<a href="'. \yii\helpers\Url::to(['project/members', 'id' => $searchModel->id]) .'"><span class="label label-success">成员管理</span></a>';
+                        return '<a href="'. \yii\helpers\Url::to(['project/members', 'id' => $searchModel->id]) .'"><span class="label label-success">加入成员</span></a>';
                     },
                     'format' => 'html',
                     'headerOptions' => ['width' => 80]

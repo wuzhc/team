@@ -34,38 +34,10 @@ $identify = Yii::$app->user->identity;
                 'options' => ['class' => 'sidebar-menu tree', 'data-widget'=> 'tree'],
                 'items' => [
                     ['label' => 'Menu Yii2', 'options' => ['class' => 'header']],
-                    ['label' => '动态', 'icon' => 'file-code-o', 'url' => ['/default/dynamic']],
-                    ['label' => '团队', 'icon' => 'fa fa-group', 'url' => ['/team/index']],
-                    ['label' => '任务', 'icon' => 'dashboard', 'url' => ['/task/index','projectID' => 1]],
-                    ['label' => '项目', 'icon' => 'dashboard', 'url' => ['/project/index'], 'visible' => ($identify->fdRoleID === \common\config\Conf::ROLE_SUPER || $identify->fdRoleID === \common\config\Conf::ROLE_ADMIN)],
-                    ['label' => '成员', 'icon' => 'dashboard', 'url' => ['/user-manage/index'], 'visible' => ($identify->fdRoleID === \common\config\Conf::ROLE_SUPER || $identify->fdRoleID === \common\config\Conf::ROLE_ADMIN)],
-                    ['label' => 'Login', 'url' => ['site/login'], 'visible' => Yii::$app->user->isGuest],
-                    [
-                        'label' => 'Some tools',
-                        'icon' => 'share',
-                        'url' => '#',
-                        'items' => [
-                            ['label' => 'Gii', 'icon' => 'file-code-o', 'url' => ['/gii'],],
-                            ['label' => 'Debug', 'icon' => 'dashboard', 'url' => ['/debug'],],
-                            [
-                                'label' => 'Level One',
-                                'icon' => 'circle-o',
-                                'url' => '#',
-                                'items' => [
-                                    ['label' => 'Level Two', 'icon' => 'circle-o', 'url' => '#',],
-                                    [
-                                        'label' => 'Level Two',
-                                        'icon' => 'circle-o',
-                                        'url' => '#',
-                                        'items' => [
-                                            ['label' => 'Level Three', 'icon' => 'circle-o', 'url' => '#',],
-                                            ['label' => 'Level Three', 'icon' => 'circle-o', 'url' => '#',],
-                                        ],
-                                    ],
-                                ],
-                            ],
-                        ],
-                    ],
+                    ['label' => '最新动态', 'icon' => 'car', 'url' => ['/default/dynamic']],
+                    ['label' => '团队成员', 'icon' => 'space-shuttle', 'url' => ['/team/index']],
+                    ['label' => '项目管理', 'icon' => 'motorcycle', 'url' => ['/project/index'], 'visible' => ($identify->fdRoleID === \common\config\Conf::ROLE_SUPER || $identify->fdRoleID === \common\config\Conf::ROLE_ADMIN)],
+                    ['label' => '成员管理', 'icon' => 'subway', 'url' => ['/user-manage/index'], 'visible' => ($identify->fdRoleID === \common\config\Conf::ROLE_SUPER || $identify->fdRoleID === \common\config\Conf::ROLE_ADMIN)],
                 ],
             ]
         ) ?>

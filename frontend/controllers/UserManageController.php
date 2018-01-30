@@ -16,6 +16,7 @@ use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\helpers\StringHelper;
 use yii\web\ForbiddenHttpException;
+use yii\web\NotFoundHttpException;
 
 /**
  * UserManageController implements the CRUD actions for User model.
@@ -81,7 +82,7 @@ class UserManageController extends BaseController
         $totalInit = Yii::$app->request->get('totalInit', 0);
 
         $args = [
-            'status'    => Conf::USER_ENABLE,
+            'status'    => [Conf::USER_ENABLE, Conf::USER_FREEZE],
             'companyID' => $this->companyID
         ];
 
@@ -92,7 +93,7 @@ class UserManageController extends BaseController
 
         $args['limit'] = $pageSize;
         $args['offset'] = $pageSize * ($page - 1);
-        $args['order'] = ['id' => SORT_DESC];
+        $args['order'] = ['id' => SORT_ASC];
         $users = UserService::factory()->getUsers($args);
 
         /** @var User $user */
@@ -108,6 +109,7 @@ class UserManageController extends BaseController
             $temp['team'] = $user->team->fdName ?: '未加入';
             $temp['role'] = Yii::$app->params['role'][$user->fdRoleID];
             $temp['style'] = Yii::$app->params['colorTwo'][$user->fdRoleID];
+            $temp['status'] = $user->fdStatus;
             $temp['portrait'] = UserService::factory()->getUserPortrait($user);
             $data[] = $temp;
         }
@@ -116,5 +118,98 @@ class UserManageController extends BaseController
             'list'  => $data,
             'total' => $total
         ]);
+    }
+
+    /**
+     * 导入成员
+     * @return string
+     * @throws ForbiddenHttpException
+     */
+    public function actionImport()
+    {
+        // 权限检测，只有超级管理员和普通管理员才能执行
+        if (!Yii::$app->user->can('importUser')) {
+            throw new ForbiddenHttpException(Yii::t('yii', 'You are not allowed to perform this action.'));
+        }
+
+        if (Yii::$app->request->isAjax && ($data = Yii::$app->request->post())) {
+            if (!$data['accounts']) {
+                ResponseUtil::jsonCORS(['status' => 0, 'msg' => '账号不能为空']);
+            }
+
+            $existAccounts = []; // 已存在的账号
+            $newAccounts = []; // 新账号
+            $accounts = array_unique(array_filter(explode(',', $data['accounts'])));
+
+            foreach ($accounts as $account) {
+                $account = trim($account);
+
+                // 账号已经存在
+                if (UserService::factory()->getUserObjByAccount($account)) {
+                    $exists[] = $account;
+                    continue;
+                }
+
+                $temp = [
+                    'name'  => '',
+                    'phone' => '',
+                    'email' => '',
+                    'login' => 't_' . VerifyUtil::getRandomCode(8, 3)
+                ];
+
+                if (VerifyUtil::checkPhone($account)) {
+                    $temp['phone'] = $account;
+                    $temp['name'] = $account;
+                } elseif (VerifyUtil::checkEmail($account)) {
+                    $temp['email'] = $account;
+                    $temp['name'] = $account;
+                } else {
+                    $temp['login'] = $account;
+                    $temp['name'] = $account;
+                }
+
+                $newAccounts[] = $temp;
+            }
+
+            // 成员入库
+            if ($newAccounts) {
+                UserService::factory()->batchCreateUser($this->companyID, $newAccounts);
+                ResponseUtil::jsonCORS([
+                    'status' => 0,
+                    'exists' => $existAccounts
+                ]);
+            }
+
+            ResponseUtil::jsonCORS([
+                'status' => 1,
+                'exists' => $existAccounts
+            ]);
+        }
+
+        return $this->render('import');
+    }
+
+    /**
+     * 删除用户
+     * @param $userID
+     * @throws ForbiddenHttpException
+     * @throws NotFoundHttpException
+     * @since 2018-01-30
+     */
+    public function actionDelete($userID)
+    {
+        $user = User::findOne(['id' => $userID]);
+        if (!$user) {
+            throw new NotFoundHttpException('用户数据有误');
+        }
+        if ($user->fdCompanyID != $this->companyID) {
+            throw new ForbiddenHttpException('这不是你公司的成员，你无权删除');
+        }
+        if ($user->fdStatus == Conf::USER_DISABLE) {
+            ResponseUtil::jsonCORS(null, Conf::SUCCESS);
+        }
+
+        $res = User::updateAll(['fdStatus' => Conf::USER_DISABLE], ['id' => $userID]) ? Conf::SUCCESS : Conf::FAILED;
+        ResponseUtil::jsonCORS(null, $res);
     }
 }

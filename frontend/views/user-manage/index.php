@@ -4,19 +4,16 @@ use yii\helpers\Url;
 use frontend\assets\AppAsset;
 
 AppAsset::registerJsFile($this, 'js/template.js');
-?>
 
-    <div class="box">
+$this->title = '用户管理';
+?>
+    <div class="box box-success" id="user-manage">
         <div class="box-header">
             <h3 class="box-title">用户管理</h3>
 
             <div class="box-tools">
                 <div class="input-group input-group-sm" style="width: 150px;">
-                    <input type="text" name="table_search" class="form-control pull-right" placeholder="Search">
-
-                    <div class="input-group-btn">
-                        <button type="submit" class="btn btn-default"><i class="fa fa-search"></i></button>
-                    </div>
+                    <a href="<?= Url::to(['user-manage/import']) ?>" class="btn-sm btn-danger pull-right" id="team-url">导入成员</a>
                 </div>
             </div>
         </div>
@@ -40,23 +37,41 @@ AppAsset::registerJsFile($this, 'js/template.js');
             <th>手机</th>
             <th>邮箱</th>
             <th>角色</th>
+            <th>状态</th>
             <th>所属团队</th>
             <th>创建时间</th>
-            <th>Reason</th>
+            <th>操作</th>
         </tr>
         <% for(var i = 0, len = list.length; i < len; i++) { %>
         <tr>
-            <td><%=list[i].id%>
-                <img width="40px" height="40" src="<%=list[i].portrait%>" class="img-circle" alt="User Image">
+            <td>
+                <a href="<?= Url::to(['user/profile']) ?>&userID=<%=list[i].id%>">
+                    <img width="40px" height="40px" src="<%=list[i].portrait%>" class="img-circle" alt="User Image">
+                </a>
             </td>
             <td><%=list[i].login%></td>
             <td><%=list[i].name%></td>
             <td><%=list[i].phone%></td>
             <td><%=list[i].email%></td>
-            <td><span class="label label-<%=list[i].style%>"><%=list[i].role%></span></td>
+            <td><%=list[i].role%></td>
+            <td>
+                <% if (list[i].status == "<?=\common\config\Conf::USER_FREEZE?>") { %>
+                <span class="label label-danger">冻结</span>
+                <% } else if (list[i].status == "<?=\common\config\Conf::USER_ENABLE?>") { %>
+                <span class="label label-success">正常</span>
+                <% } %>
+            </td>
             <td><%=list[i].team%></td>
             <td><%=list[i].create%></td>
-            <td></td>
+            <td>
+                <a href="<?= Url::to(['user/profile']) ?>&userID=<%=list[i].id%>" title="查看" aria-label="查看"
+                   data-pjax="0">
+                    <span class="glyphicon glyphicon-eye-open"></span></a>
+                <a href="<?= Url::to(['user-manage/delete']) ?>&userID=<%=list[i].id%>" title="删除" aria-label="删除"
+                   class="delete-user">
+                    <span class="glyphicon glyphicon-trash"></span>
+                </a>
+            </td>
         </tr>
         <% } %>
     </script>
@@ -64,9 +79,9 @@ AppAsset::registerJsFile($this, 'js/template.js');
     <script type="text/html" id="none-user-template">
         <div class="jumbotron">
             <p>
-            <p class="lead">现在还没有新任务，点击创建一个新任务试试吧.</p>
+            <p class="lead">现在还没有成员，点击导入成员吧.</p>
             <a class="btn btn-lg btn-success"
-               href="<?= \yii\helpers\Url::to(['user/create']) ?>&projectID=1&categoryID=<%=info.id%>">新建任务</a>
+               href="<?= Url::to(['user-manage/import']) ?>&projectID=1&categoryID=<%=info.id%>">导入成员</a>
             </p>
         </div>
     </script>
@@ -139,6 +154,31 @@ AppAsset::registerJsFile($this, 'js/template.js');
             }
 
             renderList({});
+
+            $('#user-manage').on('click', '.delete-user', function (e) {
+                // 删除用户
+                e.preventDefault();
+                if (!confirm('你确定要删除该用户吗？')) {
+                    return false;
+                }
+
+                var self = $(this);
+                var url = self.attr('href');
+                $.ajax({
+                    url: url,
+                    method: 'get',
+                    dataType: 'json'
+                }).done(function (data) {
+                    if (data.status === 1) {
+                        self.parent().parent().remove();
+                    } else {
+                        $.showBox('删除失败');
+                    }
+                }).fail(function (xhr, status, error) {
+                    var msg = xhr.responseText || '系统繁忙～';
+                    $.showBox(msg);
+                })
+            });
 
         })
         ;

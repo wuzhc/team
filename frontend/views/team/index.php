@@ -7,9 +7,9 @@ $directoryAsset = Yii::$app->assetManager->getPublishedUrl('@vendor/almasaeed201
 <div class="row" id="team-index">
     <div class="col-md-3">
         <?php if (Yii::$app->user->can('importUser')) { ?>
-        <div class="box box-solid">
-            <a href="<?= Url::to(['team/create'])?>" class="btn btn-success" style="width: 100%">新建团队</a>
-        </div>
+            <div class="box box-solid">
+                <a href="<?= Url::to(['team/create']) ?>" class="btn btn-success" style="width: 100%">新建团队</a>
+            </div>
         <?php } ?>
         <div class="box box-solid">
             <div class="box-header with-border">
@@ -187,16 +187,16 @@ $directoryAsset = Yii::$app->assetManager->getPublishedUrl('@vendor/almasaeed201
         function renderMembers(teamID) {
 
             $('#team-name').text(teamMemeberMap[teamID].name);
-            $('#team-url').attr('href', "<?= Url::to(['team/update'])?>&id="+teamID);
+            $('#team-url').attr('href', "<?= Url::to(['team/update'])?>&id=" + teamID);
 
             var portrait = '';
             var members = teamMemeberMap[teamID].members || [];
             for (var j = 0, mlen = members.length; j < mlen; j++) {
-                portrait += '<li>' +
+                portrait += '<li><a href="<?=Url::to(['user/profile'])?>&userID=' + members[j].id + '">' +
                     '<img src="' + members[j].portrait + '" alt="User Image" width="100px" height="100px">' +
                     '<a class="users-list-name" href="#">' + members[j].name + '</a>' +
                     '<span class="users-list-date">' + members[j].role + '</span>' +
-                    '</li>';
+                    '</a></li>';
             }
 
             if (!portrait) {

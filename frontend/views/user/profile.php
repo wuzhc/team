@@ -1,8 +1,8 @@
 <?php
-/* @var $username string */
-/* @var $portrait string */
+
 /* @var $user \common\models\User */
 
+use common\services\UserService;
 use frontend\assets\AdminLtePluginAsset;
 use frontend\assets\AppAsset;
 use yii\helpers\Url;
@@ -13,352 +13,360 @@ AdminLtePluginAsset::register($this);
 AppAsset::registerJsFile($this, 'js/template.js')
 
 ?>
-<div class="row" id="user-profile">
-    <div class="col-md-3">
+    <div class="row" id="user-profile">
+        <div class="col-md-3">
 
-        <!-- Profile Image -->
-        <div class="box box-success">
-            <div class="box-body box-profile">
-                <img class="profile-user-img img-responsive img-circle" src="<?=$portrait?>"
-                     alt="User profile picture">
+            <!-- Profile Image -->
+            <div class="box box-success">
+                <div class="box-body box-profile">
+                    <img class="profile-user-img img-responsive img-circle"
+                         src="<?= UserService::factory()->getUserPortrait($user) ?>"
+                         alt="User profile picture">
 
-                <h3 class="profile-username text-center"><?=Html::encode($username)?></h3>
+                    <h3 class="profile-username text-center"><?= Html::encode(UserService::factory()->getUserName($user)) ?></h3>
 
-                <p class="text-muted text-center"><?=Html::encode($user->fdPosition)?></p>
+                    <p class="text-muted text-center"><?= Html::encode($user->fdPosition) ?></p>
 
-                <ul class="list-group list-group-unbordered">
-                    <li class="list-group-item">
-                        <b>所有任务</b> <a class="pull-right" id="total-task">?</a>
-                    </li>
-                    <li class="list-group-item">
-                        <b>已完成任务</b> <a class="pull-right" id="complete-task">?</a>
-                    </li>
-                    <li class="list-group-item">
-                        <b>未完成任务</b> <a class="pull-right" id="unComplete-task">?</a>
-                    </li>
-                </ul>
+                    <ul class="list-group list-group-unbordered">
+                        <li class="list-group-item">
+                            <b>所有任务</b> <a class="pull-right" id="total-task">?</a>
+                        </li>
+                        <li class="list-group-item">
+                            <b>已完成任务</b> <a class="pull-right" id="complete-task">?</a>
+                        </li>
+                        <li class="list-group-item">
+                            <b>未完成任务</b> <a class="pull-right" id="unComplete-task">?</a>
+                        </li>
+                    </ul>
 
-                <a href="<?=Url::to(['default/index'])?>" class="btn btn-success btn-block">查看项目</a>
-            </div>
-            <!-- /.box-body -->
-        </div>
-        <!-- /.box -->
-
-        <!-- About Me Box -->
-        <div class="box box-success">
-            <div class="box-header with-border">
-                <h3 class="box-title">About Me</h3>
-            </div>
-            <!-- /.box-header -->
-            <div class="box-body">
-                <strong><i class="fa fa-book margin-r-5"></i> Education</strong>
-
-                <p class="text-muted">
-                    B.S. in Computer Science from the University of Tennessee at Knoxville
-                </p>
-
-                <hr>
-
-                <strong><i class="fa fa-map-marker margin-r-5"></i> Location</strong>
-
-                <p class="text-muted">Malibu, California</p>
-
-                <hr>
-
-                <strong><i class="fa fa-pencil margin-r-5"></i> Skills</strong>
-
-                <p>
-                    <span class="label label-danger">UI Design</span>
-                    <span class="label label-success">Coding</span>
-                    <span class="label label-info">Javascript</span>
-                    <span class="label label-warning">PHP</span>
-                    <span class="label label-primary">Node.js</span>
-                </p>
-
-                <hr>
-
-                <strong><i class="fa fa-file-text-o margin-r-5"></i> Notes</strong>
-
-                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam fermentum enim neque.</p>
-            </div>
-            <!-- /.box-body -->
-        </div>
-        <!-- /.box -->
-    </div>
-    <!-- /.col -->
-    <div class="col-md-9">
-        <div class="nav-tabs-custom">
-            <ul class="nav nav-tabs">
-                <li class="active"><a href="#activity" data-toggle="tab">我的任务</a></li>
-                <li><a href="#timeline" data-toggle="tab">动态</a></li>
-                <li><a href="#settings" data-toggle="tab">设置</a></li>
-            </ul>
-            <div class="tab-content">
-                <div class="active tab-pane" id="activity">
-                    <!-- /.box-header -->
-                    <div class="box-body no-padding">
-                        <div class="mailbox-controls">
-                            <!-- Single button -->
-                            <div class="btn-group">
-                                <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown"
-                                        aria-haspopup="true" aria-expanded="false">
-                                    任务进度 <span class="caret"></span>
-                                </button>
-                                <ul class="dropdown-menu">
-                                    <li><a href="#" data-type="stop">未处理</a></li>
-                                    <li><a href="#" data-type="begin">正在处理</a></li>
-                                    <li><a href="#" data-type="finish">已完成</a></li>
-                                </ul>
-                            </div>
-                            <a href="<?= Url::to(['task/index', 'projectID' => $_GET['projectID']]) ?>" id="task-fresh" title="刷新页面">
-                                <button type="button" class="btn btn-default btn-sm">
-                                    <i class="fa fa-refresh"></i>
-                                </button>
-                            </a>
-                            <div class="box-tools pull-right">
-                                <div class="has-feedback">
-                                    <input type="text" class="form-control input-sm" placeholder="Search Mail">
-                                    <span class="glyphicon glyphicon-search form-control-feedback"></span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="table-responsive mailbox-messages">
-                            <table class="table table-hover table-striped">
-                                <tbody id="task-list"></tbody>
-                            </table>
-                            <!-- /.table -->
-                        </div>
-                        <!-- /.mail-box-messages -->
-                    </div>
-                    <!-- /.box-body -->
-                    <div class="box-footer no-padding">
-                        <div class="mailbox-controls">
-                            <!-- /.btn-group -->
-                            <div class="pull-right">
-                                <span id="task-cur-page"></span>-<span id="task-total-page"></span>/<span
-                                        id="task-total"></span>
-                                <div class="btn-group">
-                                    <button type="button" class="btn btn-default btn-sm btn-prev"><i
-                                                class="fa fa-chevron-left"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-default btn-sm btn-next"><i
-                                                class="fa fa-chevron-right"></i>
-                                    </button>
-                                </div>
-                                <!-- /.btn-group -->
-                            </div>
-                            <!-- /.pull-right -->
-                        </div>
-                    </div>
+                    <a href="<?= Url::to(['default/index']) ?>" class="btn btn-success btn-block">查看项目</a>
                 </div>
-                <!-- /.tab-pane -->
-                <div class="tab-pane" id="timeline">
-                    <!-- The timeline -->
-                    <ul class="timeline timeline-inverse">
-                        <!-- timeline time label -->
-                        <li class="time-label">
+                <!-- /.box-body -->
+            </div>
+            <!-- /.box -->
+
+            <!-- About Me Box -->
+            <div class="box box-success">
+                <div class="box-header with-border">
+                    <h3 class="box-title">About Me</h3>
+                </div>
+                <!-- /.box-header -->
+                <div class="box-body">
+                    <strong><i class="fa fa-book margin-r-5"></i> Education</strong>
+
+                    <p class="text-muted">
+                        B.S. in Computer Science from the University of Tennessee at Knoxville
+                    </p>
+
+                    <hr>
+
+                    <strong><i class="fa fa-map-marker margin-r-5"></i> Location</strong>
+
+                    <p class="text-muted">Malibu, California</p>
+
+                    <hr>
+
+                    <strong><i class="fa fa-pencil margin-r-5"></i> Skills</strong>
+
+                    <p>
+                        <span class="label label-danger">UI Design</span>
+                        <span class="label label-success">Coding</span>
+                        <span class="label label-info">Javascript</span>
+                        <span class="label label-warning">PHP</span>
+                        <span class="label label-primary">Node.js</span>
+                    </p>
+
+                    <hr>
+
+                    <strong><i class="fa fa-file-text-o margin-r-5"></i> Notes</strong>
+
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam fermentum enim neque.</p>
+                </div>
+                <!-- /.box-body -->
+            </div>
+            <!-- /.box -->
+        </div>
+        <!-- /.col -->
+        <div class="col-md-9">
+            <div class="nav-tabs-custom">
+                <ul class="nav nav-tabs">
+                    <li class="active"><a href="#activity" data-toggle="tab">我的任务</a></li>
+                    <li><a href="#timeline" data-toggle="tab">动态</a></li>
+                    <li><a href="#settings" data-toggle="tab">设置</a></li>
+                </ul>
+                <div class="tab-content">
+                    <div class="active tab-pane" id="activity">
+                        <!-- /.box-header -->
+                        <div class="box-body no-padding">
+                            <div class="mailbox-controls">
+                                <!-- Single button -->
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown"
+                                            aria-haspopup="true" aria-expanded="false">
+                                        任务进度 <span class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a href="#" data-type="stop">未处理</a></li>
+                                        <li><a href="#" data-type="begin">正在处理</a></li>
+                                        <li><a href="#" data-type="finish">已完成</a></li>
+                                    </ul>
+                                </div>
+                                <a href="<?= Url::to(['task/index', 'projectID' => $_GET['projectID']]) ?>"
+                                   id="task-fresh" title="刷新页面">
+                                    <button type="button" class="btn btn-default btn-sm">
+                                        <i class="fa fa-refresh"></i>
+                                    </button>
+                                </a>
+                                <div class="box-tools pull-right">
+                                    <div class="has-feedback">
+                                        <input type="text" class="form-control input-sm" placeholder="Search Mail">
+                                        <span class="glyphicon glyphicon-search form-control-feedback"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="table-responsive mailbox-messages">
+                                <table class="table table-hover table-striped">
+                                    <tbody id="task-list"></tbody>
+                                </table>
+                                <!-- /.table -->
+                            </div>
+                            <!-- /.mail-box-messages -->
+                        </div>
+                        <!-- /.box-body -->
+                        <div class="box-footer no-padding">
+                            <div class="mailbox-controls">
+                                <!-- /.btn-group -->
+                                <div class="pull-right">
+                                    <span id="task-cur-page"></span>-<span id="task-total-page"></span>/<span
+                                            id="task-total"></span>
+                                    <div class="btn-group">
+                                        <button type="button" class="btn btn-default btn-sm btn-prev"><i
+                                                    class="fa fa-chevron-left"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-default btn-sm btn-next"><i
+                                                    class="fa fa-chevron-right"></i>
+                                        </button>
+                                    </div>
+                                    <!-- /.btn-group -->
+                                </div>
+                                <!-- /.pull-right -->
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /.tab-pane -->
+                    <div class="tab-pane" id="timeline">
+                        <!-- The timeline -->
+                        <ul class="timeline timeline-inverse">
+                            <!-- timeline time label -->
+                            <li class="time-label">
                         <span class="bg-red">
                           10 Feb. 2014
                         </span>
-                        </li>
-                        <!-- /.timeline-label -->
-                        <!-- timeline item -->
-                        <li>
-                            <i class="fa fa-envelope bg-blue"></i>
+                            </li>
+                            <!-- /.timeline-label -->
+                            <!-- timeline item -->
+                            <li>
+                                <i class="fa fa-envelope bg-blue"></i>
 
-                            <div class="timeline-item">
-                                <span class="time"><i class="fa fa-clock-o"></i> 12:05</span>
+                                <div class="timeline-item">
+                                    <span class="time"><i class="fa fa-clock-o"></i> 12:05</span>
 
-                                <h3 class="timeline-header"><a href="#">Support Team</a> sent you an email</h3>
+                                    <h3 class="timeline-header"><a href="#">Support Team</a> sent you an email</h3>
 
-                                <div class="timeline-body">
-                                    Etsy doostang zoodles disqus groupon greplin oooj voxy zoodles,
-                                    weebly ning heekya handango imeem plugg dopplr jibjab, movity
-                                    jajah plickers sifteo edmodo ifttt zimbra. Babblely odeo kaboodle
-                                    quora plaxo ideeli hulu weebly balihoo...
+                                    <div class="timeline-body">
+                                        Etsy doostang zoodles disqus groupon greplin oooj voxy zoodles,
+                                        weebly ning heekya handango imeem plugg dopplr jibjab, movity
+                                        jajah plickers sifteo edmodo ifttt zimbra. Babblely odeo kaboodle
+                                        quora plaxo ideeli hulu weebly balihoo...
+                                    </div>
+                                    <div class="timeline-footer">
+                                        <a class="btn btn-success btn-xs">Read more</a>
+                                        <a class="btn btn-danger btn-xs">Delete</a>
+                                    </div>
                                 </div>
-                                <div class="timeline-footer">
-                                    <a class="btn btn-success btn-xs">Read more</a>
-                                    <a class="btn btn-danger btn-xs">Delete</a>
+                            </li>
+                            <!-- END timeline item -->
+                            <!-- timeline item -->
+                            <li>
+                                <i class="fa fa-user bg-aqua"></i>
+
+                                <div class="timeline-item">
+                                    <span class="time"><i class="fa fa-clock-o"></i> 5 mins ago</span>
+
+                                    <h3 class="timeline-header no-border"><a href="#">Sarah Young</a> accepted your
+                                        friend request
+                                    </h3>
                                 </div>
-                            </div>
-                        </li>
-                        <!-- END timeline item -->
-                        <!-- timeline item -->
-                        <li>
-                            <i class="fa fa-user bg-aqua"></i>
+                            </li>
+                            <!-- END timeline item -->
+                            <!-- timeline item -->
+                            <li>
+                                <i class="fa fa-comments bg-yellow"></i>
 
-                            <div class="timeline-item">
-                                <span class="time"><i class="fa fa-clock-o"></i> 5 mins ago</span>
+                                <div class="timeline-item">
+                                    <span class="time"><i class="fa fa-clock-o"></i> 27 mins ago</span>
 
-                                <h3 class="timeline-header no-border"><a href="#">Sarah Young</a> accepted your
-                                    friend request
-                                </h3>
-                            </div>
-                        </li>
-                        <!-- END timeline item -->
-                        <!-- timeline item -->
-                        <li>
-                            <i class="fa fa-comments bg-yellow"></i>
+                                    <h3 class="timeline-header"><a href="#">Jay White</a> commented on your post</h3>
 
-                            <div class="timeline-item">
-                                <span class="time"><i class="fa fa-clock-o"></i> 27 mins ago</span>
-
-                                <h3 class="timeline-header"><a href="#">Jay White</a> commented on your post</h3>
-
-                                <div class="timeline-body">
-                                    Take me to your leader!
-                                    Switzerland is small and neutral!
-                                    We are more like Germany, ambitious and misunderstood!
+                                    <div class="timeline-body">
+                                        Take me to your leader!
+                                        Switzerland is small and neutral!
+                                        We are more like Germany, ambitious and misunderstood!
+                                    </div>
+                                    <div class="timeline-footer">
+                                        <a class="btn btn-warning btn-flat btn-xs">View comment</a>
+                                    </div>
                                 </div>
-                                <div class="timeline-footer">
-                                    <a class="btn btn-warning btn-flat btn-xs">View comment</a>
-                                </div>
-                            </div>
-                        </li>
-                        <!-- END timeline item -->
-                        <!-- timeline time label -->
-                        <li class="time-label">
+                            </li>
+                            <!-- END timeline item -->
+                            <!-- timeline time label -->
+                            <li class="time-label">
                         <span class="bg-green">
                           3 Jan. 2014
                         </span>
-                        </li>
-                        <!-- /.timeline-label -->
-                        <!-- timeline item -->
-                        <li>
-                            <i class="fa fa-camera bg-purple"></i>
+                            </li>
+                            <!-- /.timeline-label -->
+                            <!-- timeline item -->
+                            <li>
+                                <i class="fa fa-camera bg-purple"></i>
 
-                            <div class="timeline-item">
-                                <span class="time"><i class="fa fa-clock-o"></i> 2 days ago</span>
+                                <div class="timeline-item">
+                                    <span class="time"><i class="fa fa-clock-o"></i> 2 days ago</span>
 
-                                <h3 class="timeline-header"><a href="#">Mina Lee</a> uploaded new photos</h3>
+                                    <h3 class="timeline-header"><a href="#">Mina Lee</a> uploaded new photos</h3>
 
-                                <div class="timeline-body">
-                                    <img src="http://placehold.it/150x100" alt="..." class="margin">
-                                    <img src="http://placehold.it/150x100" alt="..." class="margin">
-                                    <img src="http://placehold.it/150x100" alt="..." class="margin">
-                                    <img src="http://placehold.it/150x100" alt="..." class="margin">
+                                    <div class="timeline-body">
+                                        <img src="http://placehold.it/150x100" alt="..." class="margin">
+                                        <img src="http://placehold.it/150x100" alt="..." class="margin">
+                                        <img src="http://placehold.it/150x100" alt="..." class="margin">
+                                        <img src="http://placehold.it/150x100" alt="..." class="margin">
+                                    </div>
+                                </div>
+                            </li>
+                            <!-- END timeline item -->
+                            <li>
+                                <i class="fa fa-clock-o bg-gray"></i>
+                            </li>
+                        </ul>
+                    </div>
+                    <!-- /.tab-pane -->
+
+                    <div class="tab-pane" id="settings">
+                        <form class="form-horizontal">
+                            <div class="form-group">
+                                <label for="inputName" class="col-sm-2 control-label">Name</label>
+
+                                <div class="col-sm-10">
+                                    <input type="email" class="form-control" id="inputName" placeholder="Name">
                                 </div>
                             </div>
-                        </li>
-                        <!-- END timeline item -->
-                        <li>
-                            <i class="fa fa-clock-o bg-gray"></i>
-                        </li>
-                    </ul>
-                </div>
-                <!-- /.tab-pane -->
+                            <div class="form-group">
+                                <label for="inputEmail" class="col-sm-2 control-label">Email</label>
 
-                <div class="tab-pane" id="settings">
-                    <form class="form-horizontal">
-                        <div class="form-group">
-                            <label for="inputName" class="col-sm-2 control-label">Name</label>
-
-                            <div class="col-sm-10">
-                                <input type="email" class="form-control" id="inputName" placeholder="Name">
+                                <div class="col-sm-10">
+                                    <input type="email" class="form-control" id="inputEmail" placeholder="Email">
+                                </div>
                             </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="inputEmail" class="col-sm-2 control-label">Email</label>
+                            <div class="form-group">
+                                <label for="inputName" class="col-sm-2 control-label">Name</label>
 
-                            <div class="col-sm-10">
-                                <input type="email" class="form-control" id="inputEmail" placeholder="Email">
+                                <div class="col-sm-10">
+                                    <input type="text" class="form-control" id="inputName" placeholder="Name">
+                                </div>
                             </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="inputName" class="col-sm-2 control-label">Name</label>
+                            <div class="form-group">
+                                <label for="inputExperience" class="col-sm-2 control-label">Experience</label>
 
-                            <div class="col-sm-10">
-                                <input type="text" class="form-control" id="inputName" placeholder="Name">
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="inputExperience" class="col-sm-2 control-label">Experience</label>
-
-                            <div class="col-sm-10">
+                                <div class="col-sm-10">
                                     <textarea class="form-control" id="inputExperience"
                                               placeholder="Experience"></textarea>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="inputSkills" class="col-sm-2 control-label">Skills</label>
-
-                            <div class="col-sm-10">
-                                <input type="text" class="form-control" id="inputSkills" placeholder="Skills">
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <div class="col-sm-offset-2 col-sm-10">
-                                <div class="checkbox">
-                                    <label>
-                                        <input type="checkbox"> I agree to the <a href="#">terms and conditions</a>
-                                    </label>
                                 </div>
                             </div>
-                        </div>
-                        <div class="form-group">
-                            <div class="col-sm-offset-2 col-sm-10">
-                                <button type="submit" class="btn btn-danger">Submit</button>
+                            <div class="form-group">
+                                <label for="inputSkills" class="col-sm-2 control-label">Skills</label>
+
+                                <div class="col-sm-10">
+                                    <input type="text" class="form-control" id="inputSkills" placeholder="Skills">
+                                </div>
                             </div>
-                        </div>
-                    </form>
+                            <div class="form-group">
+                                <div class="col-sm-offset-2 col-sm-10">
+                                    <div class="checkbox">
+                                        <label>
+                                            <input type="checkbox"> I agree to the <a href="#">terms and conditions</a>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-offset-2 col-sm-10">
+                                    <button type="submit" class="btn btn-danger">Submit</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <!-- /.tab-pane -->
                 </div>
-                <!-- /.tab-pane -->
+                <!-- /.tab-content -->
             </div>
-            <!-- /.tab-content -->
+            <!-- /.nav-tabs-custom -->
         </div>
-        <!-- /.nav-tabs-custom -->
+        <!-- /.col -->
     </div>
-    <!-- /.col -->
-</div>
 
-<script type="text/html" id="task-template">
-    <% for(var i = 0, len = list.length; i < len; i++) { %>
-    <tr>
-        <td title="标记为完成任务"><input type="checkbox" value="<%=list[i].id%>" <% if (list[i].progress == 2) { %>
-            checked=true <% } %>>
-        </td>
-        <td class="mailbox-subject">
-            <a href="<?= Url::to(['task/view', 'projectID' => $_GET['projectID']])?>&taskID=<%=list[i].id%>&categoryID=<%=list[i].categoryID%>" class="text-black" title="<%=list[i].originName%>">
-                <i class="fa fa-circle-o <%=list[i].level%>"></i>&nbsp;&nbsp;
-                <%=list[i].name%>
-            </a>
-        </td>
-        <td class="mailbox-date"><%=list[i].create%></td>
-        <td class="mailbox-attachment">
-            <% if (list[i].progress == 0) { %>
-            <a href="javascript:void(0)" class="text-success" data-id="<%=list[i].id%>">
-                <i class="fa fa-circle" title="点击开始任务"></i>
-            </a>
-            <% } else if (list[i].progress == 1) { %>
-            <a href="javascript:void(0)" class="text-red" data-id="<%=list[i].id%>">
-                <i class="fa fa-play" title="点击停止任务"></i>
-            </a>
-            <% } %>
-        </td>
-        <td>
-            <a href="javascript:void(0)" class="text-muted" data-id="<%=list[i].id%>">
-                <i class="fa fa-trash-o" title="删除任务"></i>
-            </a>
-        </td>
-        <td>
-            <a href="<?=Url::to(['task/update', 'projectID' => $_GET['projectID']])?>&categoryID=<%=list[i].categoryID%>&taskID=<%=list[i].id%>" class="text-muted">
-                <i class="fa fa-edit" title="编辑任务"></i>
-            </a>
-        </td>
-    </tr>
-    <% } %>
-</script>
+    <script type="text/html" id="task-template">
+        <% for(var i = 0, len = list.length; i < len; i++) { %>
+        <tr>
+            <td title="标记为完成任务"><input type="checkbox" value="<%=list[i].id%>" <% if (list[i].progress == 2) { %>
+                checked=true <% } %>>
+            </td>
+            <td class="mailbox-subject">
+                <a href="<?= Url::to([
+                    'task/view',
+                    'projectID' => $_GET['projectID']
+                ]) ?>&taskID=<%=list[i].id%>&categoryID=<%=list[i].categoryID%>" class="text-black"
+                   title="<%=list[i].originName%>">
+                    <i class="fa fa-circle-o <%=list[i].level%>"></i>&nbsp;&nbsp;
+                    <%=list[i].name%>
+                </a>
+            </td>
+            <td class="mailbox-date"><%=list[i].create%></td>
+            <td class="mailbox-attachment">
+                <% if (list[i].progress == 0) { %>
+                <a href="javascript:void(0)" class="text-success" data-id="<%=list[i].id%>">
+                    <i class="fa fa-circle" title="点击开始任务"></i>
+                </a>
+                <% } else if (list[i].progress == 1) { %>
+                <a href="javascript:void(0)" class="text-red" data-id="<%=list[i].id%>">
+                    <i class="fa fa-play" title="点击停止任务"></i>
+                </a>
+                <% } %>
+            </td>
+            <td>
+                <a href="javascript:void(0)" class="text-muted" data-id="<%=list[i].id%>">
+                    <i class="fa fa-trash-o" title="删除任务"></i>
+                </a>
+            </td>
+            <td>
+                <a href="<?= Url::to([
+                    'task/update',
+                    'projectID' => $_GET['projectID']
+                ]) ?>&categoryID=<%=list[i].categoryID%>&taskID=<%=list[i].id%>" class="text-muted">
+                    <i class="fa fa-edit" title="编辑任务"></i>
+                </a>
+            </td>
+        </tr>
+        <% } %>
+    </script>
 
-<script type="text/html" id="none-task-template">
-    <div class="jumbotron">
-        <p>
-        <p class="lead">现在还没有新任务，点击创建一个新任务试试吧.</p>
-        <a class="btn btn-lg btn-success"
-           href="<?= \yii\helpers\Url::to(['task/create']) ?>&projectID=1&categoryID=<%=info.id%>">新建任务</a>
-        </p>
-    </div>
-</script>
+    <script type="text/html" id="none-task-template">
+        <div class="jumbotron">
+            <p>
+            <p class="lead"><?= Html::encode(UserService::factory()->getUserName($user)) ?>现在还没有任务，可以进入项目里创建任务啊.</p>
+            <a class="btn btn-sm btn-success" href="<?= \yii\helpers\Url::to(['default/index']) ?>">进入项目</a>
+            </p>
+        </div>
+    </script>
 
     <script>
         <?php $this->beginBlock('profile') ?>
@@ -528,21 +536,21 @@ AppAsset::registerJsFile($this, 'js/template.js')
                 })
             }
 
-            var ajaxBort = null;
+            var ajaxAbort = null;
 
             // 渲染列表
             function renderList(options) {
                 var params = $.extend({
                     totalInit: 1,
-                    pageSize: 10,
+                    pageSize: 15,
                     page: curPage,
                     categoryID: categoryID,
-                    me: 1,
+                    userID: "<?=$user->id?>"
                 }, options);
                 var url = "<?=\yii\helpers\Url::to(['user/tasks'])?>";
 
-                ajaxBort && ajaxBort.abort();
-                ajaxBort = $.ajax({
+                ajaxAbort && ajaxAbort.abort();
+                ajaxAbort = $.ajax({
                     type: 'GET',
                     url: url,
                     data: params,
@@ -552,9 +560,9 @@ AppAsset::registerJsFile($this, 'js/template.js')
                     // 页码设置
                     $('#task-cur-page').text(curPage);
                     if (params.totalInit === 1) {
-                        if (data.data.total > 0) {
-                            totalPage = (data.data.total / params.pageSize).toFixed(0);
-                            $('#task-total').text(data.data.total);
+                        if (data.total > 0) {
+                            totalPage = (data.total / params.pageSize).toFixed(0);
+                            $('#task-total').text(data.total);
                             $('#task-total-page').text(totalPage);
                         } else {
                             $('#task-total').text(0);
@@ -576,10 +584,7 @@ AppAsset::registerJsFile($this, 'js/template.js')
                         $('.btn-next').removeAttr('disabled');
                     }
 
-                    // 刷新页面
-                    $('#task-fresh').attr('href', "<?= Url::to(['task/index', 'me' => $_GET['me']])?>");
-
-                    var list = data.data.list || [];
+                    var list = data.list || [];
                     var len = list.length;
                     var html = '';
                     if (len > 0) {
@@ -590,7 +595,7 @@ AppAsset::registerJsFile($this, 'js/template.js')
                             radioClass: 'iradio_flat-green'
                         });
                     } else {
-                        html = template.render('none-task-template', {info: info});
+                        html = template.render('none-task-template');
                         $('#task-list').html(html);
                     }
                 }).fail(function (xhr, status, error) {
@@ -602,7 +607,7 @@ AppAsset::registerJsFile($this, 'js/template.js')
             renderList({});
 
             // 总数
-            (function(){
+            (function () {
                 $.ajax({
                     type: 'GET',
                     url: "<?=Url::to(['user/stat-tasks'])?>",

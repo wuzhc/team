@@ -14,6 +14,13 @@ return [
         '3' => '帐号被冻结'
     ],
 
+    // 用户状态
+    'userStatus' => [
+        Conf::USER_DISABLE => '已删除',
+        Conf::USER_ENABLE => '正常',
+        Conf::USER_FREEZE => '冻结',
+    ],
+
     // 任务等级样式类
     'taskLevel' => [
         0 => 'text-yellow',
