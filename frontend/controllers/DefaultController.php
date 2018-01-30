@@ -73,7 +73,6 @@ class DefaultController extends BaseController
      */
     public function actionIndex()
     {
-        throw new ForbiddenHttpException('sss');
         // 所有总数
         $records = TaskService::factory()->findTaskCriteria([
             'group'     => 'fdProjectID',
@@ -168,27 +167,5 @@ class DefaultController extends BaseController
         $data = $data ? json_decode($data, true) : array();
         Yii::$app->session->set('showbox', null);
         ResponseUtil::jsonCORS($data);
-    }
-
-    public function actionT()
-    {
-        HttpClient::request('http://localhost:2121/?action=dynamic', 'post', [
-            'title'    => '啊牛管理员把任务指派给张飞',
-            'content'  => '班级：完善资料页面的任教班级中，增加【设置】按钮，教师可自行增删',
-            'portrait' => Yii::$app->params['defaultPortrait'][rand(0, 10)],
-            'to'       => 9,
-            'type'     => 'publish',
-            'typeID'   => Conf::MSG_HANDLE,
-            'companyID' => 1
-        ]);
-    }
-
-    public function actionE()
-    {
-        $key = 'wuzhc';
-        $res = Yii::$app->getSecurity()->encryptByKey('123456', $key);
-
-        echo Yii::$app->getSecurity()->decryptByKey($res, $key);
-//        echo base64_encode($res);
     }
 }
