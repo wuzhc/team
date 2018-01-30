@@ -3,14 +3,15 @@
 namespace common\services;
 
 
+use Yii;
 use yii\web\Controller;
 
-class CommonService extends AbstractService
+class SystemService extends AbstractService
 {
     /**
      * Returns the static model.
      * @param string $className Service class name.
-     * @return CommonService the static model class
+     * @return SystemService the static model class
      */
     public static function factory($className = __CLASS__)
     {

@@ -4,6 +4,7 @@ namespace common\services;
 
 
 use common\config\Conf;
+use common\utils\HttpClient;
 use MongoDB\BSON\UTCDateTime;
 use Yii;
 use yii\helpers\Html;
@@ -130,7 +131,6 @@ class MsgService extends AbstractService
     {
         $data = [];
 
-
         foreach ($this->findMessage($args)->all() as $row) {
             $temp = [];
             $temp['url'] = $row['url'];
@@ -195,5 +195,30 @@ class MsgService extends AbstractService
         }
 
         return $obj->where($condition)->orderBy(['date' => SORT_DESC]);
+    }
+
+    /**
+     * 即时推送
+     * @param string $action 动作，dynamic表示动态，message表示消息
+     * @param array $args 具体参数参考文档
+     * @since 2018-01-30
+     */
+    public function push($action, array $args)
+    {
+        $args = array_merge($args, [
+            'action' => $action,
+            'token' => $this->encrypt(serialize($args))
+        ]);
+        HttpClient::request(PUSH_MSG_REQUEST_URL, 'post', $args);
+    }
+
+    public function encrypt($data)
+    {
+        Yii::$app->security->encryptByKey($data, PUSH_MSG_SECRET);
+    }
+
+    public function decrypt($str)
+    {
+        Yii::$app->security->decryptByKey($str, PUSH_MSG_SECRET);
     }
 }

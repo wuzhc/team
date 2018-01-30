@@ -23,12 +23,13 @@ class HttpClient
      * @param array $data 请求参数
      * @param array $options 请求选项
      * @return string
+     * @since 2018-01-28
      */
     public static function request($url, $method = 'get', $data = [], $options = [])
     {
         $client = new Client();
 
-        // 请求选项，如果自己设置，则默认值会被覆盖
+        // 默认请求选项，如果自己设置，则默认值会被覆盖
         $options = array_merge([
             'debug'       => false, // 调试模式
             'timeout'     => 5, // 请求超时时间，0表示无限制
@@ -50,7 +51,7 @@ class HttpClient
             if ($response->getStatusCode() == 200) {
                 return $response->getBody()->getContents();
             } else {
-                return '';
+                return ''; // http_errors 设置为true时会自动抛出异常
             }
         } catch (RequestException $e) {
             var_dump($e->getCode(), $e->getMessage());

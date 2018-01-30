@@ -111,23 +111,23 @@ class LogService extends AbstractService
         }
 
         // 操作对象
-        if (!empty($args['targetID'])) {
-            $data['targetID'] = (int)$args['targetID'];
+        if (!empty($args['objectID'])) {
+            $data['objectID'] = (int)$args['objectID'];
         } else {
             if (YII_DEBUG) {
-                Yii::$app->end('targetID empty');
+                Yii::$app->end('objectID empty');
             }
             return false;
         }
 
-        // 操作对象类型 see Yii::$app->params['handleTargetType']
-        if (!empty($args['targetType']) &&
-            in_array($args['targetType'], array_keys(Yii::$app->params['handleTargetType']))
+        // 操作对象类型 see Yii::$app->params['handleObjectType']
+        if (!empty($args['objectType']) &&
+            in_array($args['objectType'], array_keys(Yii::$app->params['handleObjectType']))
         ) {
-            $data['targetType'] = (int)$args['targetType'];
+            $data['objectType'] = (int)$args['objectType'];
         } else {
             if (YII_DEBUG) {
-                Yii::$app->end('targetType empty or error');
+                Yii::$app->end('objectType empty or error');
             }
             return false;
         }
@@ -155,11 +155,11 @@ class LogService extends AbstractService
         if (!empty($args['end'])) {
             $condition['date']['$lt'] = new UTCDateTime($args['end'] * 1000);
         }
-        if (!empty($args['targetID'])) {
-            $condition['targetID'] = (int)$args['targetID'];
+        if (!empty($args['objectID'])) {
+            $condition['objectID'] = (int)$args['objectID'];
         }
-        if (!empty($args['targetType'])) {
-            $condition['targetType'] = (int)$args['targetType'];
+        if (!empty($args['objectType'])) {
+            $condition['objectType'] = (int)$args['objectType'];
         }
         if (!empty($args['companyID'])) {
             $condition['companyID'] = (int)$args['companyID'];

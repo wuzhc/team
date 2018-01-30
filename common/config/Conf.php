@@ -43,13 +43,12 @@ class Conf
     /** 默认用户头像 */
     const USER_PORTRAIT = 'http://file.cnweike.cn/content/0/0/0/251/255072.png?r=1516088302';
 
-    /** 操作常量定义 */
-    /*target 操作目标类型*/
-    const TARGET_PROJECT = 1; // 项目
-    const TARGET_TEAM = 2; // 团队
-    const TARGET_USER = 3; // 用户
-    const TARGET_TASK = 4; // 任务
-    const TARGET_DOC = 5; // 文档
+    /** 操作对象 */
+    const OBJECT_PROJECT = 1; // 项目
+    const OBJECT_TEAM = 2; // 团队
+    const OBJECT_USER = 3; // 用户
+    const OBJECT_TASK = 4; // 任务
+    const OBJECT_DOC = 5; // 文档
 
     /** 消息通知 */
     const MSG_SYSTEM = 1; // 系统通知

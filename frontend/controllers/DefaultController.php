@@ -180,4 +180,13 @@ class DefaultController extends BaseController
             'companyID' => 1
         ]);
     }
+
+    public function actionE()
+    {
+        $key = 'wuzhc';
+        $res = Yii::$app->getSecurity()->encryptByKey('123456', $key);
+
+        echo Yii::$app->getSecurity()->decryptByKey($res, $key);
+//        echo base64_encode($res);
+    }
 }

@@ -103,11 +103,10 @@ class PushMsgController extends Controller
             $httpWorker = new Worker('http://0.0.0.0:2121');
             // 当http客户端发来数据时触发
             $httpWorker->onMessage = function ($conn, $data) use ($io, $redis) {
-                $response = [];
                 $_POST = $_POST ? $_POST : $_GET;
                 switch (@$_POST['action']) {
-                    case 'publish':
-                        $to = 'uid:' . @$_POST['to'];
+                    case 'message':
+                        $to = 'uid:' . @$_POST['receiverID'];
                         $_POST['content'] = htmlspecialchars(@$_POST['content']);
                         $_POST['title'] = htmlspecialchars(@$_POST['title']);
 

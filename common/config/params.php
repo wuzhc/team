@@ -67,8 +67,8 @@ return [
     // 颜色样式类2
     'colorTwo' => [
         'danger',
-        'success',
         'warning',
+        'success',
         'primary'
     ],
 
@@ -107,11 +107,11 @@ return [
     ],
 
     // 操作目标类型
-    'handleTargetType' => [
-        Conf::TARGET_PROJECT => '项目',
-        Conf::TARGET_TEAM    => '团队',
-        Conf::TARGET_USER    => '用户',
-        Conf::TARGET_TASK    => '任务',
-        Conf::TARGET_DOC     => '文档',
+    'handleObjectType' => [
+        Conf::OBJECT_PROJECT => '项目',
+        Conf::OBJECT_TEAM    => '团队',
+        Conf::OBJECT_USER    => '用户',
+        Conf::OBJECT_TASK    => '任务',
+        Conf::OBJECT_DOC     => '文档',
     ],
 ];

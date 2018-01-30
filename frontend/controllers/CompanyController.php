@@ -3,7 +3,7 @@
 namespace frontend\controllers;
 
 use common\config\Conf;
-use common\services\CommonService;
+use common\services\SystemService;
 use common\services\UserService;
 use common\utils\ResponseUtil;
 use common\utils\VerifyUtil;

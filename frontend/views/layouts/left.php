@@ -38,6 +38,7 @@ $identify = Yii::$app->user->identity;
                     ['label' => '团队', 'icon' => 'fa fa-group', 'url' => ['/team/index']],
                     ['label' => '任务', 'icon' => 'dashboard', 'url' => ['/task/index','projectID' => 1]],
                     ['label' => '项目', 'icon' => 'dashboard', 'url' => ['/project/index'], 'visible' => ($identify->fdRoleID === \common\config\Conf::ROLE_SUPER || $identify->fdRoleID === \common\config\Conf::ROLE_ADMIN)],
+                    ['label' => '成员', 'icon' => 'dashboard', 'url' => ['/user-manage/index'], 'visible' => ($identify->fdRoleID === \common\config\Conf::ROLE_SUPER || $identify->fdRoleID === \common\config\Conf::ROLE_ADMIN)],
                     ['label' => 'Login', 'url' => ['site/login'], 'visible' => Yii::$app->user->isGuest],
                     [
                         'label' => 'Some tools',

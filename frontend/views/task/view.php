@@ -141,7 +141,7 @@ $directoryAsset = Yii::$app->assetManager->getPublishedUrl('@vendor/almasaeed201
                 $.ajax({
                     url: "<?= Url::to(['task/assign'])?>",
                     method: 'POST',
-                    dataType: 'JSON',
+                    dataType: 'json',
                     data: {
                         taskID: taskID,
                         acceptor: acceptor,
@@ -160,6 +160,7 @@ $directoryAsset = Yii::$app->assetManager->getPublishedUrl('@vendor/almasaeed201
                         $.showBox({msg: '指派失败'});
                     }
                 }).fail(function (xhr, status, error) {
+                    console.log(error);
                     $('#assign-task').modal('hide');
                     var msg = xhr.responseText || '系统繁忙';
                     $.showBox({msg: msg});

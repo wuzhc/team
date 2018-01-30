@@ -199,10 +199,10 @@ class TaskController extends BaseController
 
                 // 保存操作日志
                 LogService::factory()->saveHandleLog([
-                    'targetID'   => $taskID,
+                    'objectID'   => $taskID,
                     'companyID'  => $this->companyID,
                     'operatorID' => $userID,
-                    'targetType' => Conf::TARGET_TASK,
+                    'objectType' => Conf::OBJECT_TASK,
                     'content'    => $content,
                     'url'        => $url,
                     'title'      => $title,
@@ -210,18 +210,16 @@ class TaskController extends BaseController
                     'operator'   => $username
                 ]);
 
-                // 推送内容
-                HttpClient::request(PUSH_MSG_HTTP_REQUEST . '?action=dynamic', 'post', [
-                    'targetID'   => $taskID,
+                // 动态推送
+                MsgService::factory()->push('dynamic', [
                     'companyID'  => $this->companyID,
-                    'operatorID' => Yii::$app->user->id,
-                    'targetType' => Conf::TARGET_TASK,
+                    'operatorID' => $userID,
+                    'operator'   => $username,
+                    'portrait'   => $portrait,
+                    'title'      => $title,
                     'content'    => $content,
                     'url'        => $url,
-                    'title'      => $title,
-                    'portrait'   => $portrait,
                     'date'       => date('Y-m-d H:i:s'),
-                    'operator'   => $username
                 ]);
 
                 ResponseUtil::jsonCORS(null, Conf::SUCCESS, '创建成功');
@@ -282,10 +280,10 @@ class TaskController extends BaseController
 
                 // 保存操作日志
                 LogService::factory()->saveHandleLog([
-                    'targetID'   => $taskID,
+                    'objectID'   => $taskID,
                     'companyID'  => $this->companyID,
                     'operatorID' => $userID,
-                    'targetType' => Conf::TARGET_TASK,
+                    'objectType' => Conf::OBJECT_TASK,
                     'content'    => $content,
                     'url'        => $url,
                     'title'      => $title,
@@ -293,18 +291,16 @@ class TaskController extends BaseController
                     'operator'   => $username
                 ]);
 
-                // 推送内容
-                HttpClient::request(PUSH_MSG_HTTP_REQUEST . '?action=dynamic', 'post', [
-                    'targetID'   => $taskID,
+                // 动态推送
+                MsgService::factory()->push('dynamic', [
                     'companyID'  => $this->companyID,
-                    'operatorID' => Yii::$app->user->id,
-                    'targetType' => Conf::TARGET_TASK,
+                    'operatorID' => $userID,
+                    'operator'   => $username,
+                    'portrait'   => $portrait,
+                    'title'      => $title,
                     'content'    => $content,
                     'url'        => $url,
-                    'title'      => $title,
-                    'portrait'   => $portrait,
                     'date'       => date('Y-m-d H:i:s'),
-                    'operator'   => $username
                 ]);
             }
 
@@ -338,7 +334,7 @@ class TaskController extends BaseController
 
         $logs = LogService::factory()->getHandleLogs([
             'target'     => (int)$task->id,
-            'targetType' => Conf::TARGET_TASK
+            'objectType' => Conf::OBJECT_TASK
         ]);
 
         $members = ProjectService::factory()->getHasJoinProjectMembers($task->fdProjectID);
@@ -394,10 +390,10 @@ class TaskController extends BaseController
 
         // 保存操作日志
         LogService::factory()->saveHandleLog([
-            'targetID'   => $taskID,
+            'objectID'   => $taskID,
             'companyID'  => $this->companyID,
             'operatorID' => $userID,
-            'targetType' => Conf::TARGET_TASK,
+            'objectType' => Conf::OBJECT_TASK,
             'content'    => $content,
             'url'        => $url,
             'title'      => $title,
@@ -406,17 +402,15 @@ class TaskController extends BaseController
         ]);
 
         // 推送动态
-        HttpClient::request(PUSH_MSG_HTTP_REQUEST . '?action=dynamic', 'post', [
-            'targetID'   => $taskID,
+        MsgService::factory()->push('dynamic', [
             'companyID'  => $this->companyID,
             'operatorID' => $userID,
-            'targetType' => Conf::TARGET_TASK,
+            'operator'   => $username,
             'content'    => $content,
             'url'        => $url,
             'title'      => $title,
             'portrait'   => $portrait,
             'date'       => date('Y-m-d H:i:s'),
-            'operator'   => $username
         ]);
 
         ResponseUtil::jsonCORS(null, Conf::SUCCESS);
@@ -468,11 +462,11 @@ class TaskController extends BaseController
 
             // 保存操作日志
             LogService::factory()->saveHandleLog([
-                'targetID'   => $taskID,
+                'objectID'   => $taskID,
                 'companyID'  => $this->companyID,
                 'operatorID' => $userID,
                 'receiverID' => $receiverID,
-                'targetType' => Conf::TARGET_TASK,
+                'objectType' => Conf::OBJECT_TASK,
                 'content'    => $content,
                 'url'        => $url,
                 'title'      => $title,
@@ -492,28 +486,31 @@ class TaskController extends BaseController
                 'portrait'   => $portrait
             ]);
 
-            // 消息及时推送
-            HttpClient::request(PUSH_MSG_HTTP_REQUEST . '/?action=publish', 'post', [
-                'title'    => $title,
-                'content'  => $content,
-                'portrait' => $portrait,
-                'to'       => $receiverID,
-                'typeID'   => Conf::MSG_HANDLE
-            ]);
-
-            // 推送动态
-            HttpClient::request(PUSH_MSG_HTTP_REQUEST . '?action=dynamic', 'post', [
-                'targetID'   => $taskID,
-                'companyID'  => $this->companyID,
+            // 消息推送
+            MsgService::factory()->push('message', [
                 'operatorID' => $userID,
-                'targetType' => Conf::TARGET_TASK,
+                'operator'   => $username,
+                'receiverID' => $receiverID,
+                'portrait'   => $portrait,
+                'title'      => $title,
                 'content'    => $content,
                 'url'        => $url,
-                'title'      => $title,
-                'portrait'   => $portrait,
-                'date'       => date('Y-m-d H:i:s'),
-                'operator'   => $username
+                'typeID'     => Conf::MSG_HANDLE,
             ]);
+
+            // 动态推送
+            MsgService::factory()->push('dynamic', [
+                'companyID'  => $this->companyID,
+                'operatorID' => $userID,
+                'operator'   => $username,
+                'portrait'   => $portrait,
+                'title'      => $title,
+                'content'    => $content,
+                'url'        => $url,
+                'date'       => date('Y-m-d H:i:s'),
+            ]);
+
+            ResponseUtil::jsonCORS(null, Conf::SUCCESS);
         }
     }
 
@@ -590,7 +587,7 @@ class TaskController extends BaseController
 
             if ($task->fdProgress == Conf::TASK_FINISH) {
                 $attribute['fdProgress'] = Conf::TASK_STOP;
-                $title = '暂停了任务';
+                $title = '重新开始了任务';
             } else {
                 $attribute['fdProgress'] = Conf::TASK_FINISH;
                 $title = '完成了任务';
@@ -615,10 +612,10 @@ class TaskController extends BaseController
 
             // 保存操作日志
             LogService::factory()->saveHandleLog([
-                'targetID'   => $taskID,
+                'objectID'   => $taskID,
                 'companyID'  => $this->companyID,
                 'operatorID' => $userID,
-                'targetType' => Conf::TARGET_TASK,
+                'objectType' => Conf::OBJECT_TASK,
                 'content'    => $content,
                 'url'        => $url,
                 'title'      => $title,
@@ -626,18 +623,16 @@ class TaskController extends BaseController
                 'operator'   => $username
             ]);
 
-            // 推送动态
-            HttpClient::request(PUSH_MSG_HTTP_REQUEST . '?action=dynamic', 'post', [
-                'targetID'   => $taskID,
+            // 动态推送
+            MsgService::factory()->push('dynamic', [
                 'companyID'  => $this->companyID,
                 'operatorID' => $userID,
-                'targetType' => Conf::TARGET_TASK,
+                'operator'   => $username,
+                'portrait'   => $portrait,
+                'title'      => $title,
                 'content'    => $content,
                 'url'        => $url,
-                'title'      => $title,
-                'portrait'   => $portrait,
                 'date'       => date('Y-m-d H:i:s'),
-                'operator'   => $username
             ]);
 
             ResponseUtil::jsonCORS(['action' => $action]);
@@ -682,7 +677,7 @@ class TaskController extends BaseController
                 $attribute['fdProgress'] = Conf::TASK_STOP;
                 $title = '暂停了任务';
             } else {
-                throw new ForbiddenHttpException('禁止操作');
+                throw new ForbiddenHttpException('操作失败');
             }
 
             // 更新任务进度
@@ -706,10 +701,10 @@ class TaskController extends BaseController
 
             // 保存操作日志
             LogService::factory()->saveHandleLog([
-                'targetID'   => $taskID,
+                'objectID'   => $taskID,
                 'companyID'  => $this->companyID,
                 'operatorID' => $userID,
-                'targetType' => Conf::TARGET_TASK,
+                'objectType' => Conf::OBJECT_TASK,
                 'content'    => $content,
                 'url'        => $url,
                 'title'      => $title,
@@ -717,20 +712,17 @@ class TaskController extends BaseController
                 'operator'   => $username
             ]);
 
-            // 推送动态
-            HttpClient::request(PUSH_MSG_HTTP_REQUEST . '?action=dynamic', 'post', [
-                'targetID'   => $taskID,
+            // 动态推送
+            MsgService::factory()->push('dynamic', [
                 'companyID'  => $this->companyID,
                 'operatorID' => $userID,
-                'targetType' => Conf::TARGET_TASK,
+                'operator'   => $username,
+                'portrait'   => $portrait,
+                'title'      => $title,
                 'content'    => $content,
                 'url'        => $url,
-                'title'      => $title,
-                'portrait'   => $portrait,
                 'date'       => date('Y-m-d H:i:s'),
-                'operator'   => $username
             ]);
-
 
             ResponseUtil::jsonCORS(['action' => $action]);
         }
@@ -753,4 +745,5 @@ class TaskController extends BaseController
 
         return $data;
     }
+
 }

@@ -7,7 +7,10 @@ define('MONGO_PORT', '27017');
 define('MONGO_DB', 'team');
 
 /** 消息推送请求地址 */
-define('PUSH_MSG_HTTP_REQUEST', 'http://localhost:2121');
+define('PUSH_MSG_REQUEST_URL', 'http://localhost:2121');
+
+/** 消息推送秘钥 */
+define('PUSH_MSG_SECRET', 'lfweixlwEFW2');
 
 return [
     'name' => 'Team',

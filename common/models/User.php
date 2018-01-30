@@ -165,4 +165,13 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
     {
 //        return $this->getAuthKey() === $authKey;
     }
+
+    /**
+     * 所属团队
+     * @return \yii\db\ActiveQuery
+     */
+    public function getTeam()
+    {
+        return $this->hasOne(Team::className(), ['id' => 'fdTeamID']);
+    }
 }
