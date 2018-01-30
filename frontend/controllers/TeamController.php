@@ -87,6 +87,10 @@ class TeamController extends BaseController
      */
     public function actionCreate()
     {
+        if (!Yii::$app->user->can('createTeam')) {
+            throw new ForbiddenHttpException('你没有创建团队的权限，联系下管理员吧');
+        }
+
         if ($data = Yii::$app->request->post()) {
             // 过滤非法数据
             if (!$memberIDs = $this->_filterIllegalMembers($data['members'])) {
@@ -161,6 +165,10 @@ class TeamController extends BaseController
      */
     public function actionUpdate($id)
     {
+        if (!Yii::$app->user->can('editTeam')) {
+            throw new ForbiddenHttpException('你没有编辑团队的权限，联系下管理员吧');
+        }
+
         $team = Team::findOne(['id' => $id, 'fdStatus' => Conf::ENABLE]);
         if (!$team) {
             $this->redirectMsgBox(['team/index'], '数据不存在或已删除');
@@ -227,10 +235,15 @@ class TeamController extends BaseController
      * Deletes an existing Team model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
      * @param integer $id
+     * @throws ForbiddenHttpException
      * @return mixed
      */
     public function actionDelete($id)
     {
+        if (!Yii::$app->user->can('delTeam')) {
+            throw new ForbiddenHttpException('你没有创建团队的权限，联系下管理员吧');
+        }
+
         $this->findModel($id)->delete();
 
         return $this->redirect(['index']);
