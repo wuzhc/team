@@ -27,11 +27,11 @@ $this->registerJsFile('//cdn.bootcss.com/socket.io/1.3.7/socket.io.js', [
             <span class="sr-only">Toggle navigation</span>
         </a>
 
-        <ul class="nav navbar-nav">
-            <li><a href="<?=Url::to(['default/index'])?>">首页</a></li>
-        </ul>
-
         <div class="navbar-custom-menu">
+            <ul class="nav navbar-nav">
+                <li><a href="<?=Url::to(['default/index'])?>">首页</a></li>
+            </ul>
+
             <ul class="nav navbar-nav">
                 <!-- Messages: style can be found in dropdown.less-->
                 <!--操作消息通知-->
