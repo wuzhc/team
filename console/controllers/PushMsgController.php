@@ -25,6 +25,9 @@ class PushMsgController extends Controller
 
     public $companyID;
 
+    /**
+     * 消息推送
+     */
     public function actionStart()
     {
         // PHPSocketIO服务
@@ -157,6 +160,11 @@ class PushMsgController extends Controller
         // 运行所有的实例
         global $argv;
         array_shift($argv);
+
+        if (isset($argv[2]) && $argv[2] == 'daemon') {
+            $argv[2] = '-d';
+        }
+
         Worker::runAll();
     }
 }
