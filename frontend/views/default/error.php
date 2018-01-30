@@ -20,4 +20,5 @@ $this->title = $name;
     <p>
         Please contact us if you think this is a server error. Thank you.
     </p>
+    <a class="btn btn-danger" style="text-decoration: none" href="<?= Yii::$app->request->referrer ?>">返回</a>
 </div>

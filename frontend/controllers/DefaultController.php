@@ -15,6 +15,7 @@ use Yii;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
 use yii\helpers\ArrayHelper;
+use yii\web\ForbiddenHttpException;
 
 /**
  * Site controller
@@ -72,6 +73,7 @@ class DefaultController extends BaseController
      */
     public function actionIndex()
     {
+        throw new ForbiddenHttpException('sss');
         // 所有总数
         $records = TaskService::factory()->findTaskCriteria([
             'group'     => 'fdProjectID',
