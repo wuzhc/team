@@ -129,6 +129,11 @@ class TeamController extends BaseController
     private function _filterIllegalMembers($ids, $teamID = 0)
     {
         $data = [];
+        if (empty($ids)) {
+            return $data;
+        }
+
+        // 过滤重复和空值
         $ids = array_unique(array_filter($ids));
         if (count($ids) == 0) {
             return $data;
