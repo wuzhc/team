@@ -79,15 +79,21 @@ class TeamController extends BaseController
     }
 
     /**
+     * 创建团队
      * @return string
      * @throws ForbiddenHttpException
+     * @throws BadRequestHttpException
+     * @since 2018-01-20
      */
     public function actionCreate()
     {
         if ($data = Yii::$app->request->post()) {
             // 过滤非法数据
             if (!$memberIDs = $this->_filterIllegalMembers($data['members'])) {
-                throw new ForbiddenHttpException('非法参数');
+                throw new ForbiddenHttpException('非法参数，禁止此次操作');
+            }
+            if (empty($data['name'])) {
+                throw new BadRequestHttpException('团队名称不能为空');
             }
 
             $teamID = TeamService::factory()->save([
@@ -119,6 +125,10 @@ class TeamController extends BaseController
     private function _filterIllegalMembers($ids, $teamID = 0)
     {
         $data = [];
+        $ids = array_unique(array_filter($ids));
+        if (count($ids) == 0) {
+            return $data;
+        }
 
         $members = User::find()
             ->select(['id', 'fdStatus', 'fdCompanyID', 'fdTeamID'])
