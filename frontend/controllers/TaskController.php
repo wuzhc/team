@@ -323,12 +323,13 @@ class TaskController extends BaseController
      */
     public function actionView($taskID)
     {
+        $userID = Yii::$app->user->id;
         $task = Task::findOne(['id' => $taskID, 'fdStatus' => Conf::ENABLE]);
         if (!$task) {
             throw new NotFoundHttpException('任务不存在或已删除');
         }
 
-        if (!ProjectService::factory()->checkUserAccessProject(Yii::$app->user->id, $task->fdProjectID)) {
+        if (!ProjectService::factory()->checkUserAccessProject($userID, $task->fdProjectID)) {
             throw new ForbiddenHttpException(ResponseUtil::$msg[1]);
         }
 
@@ -337,7 +338,17 @@ class TaskController extends BaseController
             'objectType' => Conf::OBJECT_TASK
         ]);
 
+        // 已加入项目所有成员
         $members = ProjectService::factory()->getHasJoinProjectMembers($task->fdProjectID);
+
+        // 是否有消息，如果有则更新为已读
+        $messageID = Yii::$app->request->get('messageID');
+        if (!empty($messageID)) {
+            if (MsgService::factory()->hasMessage($messageID)) {
+                MsgService::factory()->updateRead($messageID);
+            }
+        }
+
         return $this->render('view', [
             'task'    => $task,
             'logs'    => $logs,

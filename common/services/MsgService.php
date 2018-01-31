@@ -133,7 +133,7 @@ class MsgService extends AbstractService
 
         foreach ($this->findMessage($args)->all() as $row) {
             $temp = [];
-            $temp['url'] = $row['url'];
+            $temp['url'] = $row['url'] . '&messageID=' . (string)$row['_id'];
             $temp['typeID'] = $row['typeID'];
             $temp['senderID'] = $row['senderID'];
             $temp['title'] = Html::encode($row['title']);
@@ -161,6 +161,35 @@ class MsgService extends AbstractService
     }
 
     /**
+     * 消息是否存在
+     * @param string $id 对应mongodb.id
+     * @see findMessage
+     * @return bool
+     * @since 2018-01-31
+     */
+    public function hasMessage($id)
+    {
+        return $this->findMessage([
+            'id'     => $id,
+            'isRead' => Conf::MSG_UNREAD
+        ])->exists();
+    }
+
+    /**
+     * 更新为已读消息
+     * @param string $id 对应mongodb.id
+     * @return bool
+     * @since 2018-01-31
+     */
+    public function updateRead($id)
+    {
+        /** @var \yii\mongodb\Connection $mongo */
+        $mongo = Yii::$app->mongodb;
+        $collection = $mongo->getCollection(Conf::M_MSG_NOTICE);
+        return $collection->update(['_id' => $id], ['$set' => ['isRead' => Conf::MSG_READ]]) ? true : false;
+    }
+
+    /**
      * @param $args
      * @return Query
      */
@@ -169,6 +198,9 @@ class MsgService extends AbstractService
         $obj = (new Query())->from(Conf::M_MSG_NOTICE);
 
         $condition = [];
+        if (!empty($args['id'])) {
+            $condition['_id'] = (string)$args['id'];
+        }
         if (!empty($args['begin'])) {
             $condition['date']['$gt'] = new UTCDateTime($args['begin'] * 1000);
         }
@@ -207,7 +239,7 @@ class MsgService extends AbstractService
     {
         $args = array_merge($args, [
             'action' => $action,
-            'token' => $this->encrypt(serialize($args))
+            'token'  => $this->encrypt(serialize($args))
         ]);
         HttpClient::request(PUSH_MSG_REQUEST_URL, 'post', $args);
     }
