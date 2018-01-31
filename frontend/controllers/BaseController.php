@@ -3,10 +3,13 @@
 namespace frontend\controllers;
 
 
+use common\config\Conf;
+use common\models\User;
 use Yii;
 use yii\helpers\Url;
 use yii\web\Controller;
 use yii\web\ForbiddenHttpException;
+use yii\web\NotFoundHttpException;
 
 /**
  * 基础控制器
@@ -30,6 +33,25 @@ class BaseController extends Controller
                 throw new ForbiddenHttpException('禁止访问');
             }
         }
+    }
+
+    /**
+     * 检测指定用户可操作权限
+     * @param $userID
+     * @return null|User
+     * @throws ForbiddenHttpException
+     * @throws NotFoundHttpException
+     */
+    protected function checkUserAccess($userID)
+    {
+        $user = User::findOne(['id' => $userID, 'fdStatus' => Conf::USER_ENABLE]);
+        if (!$user) {
+            throw new NotFoundHttpException('用户不存在或已删除');
+        }
+        if ($user->fdCompanyID != $this->companyID) {
+            throw new ForbiddenHttpException('这不是你公司的成员，禁止此次操作');
+        }
+        return $user;
     }
 
     /**

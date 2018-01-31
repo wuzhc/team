@@ -15,6 +15,7 @@ use Yii;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\helpers\StringHelper;
+use yii\web\BadRequestHttpException;
 use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 
@@ -108,7 +109,7 @@ class UserManageController extends BaseController
             $temp['create'] = $user->fdCreate;
             $temp['team'] = $user->team->fdName ?: '未加入';
             $temp['role'] = Yii::$app->params['role'][$user->fdRoleID];
-            $temp['style'] = Yii::$app->params['colorTwo'][$user->fdRoleID];
+            $temp['roleID'] = $user->fdRoleID;
             $temp['status'] = $user->fdStatus;
             $temp['portrait'] = UserService::factory()->getUserPortrait($user);
             $data[] = $temp;
@@ -198,18 +199,30 @@ class UserManageController extends BaseController
      */
     public function actionDelete($userID)
     {
-        $user = User::findOne(['id' => $userID]);
-        if (!$user) {
-            throw new NotFoundHttpException('用户数据有误');
-        }
-        if ($user->fdCompanyID != $this->companyID) {
-            throw new ForbiddenHttpException('这不是你公司的成员，你无权删除');
-        }
-        if ($user->fdStatus == Conf::USER_DISABLE) {
-            ResponseUtil::jsonCORS(null, Conf::SUCCESS);
-        }
-
-        $res = User::updateAll(['fdStatus' => Conf::USER_DISABLE], ['id' => $userID]) ? Conf::SUCCESS : Conf::FAILED;
+        $user = $this->checkUserAccess($userID);
+        $res = User::updateAll(['fdStatus' => Conf::USER_DISABLE], ['id' => $user->id]) ? Conf::SUCCESS : Conf::FAILED;
         ResponseUtil::jsonCORS(null, $res);
     }
+
+    /**
+     * 设置角色
+     * @param int $userID 用户ID
+     * @param int $roleID 角色ID
+     * @throws ForbiddenHttpException
+     */
+    public function actionSetRole($userID, $roleID)
+    {
+        if (!Yii::$app->user->can('setRole')) {
+            throw new ForbiddenHttpException('你无权限设置角色，联系下你的管理员吧');
+        }
+
+        if (!in_array($roleID, [Conf::ROLE_ADMIN, Conf::ROLE_MEMBER, Conf::ROLE_GUEST])) {
+            throw new ForbiddenHttpException('非法参数请求');
+        }
+
+        $user = $this->checkUserAccess($userID);
+        $res = User::updateAll(['fdRoleID' => $roleID], ['id' => $user->id]) ? Conf::SUCCESS : Conf::FAILED;
+        ResponseUtil::jsonCORS(null, $res);
+    }
+
 }

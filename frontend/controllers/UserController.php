@@ -138,7 +138,7 @@ class UserController extends BaseController
     public function actionProfile($userID = null)
     {
         if ($userID) {
-            $user = $this->_checkUserAccess($userID);
+            $user = $this->checkUserAccess($userID);
         } else {
             /** @var User $user */
             $user = Yii::$app->user->identity;
@@ -159,7 +159,7 @@ class UserController extends BaseController
             $progress = isset($params['progress']) ? $params['progress'] : null;
 
             if (!empty($params['userID'])) {
-                $user = $this->_checkUserAccess($params['userID']);
+                $user = $this->checkUserAccess($params['userID']);
                 $userID = $user->id;
             } else {
                 $userID = Yii::$app->user->id;
@@ -268,24 +268,5 @@ class UserController extends BaseController
         } else {
             $this->redirectMsgBox(['user/login'], '验证成功，请登录...');
         }
-    }
-
-    /**
-     * 检测用户可操作权限
-     * @param $userID
-     * @return null|User
-     * @throws ForbiddenHttpException
-     * @throws NotFoundHttpException
-     */
-    private function _checkUserAccess($userID)
-    {
-        $user = User::findOne(['id' => $userID, 'fdStatus' => Conf::USER_ENABLE]);
-        if (!$user) {
-            throw new NotFoundHttpException('用户不存在或已删除');
-        }
-        if ($user->fdCompanyID != $this->companyID) {
-            throw new ForbiddenHttpException('这不是你公司的成员，你无权查看他的信息');
-        }
-        return $user;
     }
 }

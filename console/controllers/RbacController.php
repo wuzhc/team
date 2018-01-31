@@ -71,13 +71,13 @@ class RbacController extends Controller
         $auth->addChild($admin, $importUser);
         echo "- 成功添加导入成员权限（importUser），并赋给了管理员角色 \n";
 
-        // 设置管理员
-        $setAdmin = $auth->createPermission('setAdmin');
-        $setAdmin->description = '设置管理员';
-        $setAdmin->ruleName = null;
-        $auth->add($setAdmin);
-        $auth->addChild($super, $setAdmin);
-        echo "- 成功添加设置管理管理权限（setAdmin），并赋给了超级管理员角色 \n";
+        // 设置角色
+        $setRole = $auth->createPermission('setRole');
+        $setRole->description = '设置管理员';
+        $setRole->ruleName = null;
+        $auth->add($setRole);
+        $auth->addChild($admin, $setRole);
+        echo "- 成功添加设置角色权限（setRole），并赋给了管理员角色 \n";
 
         // 删除普通成员
         $delMember = $auth->createPermission('delMember');

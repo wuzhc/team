@@ -238,7 +238,7 @@ class UserService extends AbstractService
         if (is_numeric($args['offset'])) {
             $user->offset($args['offset']);
         }
-        if (is_numeric($args['status'])) {
+        if (is_numeric($args['status']) || is_array($args['status'])) {
             $user->andWhere(['fdStatus' => $args['status']]);
         }
         if (is_numeric($args['teamID'])) {

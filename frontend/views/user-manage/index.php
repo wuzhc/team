@@ -2,6 +2,7 @@
 
 use yii\helpers\Url;
 use frontend\assets\AppAsset;
+use common\config\Conf;
 
 AppAsset::registerJsFile($this, 'js/template.js');
 
@@ -29,6 +30,38 @@ $this->title = '用户管理';
     </div>
     <!-- /.box -->
 
+    <div class="modal fade" id="set-role" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="exampleModalLabel">设置角色</h4>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <label class="radio-inline">
+                            <input type="radio" name="roleID" id="inlineRadio1" value="<?=Conf::ROLE_ADMIN?>"> 管理员
+                        </label>
+                        <label class="radio-inline">
+                            <input type="radio" name="roleID" id="inlineRadio2" value="<?=Conf::ROLE_MEMBER?>"> 成员
+                        </label>
+                        <label class="radio-inline">
+                            <input type="radio" name="roleID" id="inlineRadio3" value="<?=Conf::ROLE_GUEST?>"> 游客
+                        </label>
+                        <input type="hidden" id="user-id" name="userID" value="">
+                        <input type="hidden" id="_csrf" value="<?= Yii::$app->request->csrfToken ?>">
+                    </form>
+                    <p class="help-block text-red set-role-tip hide">请选择角色.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                    <button type="button" class="btn btn-success" id="submit-set-role">确定</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script type="text/html" id="user-template">
         <tr>
             <th>ID</th>
@@ -53,7 +86,18 @@ $this->title = '用户管理';
             <td><%=list[i].name%></td>
             <td><%=list[i].phone%></td>
             <td><%=list[i].email%></td>
-            <td><%=list[i].role%></td>
+            <td>
+                <% if (list[i].roleID == "<?=Conf::ROLE_SUPER?>") { %>
+                <span>
+                    <%=list[i].role%>
+                </span>
+                <% } else { %>
+                <% var cls = list[i].roleID == "<?=Conf::ROLE_ADMIN?>" ? 'text-red' : list[i].roleID == "<?=Conf::ROLE_MEMBER?>" ? 'text-orange' : '' %>
+                <a href="#" class="<%=cls%>" data-toggle="modal" data-target="#set-role" data-user_id="<%=list[i].id%>" data-role_id="<%=list[i].roleID%>" data-name="<%=list[i].name%>">
+                    <%=list[i].role%>
+                </a>
+                <% } %>
+            </td>
             <td>
                 <% if (list[i].status == "<?=\common\config\Conf::USER_FREEZE?>") { %>
                 <span class="label label-danger">冻结</span>
@@ -154,6 +198,67 @@ $this->title = '用户管理';
             }
 
             renderList({});
+
+            // 设置角色
+            $('#set-role').on('show.bs.modal', function (event) {
+                var button = $(event.relatedTarget);
+                var userID = button.data('user_id');
+                var roleID = button.data('role_id');
+                var name = button.data('name');
+                var modal = $(this);
+                modal.find('.modal-title').text('正在为'+name+'设置角色');
+                modal.find('.modal-body input[name="userID"]').val(userID);
+                $.each(modal.find('.modal-body input[type="radio"]'),function(){
+                    if ($(this).val() == roleID) {
+                        $(this).attr('checked', 'checked');
+                    }
+                });
+            });
+
+            // 设置角色
+            $('#submit-set-role').on('click', function () {
+                var userID = $('#user-id').val();
+                var roleID = $('input[name="roleID"]').val();
+                if (!userID) {
+                    $('#set-role').modal('hide');
+                    $.showBox({msg: '数据错误', callback:function () {
+                        window.location.reload();
+                    }});
+                    return false;
+                }
+                if (!roleID) {
+                    $('.set-role-tip').removeClass('hide');
+                    return false;
+                }
+
+                // 指派任务
+                $.ajax({
+                    url: "<?= Url::to(['user-manage/set-role'])?>",
+                    method: 'GET',
+                    dataType: 'json',
+                    data: {
+                        userID: userID,
+                        roleID: roleID,
+                        _csrf: $('input[name="_csrf"]').val()
+                    }
+                }).done(function (data) {
+                    if (data.status == 1) {
+                        $('#set-role').modal('hide');
+                        $.showBox({
+                            msg: '设置成功', callback: function () {
+                                window.location.reload();
+                            }
+                        });
+                    } else {
+                        $('#set-role').modal('hide');
+                        $.showBox({msg: '设置失败'});
+                    }
+                }).fail(function (xhr, status, error) {
+                    $('#set-role').modal('hide');
+                    var msg = xhr.responseText || '系统繁忙';
+                    $.showBox({msg: msg});
+                });
+            });
 
             $('#user-manage').on('click', '.delete-user', function (e) {
                 // 删除用户
