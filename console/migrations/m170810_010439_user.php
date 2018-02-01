@@ -190,7 +190,7 @@ class m170810_010439_user extends Migration
                 'zhangfei@qq.com',
                 '',
                 Conf::USER_ENABLE,
-                Conf::ROLE_MEMBER,
+                Conf::ROLE_ADMIN,
                 Yii::$app->params['defaultPortrait'][7],
                 1
             ],

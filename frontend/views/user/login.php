@@ -63,4 +63,10 @@ $fieldOptions2 = [
 
     </div>
     <!-- /.login-box-body -->
+    <div class="text-center" style="margin-top: 20px">
+        <h4>测试账号</h4>
+        <h5>超级管理员: superadmin 123456</h5>
+        <h5>普通管理员: zhangfei 123456</h5>
+        <h5>普通成员:   mayun 123456</h5>
+    </div>
 </div><!-- /.login-box -->
