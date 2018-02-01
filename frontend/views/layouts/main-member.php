@@ -48,7 +48,14 @@ if (Yii::$app->controller->action->id === 'login') {
                 }
                 /* 弹窗提示 */
 
-            });
+                var _hmt = _hmt || [];
+                (function() {
+                    var hm = document.createElement("script");
+                    hm.src = "https://hm.baidu.com/hm.js?1f0df51f0e5f2a9edacb0e47c3509e7e";
+                    var s = document.getElementsByTagName("script")[0];
+                    s.parentNode.insertBefore(hm, s);
+                })();
+        });
             <?php $this->endBlock() ?>
         </script>
         <?php $this->registerJs($this->blocks['jquery'], \yii\web\View::POS_END); ?>
