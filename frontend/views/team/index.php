@@ -183,6 +183,8 @@ $directoryAsset = Yii::$app->assetManager->getPublishedUrl('@vendor/almasaeed201
             })
         })();
 
+        var noneTemplete = '<div class="jumbotron"><p class="lead">现在还没有成员啊～</p></div>';
+
         // 渲染成员
         function renderMembers(teamID) {
 
@@ -200,7 +202,7 @@ $directoryAsset = Yii::$app->assetManager->getPublishedUrl('@vendor/almasaeed201
             }
 
             if (!portrait) {
-                $('#team-member').html('<li>还没有成员啊～</li>');
+                $('#team-member').html(noneTemplete);
             } else {
                 $('#team-member').html(portrait);
             }

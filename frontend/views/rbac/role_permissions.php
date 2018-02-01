@@ -25,14 +25,14 @@ $this->params['breadcrumbs'][] = $this->title;
         <div class="box-body table-responsive no-padding">
             <table class="table table-hover">
                 <tbody>
-                <tr>
-                    <th>名称</th>
-                    <th>描述</th>
-                    <th>规则</th>
-                    <th>创建时间</th>
-                    <th>更新时间</th>
-                </tr>
                 <?php if (!empty($permissions)) { ?>
+                    <tr>
+                        <th>名称</th>
+                        <th>描述</th>
+                        <th>规则</th>
+                        <th>创建时间</th>
+                        <th>更新时间</th>
+                    </tr>
                 <?php foreach ($permissions as $permission) { ?>
                     <tr>
                         <td><?= $permission->name ?></td>
