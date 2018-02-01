@@ -1,3 +1,6 @@
+#### 网址
+- http://wuzhc.top
+
 #### 环境要求
 - php5.6+
 - mongodb扩展
@@ -49,7 +52,7 @@ CREATE DATABASE team DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci
 本地网址：
 > 最好是自己配置虚拟域名，然后team/frontend/web作为root目录
 ```bash
-http://localhost/team/docs/index.php
+http://localhost/team/frontend/web/index.php
 ```
 
 演示网址：  
@@ -62,18 +65,20 @@ http://localhost/team/docs/index.php
 
 ### 网站功能：
 - [功能需求](https://github.com/wuzhc/manage/blob/master/docs/%E5%8A%9F%E8%83%BD%E9%9C%80%E6%B1%82.md)  
-- [页面功能说明](https://github.com/wuzhc/manage/blob/master/docs/%E9%A1%B5%E9%9D%A2%E5%8A%9F%E8%83%BD%E8%AF%B4%E6%98%8E.md)  
 
 ### 数据库设计：
 - [数据库设计及字典说明](https://github.com/wuzhc/manage/blob/master/docs/%E6%95%B0%E6%8D%AE%E5%BA%93%E8%AE%BE%E8%AE%A1%E5%8F%8A%E5%AD%97%E5%85%B8%E8%AF%B4%E6%98%8E.md)  
 
 ### 技术说明：
-- [实现技术说明](https://github.com/wuzhc/manage/blob/master/docs/%E5%AE%9E%E7%8E%B0%E6%8A%80%E6%9C%AF%E8%AF%B4%E6%98%8E.md)  
+- [即时消息推送](https://github.com/wuzhc/team/blob/master/docs/%E6%B6%88%E6%81%AF%E6%8E%A8%E9%80%81.md)
+- [RBAC权限功能](https://github.com/wuzhc/team/blob/master/docs/%E5%8A%9F%E8%83%BD%E9%9C%80%E6%B1%82.md)  
 
 ### 效果图：  
 ![首页](https://github.com/wuzhc/manage/blob/master/docs/images/index.png)
 ![动态页](https://github.com/wuzhc/manage/blob/master/docs/images/dymanic.png)
-![聊天页](https://github.com/wuzhc/manage/blob/master/docs/images/chat.png)
 ![团队页](https://github.com/wuzhc/manage/blob/master/docs/images/team.png)
+![用户页](https://github.com/wuzhc/manage/blob/master/docs/images/user.png)
+![设置用户页](https://github.com/wuzhc/manage/blob/master/docs/images/set-user.png)
+![权限列表](https://github.com/wuzhc/manage/blob/master/docs/images/rbac-list.png)
 
 

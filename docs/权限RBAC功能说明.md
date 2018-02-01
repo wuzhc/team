@@ -9,7 +9,7 @@
 - 游客
 
 ### 权限分配：
-![rbac](https://github.com/wuzhc/manage/blob/master/frontend/web/images/rbac.png)
+![rbac](https://github.com/wuzhc/manage/blob/master/docs/images/rbac.png)
 #### 说明：
 - 第一个注册用户默认赋予超级管理员身份，其他成员都由超级管理员通过平台导入
 - 超级管理员可以设置成员为管理员身份，管理员身份有权限导入其他成员

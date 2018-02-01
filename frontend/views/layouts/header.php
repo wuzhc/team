@@ -250,7 +250,7 @@ $this->registerJsFile('//cdn.bootcss.com/socket.io/1.3.7/socket.io.js', [
                 var html = '<li>' +
                     '<a href="' + msg.url + '">' +
                     '<div class="pull-left">' +
-                    '<img src="<?= $directoryAsset ?>/img/user2-160x160.jpg" class="img-circle" alt="User Image"/>' +
+                    '<img src="'+msg.portrait+'" class="img-circle" alt="User Image"/>' +
                     '</div>' +
                     '<h4 style="overflow:hidden;text-overflow:ellipsis;">' + msg.title + '</h4>' +
                     '<p style="overflow:hidden;text-overflow:ellipsis;">' + msg.content + '</p>' +

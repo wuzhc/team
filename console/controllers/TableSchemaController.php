@@ -46,7 +46,7 @@ class TableSchemaController extends Controller
         }
 
         $root = dirname(dirname(dirname(__FILE__)));
-        $filename = $argv[3] ? $argv[3] : '/docs/note/数据库设计及字典说明.md';
+        $filename = $argv[3] ? $argv[3] : '/docs/数据库设计及字典说明.md';
         $filePath = $root . $filename;
 
         $fp = fopen($filePath, 'a+');
@@ -123,7 +123,7 @@ class TableSchemaController extends Controller
         }
 
         $root = dirname(dirname(dirname(__FILE__)));
-        $filePath = $argv[2] ? $argv[2] : '/docs/note/数据库设计及字典说明.md';
+        $filePath = $argv[2] ? $argv[2] : '/docs/数据库设计及字典说明.md';
         $filePath = $root . $filePath;
 
         if (!is_file($filePath)) {
