@@ -1,3 +1,7 @@
+#### 环境要求
+- php5.6+
+- mongodb扩展
+
 ### 安装方法
 下载：
 ```bash
@@ -24,13 +28,13 @@ CREATE DATABASE team DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci
 'db' => [
     'class' => 'yii\db\Connection',
     'dsn' => 'mysql:host=localhost;dbname=team',
-    'username' => 'db name',
-    'password' => 'db password',
+    'username' => '数据库用户',
+    'password' => '数据库密码',
     'charset' => 'utf8',
     'tablePrefix' => 'tb',
 ],
 ```
-- 创建数据库表并初始化数据
+- 初始化数据库表
 ```bash
 ./yii migrate/up all                
 ```
