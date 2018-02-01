@@ -40,14 +40,14 @@ class m180119_033653_project extends Migration
         $this->batchInsert($this->tableName,[
             'fdName', 'fdCreatorID', 'fdCompanyID', 'fdDescription', 'fdStatus', 'fdCreate', 'fdUpdate'
         ],[
-            ['课堂', 1, 1, '课堂', 1, date('Y-m-d H:i:s'), date('Y-m-d H:i:s')],
-            ['学堂', 1, 1, '学堂', 1, date('Y-m-d H:i:s'), date('Y-m-d H:i:s')],
-            ['培文', 1, 1, '培文', 1, date('Y-m-d H:i:s'), date('Y-m-d H:i:s')],
-            ['微课大赛', 1, 1, '微课大赛', 1, date('Y-m-d H:i:s'), date('Y-m-d H:i:s')],
-            ['科普', 1, 1, '科普', 1, date('Y-m-d H:i:s'), date('Y-m-d H:i:s')],
-            ['阅卷系统', 1, 1, '阅卷系统', 1, date('Y-m-d H:i:s'), date('Y-m-d H:i:s')],
-            ['测评系统', 1, 1, '测评系统', 1, date('Y-m-d H:i:s'), date('Y-m-d H:i:s')],
-            ['数学通关', 1, 1, '数学通关', 1, date('Y-m-d H:i:s'), date('Y-m-d H:i:s')],
+            ['项目一', 1, 1, '项目一', 1, date('Y-m-d H:i:s'), date('Y-m-d H:i:s')],
+            ['项目二', 1, 1, '项目二', 1, date('Y-m-d H:i:s'), date('Y-m-d H:i:s')],
+            ['项目三', 1, 1, '项目三', 1, date('Y-m-d H:i:s'), date('Y-m-d H:i:s')],
+            ['项目四', 1, 1, '项目四', 1, date('Y-m-d H:i:s'), date('Y-m-d H:i:s')],
+            ['项目五', 1, 1, '项目五', 1, date('Y-m-d H:i:s'), date('Y-m-d H:i:s')],
+            ['项目六', 1, 1, '项目六', 1, date('Y-m-d H:i:s'), date('Y-m-d H:i:s')],
+            ['项目七', 1, 1, '项目七', 1, date('Y-m-d H:i:s'), date('Y-m-d H:i:s')],
+            ['项目八', 1, 1, '项目八', 1, date('Y-m-d H:i:s'), date('Y-m-d H:i:s')],
         ]);
     }
 
