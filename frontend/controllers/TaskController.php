@@ -39,8 +39,8 @@ class TaskController extends BaseController
                 'class' => AccessControl::className(),
                 'rules' => [
                     [
-                        'actions'       => ['index', 'list', 'create', 'create-task-category', 'stat-tasks'],
-                        'allow'         => true,
+                        'actions' => ['index', 'list', 'create', 'create-task-category', 'stat-tasks'],
+                        'allow' => true,
                         'matchCallback' => function () {
                             // 项目访问权限检测
                             $projectID = Yii::$app->request->get('projectID');
@@ -54,7 +54,7 @@ class TaskController extends BaseController
                         }
                     ],
                     [
-                        'allow'         => true,
+                        'allow' => true,
                         'matchCallback' => function () {
                             // 登录检测
                             if (Yii::$app->user->isGuest) {

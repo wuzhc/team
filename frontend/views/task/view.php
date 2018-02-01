@@ -13,8 +13,7 @@ $this->params['breadcrumbs'][] = [
     'url'   => ['task/index', 'projectID' => $task->fdProjectID, 'isMe' => 1]
 ];
 $this->params['breadcrumbs'][] = $this->title;
-$directoryAsset = Yii::$app->assetManager->getPublishedUrl('@vendor/almasaeed2010/adminlte/dist');
-
+//$directoryAsset = Yii::$app->assetManager->getPublishedUrl('@vendor/almasaeed2010/adminlte/dist');
 ?>
     <style>
         img {
@@ -65,8 +64,7 @@ $directoryAsset = Yii::$app->assetManager->getPublishedUrl('@vendor/almasaeed201
                                 <span class="username">
                                     <span class="text-muted pull-right"><?= $log['date'] ?></span>
                                 </span><!-- /.username -->
-                                <?= $log['operator'] . $log['action'], '了', $log['type'], $log['acceptor'] ?
-                                    '给' . $log['acceptor'] : '' ?>
+                                <?= $log['operator'] . $log['title'] ?>
                             </div>
                             <!-- /.comment-text -->
                         </div>
