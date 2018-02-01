@@ -41,6 +41,10 @@ const ROLE_MEMBER = 3; // 普通成员
 ```bash
 ./yii rbac/init
 ```
+如果添加了新的权限，可以执行如下命令：
+```bash
+./yii rbac/reset
+```
 
 ### 使用：
 用户是否有权限用Yii::$app->user->can($permissionName, $params = [], $allowCaching = true)判断，如下

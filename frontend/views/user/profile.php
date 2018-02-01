@@ -1,6 +1,7 @@
 <?php
 
 /* @var $user \common\models\User */
+/* @var $username string */
 
 use common\services\UserService;
 use frontend\assets\AdminLtePluginAsset;
@@ -8,9 +9,14 @@ use frontend\assets\AppAsset;
 use yii\helpers\Url;
 use yii\helpers\Html;
 
-$this->title = '个人资料';
+$username = UserService::factory()->getUserName($user);
+$portrait = UserService::factory()->getUserPortrait($user);
+
+$this->title = $username;
 AdminLtePluginAsset::register($this);
-AppAsset::registerJsFile($this, 'js/template.js')
+AppAsset::registerJsFile($this, 'js/template.js');
+
+$this->params['breadcrumbs'][] = $this->title;
 
 ?>
     <div class="row" id="user-profile">
@@ -20,10 +26,10 @@ AppAsset::registerJsFile($this, 'js/template.js')
             <div class="box box-success">
                 <div class="box-body box-profile">
                     <img class="profile-user-img img-responsive img-circle"
-                         src="<?= UserService::factory()->getUserPortrait($user) ?>"
+                         src="<?= $portrait ?>"
                          alt="User profile picture">
 
-                    <h3 class="profile-username text-center"><?= Html::encode(UserService::factory()->getUserName($user)) ?></h3>
+                    <h3 class="profile-username text-center"><?= Html::encode($username) ?></h3>
 
                     <p class="text-muted text-center"><?= Html::encode($user->fdPosition) ?></p>
 
@@ -101,8 +107,7 @@ AppAsset::registerJsFile($this, 'js/template.js')
                             <div class="mailbox-controls">
                                 <!-- Single button -->
                                 <div class="btn-group">
-                                    <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown"
-                                            aria-haspopup="true" aria-expanded="false">
+                                    <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                         任务进度 <span class="caret"></span>
                                     </button>
                                     <ul class="dropdown-menu">
@@ -111,16 +116,18 @@ AppAsset::registerJsFile($this, 'js/template.js')
                                         <li><a href="#" data-type="finish">已完成</a></li>
                                     </ul>
                                 </div>
-                                <a href="<?= Url::to(['task/index', 'projectID' => $_GET['projectID']]) ?>"
-                                   id="task-fresh" title="刷新页面">
+                                <a href="<?= Url::to(['task/index', 'projectID' => $_GET['projectID']]) ?>" id="task-fresh" title="刷新页面">
                                     <button type="button" class="btn btn-default btn-sm">
                                         <i class="fa fa-refresh"></i>
                                     </button>
                                 </a>
                                 <div class="box-tools pull-right">
-                                    <div class="has-feedback">
-                                        <input type="text" class="form-control input-sm" placeholder="Search Mail">
-                                        <span class="glyphicon glyphicon-search form-control-feedback"></span>
+<!--                                    <div class="has-feedback">-->
+<!--                                        <input type="text" class="form-control input-sm" placeholder="Search Mail">-->
+<!--                                        <span class="glyphicon glyphicon-search form-control-feedback"></span>-->
+<!--                                    </div>-->
+                                    <div class="input-group input-group-sm" style="width: 150px;">
+                                        <a href="<?= Yii::$app->request->referrer ?>" class="btn-sm btn-danger pull-right" id="team-url">返回</a>
                                     </div>
                                 </div>
                             </div>
@@ -362,7 +369,7 @@ AppAsset::registerJsFile($this, 'js/template.js')
     <script type="text/html" id="none-task-template">
         <div class="jumbotron">
             <p>
-            <p class="lead"><?= Html::encode(UserService::factory()->getUserName($user)) ?>现在还没有任务，可以进入项目里创建任务啊.</p>
+            <p class="lead"><?= Html::encode($username) ?>现在还没有任务，可以进入项目里创建任务啊.</p>
             <a class="btn btn-sm btn-success" href="<?= \yii\helpers\Url::to(['default/index']) ?>">进入项目</a>
             </p>
         </div>
@@ -611,7 +618,8 @@ AppAsset::registerJsFile($this, 'js/template.js')
                 $.ajax({
                     type: 'GET',
                     url: "<?=Url::to(['user/stat-tasks'])?>",
-                    dataType: 'json'
+                    dataType: 'json',
+                    data: {userID: "<?=$user->id?>"}
                 }).done(function (data) {
                     $('#total-task').text(data.total);
                     $('#complete-task').text(data.complete);

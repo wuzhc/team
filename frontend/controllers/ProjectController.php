@@ -3,17 +3,15 @@
 namespace frontend\controllers;
 
 use common\config\Conf;
-use common\models\ProjectUserMap;
 use common\services\ProjectService;
-use common\services\TaskService;
 use common\services\TeamService;
 use common\services\UserService;
 use common\utils\ResponseUtil;
 use Yii;
 use common\models\Project;
 use common\models\ProjectSearch;
-use yii\base\InvalidParamException;
 use yii\filters\AccessControl;
+use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
@@ -34,7 +32,7 @@ class ProjectController extends BaseController
                 'class' => AccessControl::className(),
                 'rules' => [
                     [
-                        'allow'         => true,
+                        'allow' => true,
                         'matchCallback' => function () {
                             // 登录检测
                             if (Yii::$app->user->isGuest) {
@@ -49,8 +47,8 @@ class ProjectController extends BaseController
                     ],
                 ],
             ],
-            'verbs'  => [
-                'class'   => VerbFilter::className(),
+            'verbs' => [
+                'class' => VerbFilter::className(),
                 'actions' => [
                     'delete' => ['POST'],
                 ],
@@ -171,18 +169,22 @@ class ProjectController extends BaseController
 
     /**
      * 成员管理
-     * @since 2018-01-22
+     * @param $id
+     * @return string
+     * @throws ForbiddenHttpException
+     * @throws NotFoundHttpException
+     * @throws \Exception
      */
     public function actionMembers($id)
     {
         if (empty($id)) {
-            throw new InvalidParamException('参数错误');
+            throw new ForbiddenHttpException('参数错误');
         }
 
         /** @var Project $project */
-        $project = Project::findOne(['id' => $id]);
+        $project = Project::findOne(['id' => $id, 'fdStatus' => Conf::ENABLE]);
         if (!$project || $project->fdCompanyID != $this->companyID) {
-            throw new NotFoundHttpException('页面不存在');
+            throw new NotFoundHttpException('项目不存在或已删除');
         }
 
         if (($data = Yii::$app->request->post()) && Yii::$app->request->isAjax) {

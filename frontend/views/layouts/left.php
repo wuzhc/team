@@ -38,6 +38,7 @@ $identify = Yii::$app->user->identity;
                     ['label' => '团队成员', 'icon' => 'space-shuttle', 'url' => ['/team/index']],
                     ['label' => '项目管理', 'icon' => 'motorcycle', 'url' => ['/project/index'], 'visible' => ($identify->fdRoleID === \common\config\Conf::ROLE_SUPER || $identify->fdRoleID === \common\config\Conf::ROLE_ADMIN)],
                     ['label' => '成员管理', 'icon' => 'subway', 'url' => ['/user-manage/index'], 'visible' => ($identify->fdRoleID === \common\config\Conf::ROLE_SUPER || $identify->fdRoleID === \common\config\Conf::ROLE_ADMIN)],
+                    ['label' => '权限列表', 'icon' => 'ship', 'url' => ['/rbac/roles']],
                 ],
             ]
         ) ?>

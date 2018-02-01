@@ -8,7 +8,6 @@ use common\models\User;
 use common\services\TaskService;
 use common\services\UserService;
 use common\utils\ResponseUtil;
-use common\utils\VerifyUtil;
 use frontend\form\LoginForm;
 use frontend\form\SignupForm;
 use Yii;
@@ -207,14 +206,15 @@ class UserController extends BaseController
 
     /**
      * 个人任务数
+     * @param int $userID
      * @since 2018-01-25
      */
-    public function actionStatTasks()
+    public function actionStatTasks($userID = null)
     {
         $total = TaskService::factory()->countCompanyTasks($this->companyID, [
             'status'    => Conf::ENABLE,
             'asArray'   => true,
-            'creatorID' => Yii::$app->user->id,
+            'creatorID' => $userID ?: Yii::$app->user->id,
             'select'    => ['count(id)']
         ]);
 
@@ -222,7 +222,7 @@ class UserController extends BaseController
             'status'    => Conf::ENABLE,
             'asArray'   => true,
             'progress'  => Conf::TASK_FINISH,
-            'creatorID' => Yii::$app->user->id,
+            'creatorID' => $userID ?: Yii::$app->user->id,
             'select'    => ['count(id)']
         ]);
 

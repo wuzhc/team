@@ -7,6 +7,7 @@ use common\config\Conf;
 AppAsset::registerJsFile($this, 'js/template.js');
 
 $this->title = '用户管理';
+$this->params['breadcrumbs'][] = '用户列表';
 ?>
     <div class="box box-success" id="user-manage">
         <div class="box-header">

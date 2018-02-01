@@ -7,7 +7,7 @@ use yii\widgets\DetailView;
 /* @var $model common\models\Project */
 
 $this->title = $model->fdName;
-$this->params['breadcrumbs'][] = ['label' => $project->fdName, 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => '项目    ', 'url' => ['project/index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="project-view box box-success">
@@ -16,7 +16,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <?= Html::a('删除', ['delete', 'id' => $model->id], [
             'class' => 'btn btn-danger btn-flat',
             'data' => [
-                'confirm' => 'Are you sure you want to delete this item?',
+                'confirm' => '你确定要删除吗?',
                 'method' => 'post',
             ],
         ]) ?>

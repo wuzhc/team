@@ -4,7 +4,6 @@ namespace frontend\controllers;
 
 
 use common\config\Conf;
-use common\models\Project;
 use common\models\Task;
 use common\models\TaskCategory;
 use common\services\LogService;
@@ -12,19 +11,20 @@ use common\services\MsgService;
 use common\services\ProjectService;
 use common\services\TaskService;
 use common\services\UserService;
-use common\utils\HttpClient;
 use common\utils\ResponseUtil;
 use Yii;
-use yii\debug\UserswitchAsset;
 use yii\filters\AccessControl;
-use yii\filters\VerbFilter;
 use yii\helpers\StringHelper;
 use yii\helpers\Url;
 use yii\web\BadRequestHttpException;
 use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
-use yii\web\User;
 
+/**
+ * 任务控制器
+ * Class TaskController
+ * @package frontend\controllers
+ */
 class TaskController extends BaseController
 {
     public $layout = 'main-member';

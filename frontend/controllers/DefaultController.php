@@ -4,18 +4,13 @@ namespace frontend\controllers;
 
 use common\config\Conf;
 use common\models\Project;
-use common\models\User;
 use common\services\LogService;
 use common\services\MsgService;
-use common\services\ProjectService;
 use common\services\TaskService;
-use common\utils\HttpClient;
 use common\utils\ResponseUtil;
 use Yii;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
-use yii\helpers\ArrayHelper;
-use yii\web\ForbiddenHttpException;
 
 /**
  * Site controller

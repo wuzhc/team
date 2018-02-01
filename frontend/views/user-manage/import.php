@@ -1,6 +1,8 @@
 <?php
 
 $this->title = '导入成员';
+$this->params['breadcrumbs'][] = ['label' => '用户列表', 'url' => ['user-manage/index']];
+$this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="box box-success" id="import-user-container">
     <!-- /.box-header -->

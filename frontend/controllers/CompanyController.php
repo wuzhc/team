@@ -3,15 +3,10 @@
 namespace frontend\controllers;
 
 use common\config\Conf;
-use common\services\SystemService;
-use common\services\UserService;
-use common\utils\ResponseUtil;
-use common\utils\VerifyUtil;
 use Yii;
 use common\models\Company;
 use common\models\CompanySearch;
 use yii\filters\AccessControl;
-use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
